@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DruidNet - Beta</string>
+    <string name="welcome">¡Bienvenido a DruidNet!</string>
+    <string name="menu_action_catalog">Catálogo de plantas medicinales</string>
 </resources>
