@@ -64,7 +64,14 @@ fun Greeting(modifier: Modifier = Modifier) {
             Button(
                 onClick = {}
             ) {
-                Text(stringResource(R.string.menu_action_catalog))
+                Text(stringResource(R.string.greetings_catalog_btn))
+            }
+            Spacer(modifier = Modifier.height(48.dp))
+            Button(
+                onClick = {},
+                enabled = false
+            ) {
+                Text(stringResource(R.string.greetings_identifier_btn))
             }
         }
 
