@@ -64,8 +64,8 @@ fun Greeting(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(40.dp)
         ) {
             Image(
-                painter = painterResource(R.drawable.app_icon),
-                contentDescription = "App logo")
+                painter = painterResource(R.drawable.druid),
+                contentDescription = "An image of a druid")
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = stringResource(R.string.welcome),
