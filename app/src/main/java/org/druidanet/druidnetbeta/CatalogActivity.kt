@@ -1,5 +1,6 @@
 package org.druidanet.druidnetbeta
 
+import android.graphics.fonts.FontStyle
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,11 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle.Companion.Italic
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.druidanet.druidnetbeta.model.Plant
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
+import java.time.format.TextStyle
 
 class CatalogActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +69,9 @@ fun PlantCard(plant: Plant, modifier: Modifier) {
             Text(
                 text = plant.latinName,
                 modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.headlineLarge
+                fontStyle = Italic,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
             )
 
         }

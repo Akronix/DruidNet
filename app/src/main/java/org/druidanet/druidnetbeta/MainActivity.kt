@@ -67,7 +67,10 @@ fun Greeting(modifier: Modifier = Modifier) {
                 painter = painterResource(R.drawable.app_icon),
                 contentDescription = "App logo")
             Spacer(modifier = Modifier.height(24.dp))
-            Text(stringResource(R.string.welcome))
+            Text(
+                text = stringResource(R.string.welcome),
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(modifier = Modifier.height(48.dp))
             Button(
                 onClick = {
@@ -94,7 +97,7 @@ fun Greeting(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    DruidNetBetaTheme {
+    DruidNetBetaTheme(darkTheme = false) {
         Greeting(modifier = Modifier
             .fillMaxSize()
             .wrapContentSize(Alignment.Center))
