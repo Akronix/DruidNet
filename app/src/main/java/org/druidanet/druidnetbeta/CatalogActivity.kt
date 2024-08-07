@@ -64,16 +64,15 @@ class CatalogActivity : ComponentActivity() {
             Column {
                 Image(
                     painter = painterResource(plant.imageResourceId),
-                    contentDescription = "Image for {plant.latinName}",
+                    contentDescription = "Image for {plant.displayName}",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(194.dp),
                     contentScale = ContentScale.Crop
                 )
                 Text(
-                    text = plant.latinName,
+                    text = plant.displayName,
                     modifier = Modifier.padding(16.dp),
-                    fontStyle = Italic,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
