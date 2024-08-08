@@ -8,7 +8,7 @@ import org.druidanet.druidnetbeta.model.PlantType
 /**
  * [PlantsDataSource] generates a list of [Affirmation]
  */
-class PlantsDataSource {
+object PlantsDataSource {
     fun loadPlants(): List<Plant> {
         var plantid = 0;
         return listOf<Plant>(
