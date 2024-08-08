@@ -5,4 +5,5 @@
     <string name="greetings_identifier_btn">Identificador de plantas</string>
     <string name="title_screen_catalog">Catálogo</string>
     <string name="catalog_bar_title">Catálogo</string>
+    <string name="back_button">Ir hacia la pantalla anterior</string>
 </resources>
