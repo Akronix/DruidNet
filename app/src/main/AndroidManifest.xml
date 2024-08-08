@@ -12,14 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DruidNetBeta"
         tools:targetApi="31" >
-        <activity
-            android:name=".CatalogActivity"
-            android:exported="false"
-            android:label="@string/title_activity_catalog"
-            android:theme="@style/Theme.DruidNetBeta" />
-        <activity
-            android:name=".Catalog"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
