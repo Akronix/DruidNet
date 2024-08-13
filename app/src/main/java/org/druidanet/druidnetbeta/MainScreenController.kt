@@ -98,10 +98,9 @@ fun DruidNetApp(
             }
             composable(route = Screen.PlantSheet.name) {
                 PlantSheetScreen(
-                    druidNetUiState.selectedPlant,
+                    druidNetUiState.selectedPlant!!,
                     modifier = Modifier
                         .fillMaxSize()
-                        .wrapContentSize(Alignment.Center)
                 )
             }
 

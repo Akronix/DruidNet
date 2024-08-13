@@ -51,6 +51,8 @@ val displayFontFamily = FontFamily(
     Font(R.font.cherryswash_bold, FontWeight.Bold)
 )
 
+val titleFontFamily = labelFontFamily
+
 // Default Material 3 typography values
 val baseline = Typography()
 
@@ -61,9 +63,9 @@ val AppTypography = Typography(
     headlineLarge = baseline.headlineLarge.copy(fontFamily = displayFontFamily),
     headlineMedium = baseline.headlineMedium.copy(fontFamily = displayFontFamily),
     headlineSmall = baseline.headlineSmall.copy(fontFamily = displayFontFamily),
-    titleLarge = baseline.titleLarge.copy(fontFamily = displayFontFamily),
-    titleMedium = baseline.titleMedium.copy(fontFamily = displayFontFamily),
-    titleSmall = baseline.titleSmall.copy(fontFamily = displayFontFamily),
+    titleLarge = baseline.titleLarge.copy(fontFamily = titleFontFamily),
+    titleMedium = baseline.titleMedium.copy(fontFamily = titleFontFamily),
+    titleSmall = baseline.titleSmall.copy(fontFamily = titleFontFamily),
     bodyLarge = baseline.bodyLarge.copy(fontFamily = bodyFontFamily),
     bodyMedium = baseline.bodyMedium.copy(fontFamily = bodyFontFamily),
     bodySmall = baseline.bodySmall.copy(fontFamily = bodyFontFamily),
