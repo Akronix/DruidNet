@@ -25,8 +25,11 @@ import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
 
 
 @Composable
-fun PlantCard(plant: Plant, modifier: Modifier) {
-    Card(modifier = modifier) {
+fun PlantCard(plant: Plant, onClickPlantCard: (Plant) -> Unit, modifier: Modifier) {
+    Card(
+        onClick = { onClickPlantCard(plant) },
+        modifier = modifier
+    ) {
         Column {
             Image(
                 painter = painterResource(plant.imageResourceId),
@@ -48,11 +51,15 @@ fun PlantCard(plant: Plant, modifier: Modifier) {
 }
 
 @Composable
-fun PlantsList(plantsList: List<Plant>, modifier: Modifier = Modifier) {
+fun PlantsList(
+    plantsList: List<Plant>,
+    onClickPlantCard: (Plant) -> Unit,
+    modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(plantsList) { plant ->
             PlantCard(
                 plant = plant,
+                onClickPlantCard = onClickPlantCard,
                 modifier = Modifier.padding(8.dp)
             )
 
@@ -63,12 +70,17 @@ fun PlantsList(plantsList: List<Plant>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CatalogScreen(modifier: Modifier = Modifier) {
+fun CatalogScreen(
+    plantList: List<Plant>,
+    onClickPlantCard: (Plant) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Surface(
         modifier = modifier
     ) {
         PlantsList(
-            plantsList = PlantsDataSource.loadPlants()
+            plantsList = plantList,
+            onClickPlantCard = onClickPlantCard
         )
     }
 }
@@ -80,7 +92,7 @@ fun CatalogScreen(modifier: Modifier = Modifier) {
 @Composable
 fun CatalogPreview() {
     DruidNetBetaTheme {
-        CatalogScreen()
+        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { plant -> {} })
     }
 }
 
