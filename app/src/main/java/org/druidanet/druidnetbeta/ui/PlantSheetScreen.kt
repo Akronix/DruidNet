@@ -16,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.druidanet.druidnetbeta.R
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.Plant
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
@@ -32,13 +34,13 @@ fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
     ) {
         Box(
             modifier = Modifier
-                        .height(250.dp)
-                        .padding(0.dp)
+                .height(250.dp)
+                .padding(0.dp)
         ){
             Image(
                 contentScale = ContentScale.FillWidth,
                 painter = painterResource(plant.imageResourceId),
-                contentDescription = "Imagen de la planta",
+                contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
 
@@ -66,10 +68,11 @@ fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Nombres comunes:")
+                Text(stringResource(R.string.datasheet_common_names))
                 Text(plant.commonNames.toString())
             }
-            Text("Usos:",
+            Text(
+                stringResource(R.string.datasheet_usages_literal),
                 style = MaterialTheme.typography.titleMedium
             )
         }

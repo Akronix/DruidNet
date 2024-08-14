@@ -7,4 +7,7 @@
     <string name="catalog_bar_title">Catálogo</string>
     <string name="back_button">Ir hacia la pantalla anterior</string>
     <string name="title_screen_plant_sheet">Ficha de planta</string>
+    <string name="datasheet_image_cdescp">Imagen de la planta</string>
+    <string name="datasheet_common_names">Nombres comunes:</string>
+    <string name="datasheet_usages_literal">Usos:</string>
 </resources>

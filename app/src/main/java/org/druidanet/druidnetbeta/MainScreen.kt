@@ -26,18 +26,18 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.druidanet.druidnetbeta.data.DruidNetUiState
+import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.ui.CatalogScreen
 import org.druidanet.druidnetbeta.ui.DruidNetViewModel
 import org.druidanet.druidnetbeta.ui.PlantSheetScreen
 import org.druidanet.druidnetbeta.ui.WelcomeScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
-import org.druidanet.druidnetbeta.data.DruidNetUiState
-import org.druidanet.druidnetbeta.data.PlantsDataSource
 
 
 enum class Screen(@StringRes val title: Int) {

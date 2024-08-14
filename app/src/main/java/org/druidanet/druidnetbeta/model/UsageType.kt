@@ -1,0 +1,6 @@
+package org.druidanet.druidnetbeta.model
+
+enum class UsageType {
+    MEDICINAL, EDIBLE, ANIMAL_FOOD, VET, TOXIC, COMBUSTIBLE, CONSTRUCTION,
+    INDUSTRY_CRAFT, ENVIRONMENTAL, ORNAMENTAL, SOCIAL
+}
