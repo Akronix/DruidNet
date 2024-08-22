@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -93,7 +92,7 @@ fun CatalogScreen(
 @Composable
 fun CatalogPreview() {
     DruidNetBetaTheme {
-        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { plant -> {} })
+        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
     }
 }
 

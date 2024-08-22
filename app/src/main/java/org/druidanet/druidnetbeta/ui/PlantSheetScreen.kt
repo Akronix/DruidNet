@@ -69,7 +69,7 @@ fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(stringResource(R.string.datasheet_common_names))
-                Text(plant.commonNames.toString())
+                Text(plant.commonNames.joinToString())
             }
             Text(
                 stringResource(R.string.datasheet_usages_literal),
