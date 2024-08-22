@@ -27,6 +27,7 @@ object PlantsDataSource {
         return listOf<Plant>(
 
             Plant(
+                plantId = 1,
                 latinName = "Sambucus Nigra",
                 family = "Caprifoliaceae",
                 toxic = false,

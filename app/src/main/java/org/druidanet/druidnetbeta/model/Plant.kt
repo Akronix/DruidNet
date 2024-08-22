@@ -2,7 +2,26 @@ package org.druidanet.druidnetbeta.model
 
 import androidx.annotation.DrawableRes
 
-data class Plant(
+interface PlantBase {
+    val plantId: Int
+
+//    val latinName: String,
+
+    val displayName: String
+
+    val imageResourceId: Int
+}
+
+data class PlantBasic(
+    override val plantId: Int,
+    override val displayName: String,
+    override val imageResourceId: Int
+) : PlantBase
+
+
+data class Plant (
+    val plantId: Int,
+
     val latinName: String,
 
     val commonNames: Array<Name>,
@@ -28,7 +47,7 @@ data class Name (
     val language: LanguageEnum
 )
 
-class Confusion (
+data class Confusion (
     val latinName: String,
     val text: String
 )

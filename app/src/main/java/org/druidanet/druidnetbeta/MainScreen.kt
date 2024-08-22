@@ -1,6 +1,7 @@
 package org.druidanet.druidnetbeta
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -33,7 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.druidanet.druidnetbeta.data.DruidNetUiState
-import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.ui.CatalogScreen
 import org.druidanet.druidnetbeta.ui.DruidNetViewModel
 import org.druidanet.druidnetbeta.ui.PlantSheetScreen
@@ -48,13 +48,18 @@ enum class Screen(@StringRes val title: Int) {
 
 @Composable
 fun DruidNetApp(
-    viewModel: DruidNetViewModel = viewModel(),
+    viewModel: DruidNetViewModel = viewModel( factory = DruidNetViewModel.factory ),
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(backStackEntry?.destination?.route ?: Screen.Welcome.name)
-    val plantList = PlantsDataSource.loadPlants()
+//    val plantList = PlantsDataSource.loadPlants()
+//    val plantList2 by viewModel.getAllPlants().collectAsState(emptyList())
+    val plantList by viewModel.getAllPlants().collectAsState(emptyList())
+
     val druidNetUiState by viewModel.uiState.collectAsState()
+
+    Log.d("DRUIDNET", plantList.toString())
 
     //canNavigateBack = navController.previousBackStackEntry != null,
 
@@ -88,7 +93,7 @@ fun DruidNetApp(
                 CatalogScreen(
                     plantList = plantList,
                     onClickPlantCard = { plant ->
-                        viewModel.setSelectedPlant(plant)
+                        viewModel.setSelectedPlant(plant.plantId)
                         navController.navigate(Screen.PlantSheet.name)
                     },
                     modifier = Modifier
@@ -98,7 +103,7 @@ fun DruidNetApp(
             }
             composable(route = Screen.PlantSheet.name) {
                 PlantSheetScreen(
-                    druidNetUiState.selectedPlant!!,
+                    viewModel.getPlant(druidNetUiState.selectedPlant),
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -128,7 +133,7 @@ fun DruidNetAppBar(
             }
             Screen.PlantSheet -> {
                 topBarIconPath = null
-                topBarTitle = uiState.selectedPlant!!.displayName
+                topBarTitle = uiState.selectedPlant.toString() //!!.displayName
             }
         }
 

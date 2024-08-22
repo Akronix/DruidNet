@@ -18,14 +18,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.druidanet.druidnetbeta.data.PlantView
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.Plant
+import org.druidanet.druidnetbeta.model.PlantBasic
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
 
 
 
 @Composable
-fun PlantCard(plant: Plant, onClickPlantCard: (Plant) -> Unit, modifier: Modifier) {
+fun PlantCard(plant: PlantBasic, onClickPlantCard: (PlantBasic) -> Unit, modifier: Modifier) {
     Card(
         onClick = { onClickPlantCard(plant) },
         modifier = modifier
@@ -52,8 +54,8 @@ fun PlantCard(plant: Plant, onClickPlantCard: (Plant) -> Unit, modifier: Modifie
 
 @Composable
 fun PlantsList(
-    plantsList: List<Plant>,
-    onClickPlantCard: (Plant) -> Unit,
+    plantsList: List<PlantBasic>,
+    onClickPlantCard: (PlantBasic) -> Unit,
     modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(plantsList) { plant ->
@@ -71,8 +73,8 @@ fun PlantsList(
 
 @Composable
 fun CatalogScreen(
-    plantList: List<Plant>,
-    onClickPlantCard: (Plant) -> Unit,
+    plantList: List<PlantBasic>,
+    onClickPlantCard: (PlantBasic) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -88,13 +90,13 @@ fun CatalogScreen(
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
  */
-@Preview(showBackground = true)
-@Composable
-fun CatalogPreview() {
-    DruidNetBetaTheme {
-        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun CatalogPreview() {
+//    DruidNetBetaTheme {
+//        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
+//    }
+//}
 
 /**
  * Composable that displays what the UI of the app looks like in dark theme in the design tab.
