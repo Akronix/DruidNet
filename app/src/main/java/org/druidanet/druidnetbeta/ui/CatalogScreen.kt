@@ -1,5 +1,7 @@
 package org.druidanet.druidnetbeta.ui
 
+import android.content.Context
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,28 +15,34 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.druidanet.druidnetbeta.data.PlantView
+import androidx.core.app.ActivityCompat
+import org.druidanet.druidnetbeta.DruidNetApplication
 import org.druidanet.druidnetbeta.data.PlantsDataSource
-import org.druidanet.druidnetbeta.model.Plant
-import org.druidanet.druidnetbeta.model.PlantBasic
+import org.druidanet.druidnetbeta.model.PlantBase
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
-
-
+import org.druidanet.druidnetbeta.utils.getResourceId
 
 @Composable
-fun PlantCard(plant: PlantBasic, onClickPlantCard: (PlantBasic) -> Unit, modifier: Modifier) {
+fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier: Modifier) {
+
+    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
+
     Card(
         onClick = { onClickPlantCard(plant) },
         modifier = modifier
     ) {
         Column {
             Image(
-                painter = painterResource(plant.imageResourceId),
+                painter = painterResource(imgResourceId),
                 contentDescription = "Image for {plant.displayName}",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -54,8 +62,8 @@ fun PlantCard(plant: PlantBasic, onClickPlantCard: (PlantBasic) -> Unit, modifie
 
 @Composable
 fun PlantsList(
-    plantsList: List<PlantBasic>,
-    onClickPlantCard: (PlantBasic) -> Unit,
+    plantsList: List<PlantBase>,
+    onClickPlantCard: (PlantBase) -> Unit,
     modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(plantsList) { plant ->
@@ -73,8 +81,8 @@ fun PlantsList(
 
 @Composable
 fun CatalogScreen(
-    plantList: List<PlantBasic>,
-    onClickPlantCard: (PlantBasic) -> Unit,
+    plantList: List<PlantBase>,
+    onClickPlantCard: (PlantBase) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -90,13 +98,13 @@ fun CatalogScreen(
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
  */
-//@Preview(showBackground = true)
-//@Composable
-//fun CatalogPreview() {
-//    DruidNetBetaTheme {
-//        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun CatalogPreview() {
+    DruidNetBetaTheme {
+        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
+    }
+}
 
 /**
  * Composable that displays what the UI of the app looks like in dark theme in the design tab.

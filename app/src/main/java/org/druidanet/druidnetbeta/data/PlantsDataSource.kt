@@ -78,7 +78,7 @@ object PlantsDataSource {
                     )
                 ),
 //                references = arrayOf(refInventario1),
-                imageResourceId = R.drawable.sambucus_nigra
+                imagePath = "sambucus_nigra"
             )
 
 

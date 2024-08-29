@@ -28,8 +28,8 @@ data class PlantEntity(
 
     val observations: String? = null,
 
-    @ColumnInfo(name = "image")
-    @DrawableRes val imageResourceId: Int
+    @ColumnInfo(name = "image_path")
+    val imagePath: String
 
     // otherImages
 )
@@ -85,7 +85,7 @@ data class UsageEntity (
     val text: String
 )
 
-@DatabaseView("SELECT p.plantId, p.latin_name, n.common_name, n.language, p.image" +
+@DatabaseView("SELECT p.plantId, p.latin_name, n.common_name, n.language, p.image_path" +
         " FROM Plant p JOIN Name n ON p.plantId = n.plantId WHERE isDisplayName = TRUE"
 )
 data class PlantView(
@@ -98,5 +98,5 @@ data class PlantView(
     val common_name: String,
     val language: LanguageEnum,
 //    val common_name: String,
-    val image: Int,
+    val image_path: String,
 )

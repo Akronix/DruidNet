@@ -69,5 +69,5 @@ private fun PlantView.toPlantBasic(): PlantBasic =
     PlantBasic(
         plantId = plantId,
         displayName = common_name,
-        imageResourceId = image
+        imagePath = image_path
     )

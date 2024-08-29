@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
@@ -24,10 +25,14 @@ import org.druidanet.druidnetbeta.R
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.Plant
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
+import org.druidanet.druidnetbeta.utils.getResourceId
 
 
 @Composable
 fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
+
+    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
+
     Column (
         modifier = modifier
                 .padding(0.dp)
@@ -39,7 +44,7 @@ fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
         ){
             Image(
                 contentScale = ContentScale.FillWidth,
-                painter = painterResource(plant.imageResourceId),
+                painter = painterResource(imgResourceId),
                 contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +93,7 @@ fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
 @Composable
 fun PlantSheetScreenPreview() {
     DruidNetBetaTheme {
-        PlantSheetScreen(PlantsDataSource.loadPlants()[2],
+        PlantSheetScreen(PlantsDataSource.loadPlants()[0],
         modifier = Modifier.fillMaxSize()
         )
     }

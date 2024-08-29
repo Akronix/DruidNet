@@ -9,23 +9,23 @@ interface PlantBase {
 
     val displayName: String
 
-    val imageResourceId: Int
+    val imagePath: String
 }
 
 data class PlantBasic(
     override val plantId: Int,
     override val displayName: String,
-    override val imageResourceId: Int
+    override val imagePath: String
 ) : PlantBase
 
 
 data class Plant (
-    val plantId: Int,
+    override val plantId: Int,
 
     val latinName: String,
 
     val commonNames: Array<Name>,
-    val displayName: String = commonNames[0].name,
+    override val displayName: String = commonNames[0].name,
 
     val usages: Map<UsageType, Usage>,
     val family: String,
@@ -37,10 +37,10 @@ data class Plant (
     val confusions: Array<Confusion>,
     val observations: String? = null,
 
-    @DrawableRes val imageResourceId: Int
+    override val imagePath: String
 
     // otherImages
-)
+): PlantBase
 
 data class Name (
     val name: String,
