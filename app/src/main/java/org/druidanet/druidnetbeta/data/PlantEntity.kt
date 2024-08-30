@@ -38,7 +38,7 @@ data class PlantEntity(
     tableName = "Name",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
                                     parentColumns = arrayOf("plantId"),
-                                    childColumns = arrayOf("nameId"),
+                                    childColumns = arrayOf("plantId"),
                                     onDelete = ForeignKey.CASCADE)))
 data class NameEntity (
     @PrimaryKey(autoGenerate = true) val nameId: Int = 0,
@@ -61,7 +61,7 @@ data class NameEntity (
     tableName = "Confusion",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
                                     parentColumns = arrayOf("plantId"),
-                                    childColumns = arrayOf("confusionId"),
+                                    childColumns = arrayOf("plantId"),
                                     onDelete = ForeignKey.CASCADE)),
             indices = [Index(value = ["latin_name"], unique = true)])
 data class ConfusionEntity(
@@ -75,7 +75,7 @@ data class ConfusionEntity(
     tableName = "Usage",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
                                     parentColumns = arrayOf("plantId"),
-                                    childColumns = arrayOf("usageId"),
+                                    childColumns = arrayOf("plantId"),
                                     onDelete = ForeignKey.CASCADE)))
 data class UsageEntity (
     @PrimaryKey(autoGenerate = true) val usageId: Int = 1,

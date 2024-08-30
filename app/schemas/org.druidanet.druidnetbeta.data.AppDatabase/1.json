@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5f87a36ee0d4df503beffa437ae67835",
+    "identityHash": "11337a24725c3864e05c0fd7af43e2a7",
     "entities": [
       {
         "tableName": "Plant",
@@ -90,7 +90,7 @@
       },
       {
         "tableName": "Usage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`usageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `type` TEXT NOT NULL, `text` TEXT NOT NULL, FOREIGN KEY(`usageId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`usageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `type` TEXT NOT NULL, `text` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "usageId",
@@ -140,7 +140,7 @@
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "usageId"
+              "plantId"
             ],
             "referencedColumns": [
               "plantId"
@@ -150,7 +150,7 @@
       },
       {
         "tableName": "Name",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nameId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `common_name` TEXT NOT NULL, `isDisplayName` INTEGER NOT NULL DEFAULT 0, `language` TEXT NOT NULL, FOREIGN KEY(`nameId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nameId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `common_name` TEXT NOT NULL, `isDisplayName` INTEGER NOT NULL DEFAULT 0, `language` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "nameId",
@@ -207,7 +207,7 @@
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "nameId"
+              "plantId"
             ],
             "referencedColumns": [
               "plantId"
@@ -217,7 +217,7 @@
       },
       {
         "tableName": "Confusion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`confusionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `latin_name` TEXT NOT NULL, `text` TEXT NOT NULL, FOREIGN KEY(`confusionId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`confusionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `latin_name` TEXT NOT NULL, `text` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "confusionId",
@@ -276,7 +276,7 @@
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "confusionId"
+              "plantId"
             ],
             "referencedColumns": [
               "plantId"
@@ -293,7 +293,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5f87a36ee0d4df503beffa437ae67835')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '11337a24725c3864e05c0fd7af43e2a7')"
     ]
   }
 }
