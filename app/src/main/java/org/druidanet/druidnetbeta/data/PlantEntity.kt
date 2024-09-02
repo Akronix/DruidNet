@@ -3,11 +3,13 @@ package org.druidanet.druidnetbeta.data
 import androidx.annotation.DrawableRes
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import org.druidanet.druidnetbeta.model.Confusion
 import org.druidanet.druidnetbeta.model.LanguageEnum
 import org.druidanet.druidnetbeta.model.UsageType
 
@@ -81,7 +83,7 @@ data class UsageEntity (
     @PrimaryKey(autoGenerate = true) val usageId: Int = 1,
     @ColumnInfo(index = true) val plantId: Int,
     val type: UsageType,
-//    val subType: String,
+    val subType: String? = null,
     val text: String
 )
 
@@ -99,4 +101,27 @@ data class PlantView(
     val language: LanguageEnum,
 //    val common_name: String,
     val image_path: String,
+)
+
+data class PlantData(
+    @Embedded val p: PlantEntity,
+
+    @Relation(
+        parentColumn = "plantId",
+        entityColumn = "plantId"
+        )
+    val names: List<NameEntity>,
+
+    @Relation(
+        parentColumn = "plantId",
+        entityColumn = "plantId",
+        )
+    val confusions: List<ConfusionEntity>,
+
+    @Relation(
+        parentColumn = "plantId",
+        entityColumn = "plantId",
+        )
+    val usages: List<UsageEntity>
+
 )

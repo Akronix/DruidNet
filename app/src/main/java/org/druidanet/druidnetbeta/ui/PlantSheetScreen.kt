@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import org.druidanet.druidnetbeta.R
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.Plant
+import org.druidanet.druidnetbeta.model.Usage
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
 import org.druidanet.druidnetbeta.utils.getResourceId
 
@@ -77,7 +78,9 @@ fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {
                 Text(plant.commonNames.joinToString())
             }
             Text(
-                stringResource(R.string.datasheet_usages_literal),
+                stringResource(R.string.datasheet_usages_literal) + "\n" +
+                        plant.usages.values
+                        .joinToString (separator = "\n", transform = { it.joinToString { it.text } }),
                 style = MaterialTheme.typography.titleMedium
             )
         }

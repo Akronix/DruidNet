@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import org.druidanet.druidnetbeta.model.LanguageEnum
 
@@ -13,17 +14,24 @@ import org.druidanet.druidnetbeta.model.LanguageEnum
 @Dao
 interface PlantDAO {
 
-    @Query("SELECT * from PlantView WHERE language = :language")
+    @Query("SELECT * FROM PlantView WHERE language = :language")
     fun getPlantCatalogData(language: LanguageEnum): Flow<List<PlantView>>
 
+    @Query("SELECT common_name as displayName " +
+            "FROM PlantView" +
+            " WHERE language = :language" +
+            " AND plantId=:plantId")
+    fun getDisplayName(plantId: Int, language: LanguageEnum): Flow<String>
 
-    @Query("SELECT * from Plant WHERE plantId = :plantId")
-    fun getPlant(plantId: Int): Flow<PlantEntity>
+
+    @Query("SELECT * FROM Plant WHERE plantId = :plantId")
+    @Transaction
+    fun getPlant(plantId: Int): Flow<PlantData>
 
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun populateData(plants: List<PlantEntity>)
+//    @Insert(onConflict = OnConflictStrategy.IGNORE)
+//    fun populateData(plants: List<PlantData>)
 
 
 }

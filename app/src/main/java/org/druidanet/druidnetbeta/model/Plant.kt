@@ -27,7 +27,7 @@ data class Plant (
     val commonNames: Array<Name>,
     override val displayName: String = commonNames[0].name,
 
-    val usages: Map<UsageType, Usage>,
+    val usages: Map<UsageType, List<Usage>>,
     val family: String,
     val toxic: Boolean = false,
     val description: String,
