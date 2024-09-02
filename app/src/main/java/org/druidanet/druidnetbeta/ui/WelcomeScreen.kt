@@ -60,6 +60,18 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
     }
 }
 
+//@Preview(showBackground = true)
+//@Composable
+//fun WelcomePreviewDark() {
+//    DruidNetBetaTheme(darkTheme = true) {
+//        WelcomeScreen(
+//            onCatalogButtonClick = {},
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .wrapContentSize(Alignment.Center))
+//    }
+//}
+
 @Preview(showBackground = true)
 @Composable
 fun WelcomePreview() {

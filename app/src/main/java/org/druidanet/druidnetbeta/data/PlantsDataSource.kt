@@ -27,6 +27,7 @@ object PlantsDataSource {
         return listOf<Plant>(
 
             Plant(
+                plantId = 1,
                 latinName = "Sambucus Nigra",
                 family = "Caprifoliaceae",
                 toxic = false,
@@ -49,8 +50,12 @@ object PlantsDataSource {
                         "redondeados, color blanco y crema. Fruto en drupas de 5-7 mm, esferoidales, " +
                         "color violeta-negruzco, en grupos colgantes.",
                 usages = mapOf(
-                        Pair(UsageType.MEDICINAL, Usage(UsageType.MEDICINAL, "Infusión de sus flores para enfermedades respiratorias")),
-                        Pair(UsageType.ALIMENTATION, Usage(UsageType.ALIMENTATION, "Buñuelos de flores de Saúco"))
+                        Pair(UsageType.MEDICINAL,
+                            listOf(Usage(UsageType.MEDICINAL, "Infusión de sus flores para enfermedades respiratorias"))
+                        ),
+                        Pair(UsageType.ALIMENTATION,
+                            listOf(Usage(UsageType.ALIMENTATION, "Buñuelos de flores de Saúco"))
+                        )
                 ),
                 phenology = "Florece de abril a julio y fructifica en julio y agosto.",
                 habitat = "Indiferente edáfico, vive en suelos húmedos de los pisos basal y mon" +
@@ -77,7 +82,7 @@ object PlantsDataSource {
                     )
                 ),
 //                references = arrayOf(refInventario1),
-                imageResourceId = R.drawable.sambucus_nigra
+                imagePath = "sambucus_nigra"
             )
 
 
