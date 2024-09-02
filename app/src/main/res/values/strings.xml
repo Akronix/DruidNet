@@ -10,4 +10,7 @@
     <string name="datasheet_image_cdescp">Imagen de la planta</string>
     <string name="datasheet_common_names">Nombres comunes:</string>
     <string name="datasheet_usages_literal">Usos:</string>
+    <string name="descp_plantsheet_bottombar">Descripción</string>
+    <string name="confusions_plantsheet_bottombar">Confusiones</string>
+    <string name="usages_plantsheet_bottombar">Usos</string>
 </resources>

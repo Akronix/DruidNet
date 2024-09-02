@@ -34,15 +34,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.druidanet.druidnetbeta.data.DruidNetUiState
 import org.druidanet.druidnetbeta.ui.CatalogScreen
 import org.druidanet.druidnetbeta.ui.DruidNetViewModel
+import org.druidanet.druidnetbeta.ui.PlantSheetBottomBar
 import org.druidanet.druidnetbeta.ui.PlantSheetScreen
 import org.druidanet.druidnetbeta.ui.WelcomeScreen
-import org.druidanet.druidnetbeta.ui.toPlant
 
 
 enum class Screen(@StringRes val title: Int) {
@@ -73,6 +71,11 @@ fun DruidNetApp(
             currentScreen = currentScreen,
             navigateUp = { navController.navigateUp() },
             uiState = druidNetUiState
+        ),
+        bottomBar = PlantSheetBottomBar(
+            currentScreen = currentScreen,
+            onClickBottomNavItem = { section -> { viewModel.changeSection(section) } },
+            currentSection = druidNetUiState.currentSection
         ),
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->

@@ -28,6 +28,11 @@ import org.druidanet.druidnetbeta.model.Usage
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
 import org.druidanet.druidnetbeta.utils.getResourceId
 
+enum class PlantSheetSection {
+    DESCRIPTION, USAGES, CONFUSIONS
+}
+
+val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 
 @Composable
 fun PlantSheetScreen(plant: Plant, modifier: Modifier = Modifier) {

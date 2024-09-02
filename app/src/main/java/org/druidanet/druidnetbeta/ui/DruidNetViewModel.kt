@@ -42,6 +42,13 @@ class DruidNetViewModel(private val plantDao: PlantDAO) : ViewModel(){
 
     }
 
+    fun changeSection(newSection: PlantSheetSection) {
+        if (newSection != uiState.value.currentSection )
+            _uiState.update { currentState ->
+                currentState.copy(currentSection = newSection)
+            }
+    }
+
     /**
      * Update the item in the [ItemsRepository]'s data source
      */
