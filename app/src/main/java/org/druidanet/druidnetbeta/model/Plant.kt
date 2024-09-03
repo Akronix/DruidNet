@@ -29,13 +29,18 @@ data class Plant (
 
     val usages: Map<UsageType, List<Usage>>,
     val family: String,
+
     val toxic: Boolean = false,
+    val toxic_text: String? = null,
+
     val description: String,
     val habitat: String,
     val phenology: String,
     val distribution: String,
     val confusions: Array<Confusion>,
+
     val observations: String? = null,
+    val curiosities: String? = null,
 
     override val imagePath: String
 
@@ -49,7 +54,8 @@ data class Name (
 
 data class Confusion (
     val latinName: String,
-    val text: String
+    val text: String,
+    val imagePath: String? = null
 )
 
 data class Usage (

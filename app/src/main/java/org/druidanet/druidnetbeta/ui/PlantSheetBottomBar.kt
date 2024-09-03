@@ -74,7 +74,7 @@ fun SectionButton(rowScope: RowScope,
         icon = {
             Icon(
                 painterResource(id = resImg),
-            "Move to ${resText} section",
+            "Move to $resText section",
                 modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
         )},
 //    modifier: Modifier = Modifier,
@@ -94,12 +94,13 @@ fun PlantSheetBottomBarPreview() {
         Scaffold(
             bottomBar = PlantSheetBottomBar(
                 Screen.PlantSheet,
-                onClickBottomNavItem = { section -> {  } },
+                onClickBottomNavItem = { _ -> {  } },
                 currentSection = PlantSheetSection.DESCRIPTION
             ),
         ) {
             PlantSheetScreen(
                 plant = PlantsDataSource.loadPlants()[0],
+                currentSection = PlantSheetSection.DESCRIPTION,
                 modifier = Modifier.padding(it)
             )
         }

@@ -22,13 +22,19 @@ data class PlantEntity(
     val latinName: String,
 
     val family: String,
-    val toxic: Boolean = false,
+
     val description: String,
     val habitat: String,
     val phenology: String,
     val distribution: String,
 
+    val toxic: Boolean = false,
+    @ColumnInfo(name = "toxic_text")
+    val toxicText: String? = null,
+
+
     val observations: String? = null,
+    val curiosities: String? = null,
 
     @ColumnInfo(name = "image_path")
     val imagePath: String
@@ -70,7 +76,9 @@ data class ConfusionEntity(
     @PrimaryKey(autoGenerate = true) val confusionId: Int = 0,
     @ColumnInfo(index = true) val plantId: Int,
     @ColumnInfo(name = "latin_name") val latinName: String,
-    val text: String
+    val text: String,
+    @ColumnInfo(name = "image_path")
+    val imagePath: String?
 )
 
 @Entity(

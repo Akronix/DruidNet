@@ -110,13 +110,17 @@ fun PlantData.toPlant(displayName: String): Plant =
             .map{ Usage( it.type, it.text ) }
             .groupBy { it.type },
         family = p.family,
-        toxic = false,
+
+        toxic = p.toxic,
+        toxic_text = p.toxicText,
+
         description = p.description,
         habitat = p.habitat,
         phenology = p.phenology,
         distribution = p.distribution,
-        confusions = confusions.map { Confusion(it.latinName, it.text) }.toTypedArray(),
+        confusions = confusions.map { Confusion(it.latinName, it.text, it.imagePath) }.toTypedArray(),
         observations = p.observations,
+        curiosities = p.curiosities,
 
         imagePath = p.imagePath
     )

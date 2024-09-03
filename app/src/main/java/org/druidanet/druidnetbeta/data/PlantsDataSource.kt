@@ -30,7 +30,10 @@ object PlantsDataSource {
                 plantId = 1,
                 latinName = "Sambucus Nigra",
                 family = "Caprifoliaceae",
-                toxic = false,
+                toxic = true,
+                toxic_text = "Todas las partes verdes del Saúco, incluidos los frutos verdes, " +
+                        "contienen el glucósido cianogénico sambunigrina que es tóxico cuando se come crudo. " +
+                        "Estos compuestos pierden su toxicidad cuando se cocinan.",
                 displayName = "Saúco",
                 commonNames = arrayOf(
                     Name("Saúco", language = LanguageEnum.CASTELLANO),
@@ -53,8 +56,8 @@ object PlantsDataSource {
                         Pair(UsageType.MEDICINAL,
                             listOf(Usage(UsageType.MEDICINAL, "Infusión de sus flores para enfermedades respiratorias"))
                         ),
-                        Pair(UsageType.ALIMENTATION,
-                            listOf(Usage(UsageType.ALIMENTATION, "Buñuelos de flores de Saúco"))
+                        Pair(UsageType.EDIBLE,
+                            listOf(Usage(UsageType.EDIBLE, "Buñuelos de flores de Saúco"))
                         )
                 ),
                 phenology = "Florece de abril a julio y fructifica en julio y agosto.",
@@ -75,10 +78,11 @@ object PlantsDataSource {
                         "en la isla de El Hierro. Ambas subespecies tienen usos similares.",
                 confusions = arrayOf(
                     Confusion(
-                        latinName= "Sauquillo",
+                        latinName= "Sambucus ebulus",
                         text="Se puede confundir con el Sauquillo, Yezgo o Saúco menor (Sambucus ebulus), cuyos frutos son tóxicos. Tratándose éste último de una herbáceea, sin parte leñosa;" +
                                 " mientras que el Saúco (Sambucus Nigra) tiene porte arbustivo o arbóreo. " +
-                                "Además los frutos del Saúco caen en racimos hacia abajo, mientras que los del Sauquillo crecen hacia arriba. "
+                                "Además los frutos del Saúco caen en racimos hacia abajo, mientras que los del Sauquillo crecen hacia arriba. ",
+                        imagePath = "sambucus_ebulus"
                     )
                 ),
 //                references = arrayOf(refInventario1),

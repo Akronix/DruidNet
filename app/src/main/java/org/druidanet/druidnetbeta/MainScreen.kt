@@ -115,6 +115,7 @@ fun DruidNetApp(
             composable(route = Screen.PlantSheet.name) {
                 PlantSheetScreen(
                     plant = druidNetUiState.plantUiState!!,
+                    currentSection = druidNetUiState.currentSection,
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -140,7 +141,7 @@ fun DruidNetAppBar(
             Screen.Welcome -> return {} // No top bar in Welcome screen
             Screen.Catalog -> {
                 topBarIconPath = R.drawable.menu_book
-                topBarTitle = stringResource(R.string.catalog_bar_title)
+                topBarTitle = stringResource(currentScreen.title)
             }
             Screen.PlantSheet -> {
                 topBarIconPath = null

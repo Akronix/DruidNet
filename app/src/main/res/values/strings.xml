@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">DruidNet - Beta</string>
-    <string name="welcome">¡Os damos la bienvenida a DruidNet!</string>
-    <string name="greetings_catalog_btn">Catálogo de plantas medicinales</string>
+    <string name="welcome">¡Te damos la bienvenida a DruidNet!</string>
+    <string name="greetings_catalog_btn">Catálogo de plantas</string>
     <string name="greetings_identifier_btn">Identificador de plantas</string>
     <string name="title_screen_catalog">Catálogo</string>
     <string name="catalog_bar_title">Catálogo</string>
@@ -13,4 +13,16 @@
     <string name="descp_plantsheet_bottombar">Descripción</string>
     <string name="confusions_plantsheet_bottombar">Confusiones</string>
     <string name="usages_plantsheet_bottombar">Usos</string>
+
+    <string name="medicinal_usage_type">MEDICINAL</string>
+    <string name="alimentation_usage_type">COMESTIBLE</string>
+    <string name="animal_food_usage_type">ALIMENTACIÓN ANIMAL</string>
+    <string name="vet_usage_type">VETERINARIO</string>
+    <string name="toxic_usage_type">TÓXICO</string>
+    <string name="combustible_usage_type">COMBUSTIBLE</string>
+    <string name="construction_usage_type">CONSTRUCCIÓN</string>
+    <string name="industry_usage_type">INDUSTRIAL Y ARTESANÍA</string>
+    <string name="environmental_usage_type">MEDIOAMBIENTAL</string>
+    <string name="ornamental_usage_type">ORNAMENTAL</string>
+    <string name="social_usage_type">SOCIAL</string>
 </resources>
