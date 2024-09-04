@@ -52,7 +52,7 @@ data class NameEntity (
     @PrimaryKey(autoGenerate = true) val nameId: Int = 0,
     @ColumnInfo(index = true) val plantId: Int,
     @ColumnInfo(name = "common_name") val commonName: String,
-    @ColumnInfo(defaultValue = "0") val isDisplayName: Boolean,
+    @ColumnInfo(defaultValue = "1") val isDisplayName: Boolean,
     val language: LanguageEnum
 )
 

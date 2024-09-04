@@ -1,9 +1,6 @@
 package org.druidanet.druidnetbeta.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,24 +27,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.druidanet.druidnetbeta.R
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.Confusion
 import org.druidanet.druidnetbeta.model.Plant
 import org.druidanet.druidnetbeta.model.Usage
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
-import org.druidanet.druidnetbeta.ui.theme.primaryContainerLight
 import org.druidanet.druidnetbeta.utils.getResourceId
 
 enum class PlantSheetSection {
@@ -139,13 +130,17 @@ fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
                     style = MaterialTheme.typography.bodyLarge
             )
 
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
             Text(
                 plant.description,
                 style = MaterialTheme.typography.bodyMedium
 
             )
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
             Column {
                 Text("Distribución y Habitat:",
                     style = MaterialTheme.typography.titleMedium)
@@ -156,12 +151,27 @@ fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
                     style = MaterialTheme.typography.bodyMedium
                     )
             }
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
             Column {
                 Text("Fenología:",
                     style = MaterialTheme.typography.titleMedium)
-                Text(plant.phenology)
+                Text(plant.phenology,
+                    style = MaterialTheme.typography.bodyMedium)
             }
+
+            if (plant.observations != null) {
+                Spacer(modifier = Modifier.padding(
+                    dimensionResource(id = R.dimen.space_between_sections)
+                ))
+                Column {
+                    Text("Observaciones:",
+                        style = MaterialTheme.typography.titleMedium)
+                    Text(plant.observations,
+                        style = MaterialTheme.typography.bodyMedium)
+                }
+        }
         }
     }
 }
@@ -178,8 +188,9 @@ fun PlantSheetConfusions(plant: Plant, modifier: Modifier) {
         Text("Posibles confusiones...",
             style = MaterialTheme.typography.titleLarge)
         if (plant.confusions.isEmpty() )
-            Text("No hay registradas plantas similares con las que confudirse",
-                style = MaterialTheme.typography.bodyLarge)
+            Text("No hay registradas plantas peligrosas con las que confundirse.",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(top = 20.dp))
         else {
             plant.confusions.forEach { ConfusionTextBox(it) }
         }
@@ -244,14 +255,22 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
         }
 
         for (type in usagesTypes) {
-            Text(stringResource(type.displayText), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(type.displayText),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 5.dp)
+                )
+
             plant.usages[type]?.forEach { usage: Usage ->
                 Text(usage.text,
                     style = MaterialTheme.typography.bodyLarge)
             }
-            Spacer(modifier = Modifier.padding(10.dp))
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
         }
-        Spacer(modifier = Modifier.padding(10.dp))
+        Spacer(modifier = Modifier.padding(
+            dimensionResource(id = R.dimen.space_between_sections)
+        ))
     }
 }
 
@@ -299,7 +318,7 @@ fun PlantSheetScreenPreview() {
     DruidNetBetaTheme {
         PlantSheetScreen(
             PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.CONFUSIONS,
+            currentSection = PlantSheetSection.USAGES,
             modifier = Modifier.fillMaxSize()
         )
     }

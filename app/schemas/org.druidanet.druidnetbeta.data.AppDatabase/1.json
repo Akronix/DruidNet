@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c2af0c39c6eadca2bb39417eb4ce7b7d",
+    "identityHash": "3996372a982ff07017ea8cbb19798541",
     "entities": [
       {
         "tableName": "Plant",
@@ -168,7 +168,7 @@
       },
       {
         "tableName": "Name",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nameId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `common_name` TEXT NOT NULL, `isDisplayName` INTEGER NOT NULL DEFAULT 0, `language` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nameId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `common_name` TEXT NOT NULL, `isDisplayName` INTEGER NOT NULL DEFAULT 1, `language` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "nameId",
@@ -193,7 +193,7 @@
             "columnName": "isDisplayName",
             "affinity": "INTEGER",
             "notNull": true,
-            "defaultValue": "0"
+            "defaultValue": "1"
           },
           {
             "fieldPath": "language",
@@ -317,7 +317,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2af0c39c6eadca2bb39417eb4ce7b7d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3996372a982ff07017ea8cbb19798541')"
     ]
   }
 }

@@ -38,7 +38,7 @@ object PlantsDataSource {
                 commonNames = arrayOf(
                     Name("Saúco", language = LanguageEnum.CASTELLANO),
                     Name("Saüc", language = LanguageEnum.CATALAN),
-                    Name("Intsusa", language = LanguageEnum.VASCO),
+                    Name("Intsusa", language = LanguageEnum.EUSKERA),
                     Name("Sabugueiro", language = LanguageEnum.GALLEGO)
                 ),
                 description = "Arbusto o arbolillo caducifolio, de 1-5(10) m, ramificado desde la " +
