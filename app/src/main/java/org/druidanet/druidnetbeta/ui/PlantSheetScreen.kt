@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -40,6 +41,7 @@ import org.druidanet.druidnetbeta.model.Confusion
 import org.druidanet.druidnetbeta.model.Plant
 import org.druidanet.druidnetbeta.model.Usage
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
+import org.druidanet.druidnetbeta.utils.assetsToBitmap
 import org.druidanet.druidnetbeta.utils.getResourceId
 
 enum class PlantSheetSection {
@@ -73,7 +75,8 @@ fun PlantSheetScreen(
 
 @Composable
 fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
-    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
+//    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
+    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
 
     Column (
         modifier = modifier
@@ -86,7 +89,7 @@ fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
         ){
             Image(
                 contentScale = ContentScale.FillWidth,
-                painter = painterResource(imgResourceId),
+                bitmap = imageBitmap!!,
                 contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -208,7 +211,7 @@ fun ConfusionTextBox(confusion: Confusion) {
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
-                text = "${confusion.latinName}",
+                text = confusion.latinName,
                 style = MaterialTheme.typography.titleMedium,
                 fontStyle = Italic,
                 modifier = Modifier.padding(bottom = 5.dp)
@@ -218,12 +221,12 @@ fun ConfusionTextBox(confusion: Confusion) {
                 style = MaterialTheme.typography.bodyLarge
             )
             if (confusion.imagePath != null) {
-                val imgResourceId = LocalContext.current.getResourceId(confusion.imagePath)
+                val imageBitmap = LocalContext.current.assetsToBitmap(confusion.imagePath)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        painter = painterResource(imgResourceId),
+                        bitmap = imageBitmap!!,
                         contentDescription = "Imagen del ${confusion.latinName}",
                         modifier = Modifier.padding(top = 10.dp)
                     )
@@ -318,7 +321,7 @@ fun PlantSheetScreenPreview() {
     DruidNetBetaTheme {
         PlantSheetScreen(
             PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.USAGES,
+            currentSection = PlantSheetSection.DESCRIPTION,
             modifier = Modifier.fillMaxSize()
         )
     }

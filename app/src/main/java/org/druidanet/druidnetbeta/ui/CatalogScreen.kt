@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -29,12 +30,13 @@ import org.druidanet.druidnetbeta.DruidNetApplication
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.PlantBase
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
+import org.druidanet.druidnetbeta.utils.assetsToBitmap
 import org.druidanet.druidnetbeta.utils.getResourceId
 
 @Composable
 fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier: Modifier) {
 
-    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
+    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
 
     Card(
         onClick = { onClickPlantCard(plant) },
@@ -42,7 +44,7 @@ fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier:
     ) {
         Column {
             Image(
-                painter = painterResource(imgResourceId),
+                bitmap = imageBitmap!!,
                 contentDescription = "Image for {plant.displayName}",
                 modifier = Modifier
                     .fillMaxWidth()
