@@ -230,10 +230,12 @@ fun ConfusionTextBox(confusion: Confusion) {
                         contentDescription = "Imagen del ${confusion.latinName}",
                         modifier = Modifier.padding(top = 10.dp)
                     )
-                    Text(
-                        "Imagen del ${confusion.latinName}",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+                    if (confusion.captionText != null)
+                        Text(
+                            text = confusion.captionText,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Justify
+                        )
                 }
             }
         }

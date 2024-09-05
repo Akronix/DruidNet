@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3996372a982ff07017ea8cbb19798541",
+    "identityHash": "f410bec94a4cb06f923328fddc31084f",
     "entities": [
       {
         "tableName": "Plant",
@@ -235,7 +235,7 @@
       },
       {
         "tableName": "Confusion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`confusionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `latin_name` TEXT NOT NULL, `text` TEXT NOT NULL, `image_path` TEXT, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`confusionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `latin_name` TEXT NOT NULL, `text` TEXT NOT NULL, `image_path` TEXT, `caption_text` TEXT, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "confusionId",
@@ -264,6 +264,12 @@
           {
             "fieldPath": "imagePath",
             "columnName": "image_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "captionText",
+            "columnName": "caption_text",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -317,7 +323,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3996372a982ff07017ea8cbb19798541')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f410bec94a4cb06f923328fddc31084f')"
     ]
   }
 }

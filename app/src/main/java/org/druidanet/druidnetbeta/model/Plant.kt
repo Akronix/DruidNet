@@ -55,7 +55,8 @@ data class Name (
 data class Confusion (
     val latinName: String,
     val text: String,
-    val imagePath: String? = null
+    val imagePath: String? = null,
+    val captionText: String? = null
 )
 
 data class Usage (

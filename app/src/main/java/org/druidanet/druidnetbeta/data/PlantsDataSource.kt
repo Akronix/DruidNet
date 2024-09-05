@@ -81,8 +81,9 @@ object PlantsDataSource {
                         latinName= "Sambucus ebulus",
                         text="Se puede confundir con el Sauquillo, Yezgo o Saúco menor (Sambucus ebulus), cuyos frutos son tóxicos. Tratándose éste último de una herbáceea, sin parte leñosa;" +
                                 " mientras que el Saúco (Sambucus Nigra) tiene porte arbustivo o arbóreo. " +
-                                "Además los frutos del Saúco caen en racimos hacia abajo, mientras que los del Sauquillo crecen hacia arriba. ",
-                        imagePath = "sambucus_ebulus"
+                                "Además los frutos del Saúco caen en racimos hacia abajo, mientras que los del Sauquillo crecen hacia arriba.",
+                        imagePath = "sambucus_ebulus2",
+                        captionText = "En la imagen, las plantas que se ven más cercanas son ejemplares de Yezgo (Sambuculus ebulus), mientras que el árbol del fondo es un Saúco (Sambuculus nigra)."
                     )
                 ),
 //                references = arrayOf(refInventario1),

@@ -78,7 +78,9 @@ data class ConfusionEntity(
     @ColumnInfo(name = "latin_name") val latinName: String,
     val text: String,
     @ColumnInfo(name = "image_path")
-    val imagePath: String?
+    val imagePath: String?,
+    @ColumnInfo(name = "caption_text")
+    val captionText: String?
 )
 
 @Entity(

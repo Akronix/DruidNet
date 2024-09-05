@@ -118,7 +118,9 @@ fun PlantData.toPlant(displayName: String): Plant =
         habitat = p.habitat,
         phenology = p.phenology,
         distribution = p.distribution,
-        confusions = confusions.map { Confusion(it.latinName, it.text, it.imagePath) }.toTypedArray(),
+        confusions = confusions.map {
+            Confusion(it.latinName, it.text, it.imagePath, it.captionText)
+        }.toTypedArray(),
         observations = p.observations,
         curiosities = p.curiosities,
 
