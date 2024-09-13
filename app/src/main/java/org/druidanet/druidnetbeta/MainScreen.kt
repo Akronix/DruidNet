@@ -1,7 +1,6 @@
 package org.druidanet.druidnetbeta
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -59,8 +58,6 @@ fun DruidNetApp(
     val plantList by viewModel.getAllPlants().collectAsState(emptyList())
 
     val druidNetUiState by viewModel.uiState.collectAsState()
-
-    Log.d("DRUIDNET", druidNetUiState.plantUiState.toString())
 
     val coroutineScope = rememberCoroutineScope()
 
