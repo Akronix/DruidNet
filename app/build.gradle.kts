@@ -83,11 +83,14 @@ dependencies {
 
     implementation("androidx.compose.runtime:runtime:${rootProject.extra["compose_version"]}")
 
-    //Room
+    // Room
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     implementation("androidx.core:core-ktx:1.12.0")
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
+
+    // Telephoto lib
+    implementation("me.saket.telephoto:zoomable:0.13.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

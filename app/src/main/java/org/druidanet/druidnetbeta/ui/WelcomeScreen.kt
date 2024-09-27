@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,7 +34,9 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.padding(40.dp)
+            modifier = Modifier
+                .padding(40.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Image(
                 painter = painterResource(R.drawable.druid),

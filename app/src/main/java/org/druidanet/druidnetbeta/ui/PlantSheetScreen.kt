@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.saket.telephoto.zoomable.rememberZoomableState
+import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnetbeta.R
 import org.druidanet.druidnetbeta.data.PlantsDataSource
 import org.druidanet.druidnetbeta.model.Confusion
@@ -86,6 +89,7 @@ fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
             modifier = Modifier
                 .height(250.dp)
                 .padding(0.dp)
+                .zoomable(rememberZoomableState())
         ){
             Image(
                 contentScale = ContentScale.FillWidth,
@@ -309,6 +313,30 @@ fun ToxicTextBox(toxicText: String) {
             Text(toxicText,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
+fun FullScreenImage(imageBitmap : ImageBitmap) {
+    Surface {
+        Column(
+            modifier = Modifier
+                .padding(0.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .height(250.dp)
+                    .padding(0.dp)
+            ) {
+                Image(
+                    contentScale = ContentScale.None,
+                    bitmap = imageBitmap,
+                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+                )
+            }
         }
     }
 }
