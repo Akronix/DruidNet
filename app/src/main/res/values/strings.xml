@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">DruidNet - Beta</string>
     <string name="welcome">¡Te damos la bienvenida a DruidNet!</string>
-    <string name="greetings_catalog_btn">Catálogo de plantas</string>
+    <string name="greetings_catalog_btn">Guía de plantas</string>
     <string name="greetings_identifier_btn">Identificador de plantas</string>
     <string name="title_screen_catalog">Catálogo</string>
     <string name="catalog_bar_title">Catálogo</string>
