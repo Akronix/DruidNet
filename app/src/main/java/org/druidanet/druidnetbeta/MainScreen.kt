@@ -113,6 +113,7 @@ fun DruidNetApp(
                 PlantSheetScreen(
                     plant = druidNetUiState.plantUiState!!,
                     currentSection = druidNetUiState.currentSection,
+                    onChangeSection = { section -> { viewModel.changeSection(section) } },
                     modifier = Modifier
                         .fillMaxSize()
                 )

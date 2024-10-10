@@ -1,6 +1,8 @@
 package org.druidanet.druidnetbeta.ui
 
+import android.text.style.UnderlineSpan
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +47,6 @@ import org.druidanet.druidnetbeta.model.Plant
 import org.druidanet.druidnetbeta.model.Usage
 import org.druidanet.druidnetbeta.ui.theme.DruidNetBetaTheme
 import org.druidanet.druidnetbeta.utils.assetsToBitmap
-import org.druidanet.druidnetbeta.utils.getResourceId
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -57,12 +58,14 @@ val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 fun PlantSheetScreen(
     plant: Plant,
     currentSection: PlantSheetSection,
+    onChangeSection: (PlantSheetSection) -> () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     when (currentSection) {
         PlantSheetSection.DESCRIPTION -> PlantSheetDescription(
             plant,
+            onChangeSection(PlantSheetSection.USAGES),
             modifier.verticalScroll(rememberScrollState())
         )
         PlantSheetSection.USAGES -> PlantSheetUsages(
@@ -77,7 +80,7 @@ fun PlantSheetScreen(
 }
 
 @Composable
-fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
+fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier: Modifier) {
 //    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
     val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
 
@@ -178,7 +181,18 @@ fun PlantSheetDescription(plant: Plant, modifier: Modifier) {
                     Text(plant.observations,
                         style = MaterialTheme.typography.bodyMedium)
                 }
-        }
+            }
+
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
+
+            Text("Ver USOS ➡\uFE0F",
+                style = MaterialTheme.typography.labelMedium,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.clickable (onClick = onClickShowUsages )
+                )
+
         }
     }
 }
@@ -352,6 +366,7 @@ fun PlantSheetScreenPreview() {
         PlantSheetScreen(
             PlantsDataSource.loadPlants()[0],
             currentSection = PlantSheetSection.DESCRIPTION,
+            onChangeSection = { { } },
             modifier = Modifier.fillMaxSize()
         )
     }

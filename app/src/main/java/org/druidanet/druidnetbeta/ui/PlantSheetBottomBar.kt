@@ -100,6 +100,7 @@ fun PlantSheetBottomBarPreview() {
             PlantSheetScreen(
                 plant = PlantsDataSource.loadPlants()[0],
                 currentSection = PlantSheetSection.DESCRIPTION,
+                onChangeSection = { { } },
                 modifier = Modifier.padding(it)
             )
         }
