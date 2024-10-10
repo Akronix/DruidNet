@@ -54,7 +54,7 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
                 onClick = onCatalogButtonClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(R.string.greetings_catalog_btn))
+                Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn))
             }
             Spacer(modifier = Modifier.height(48.dp))
             Button(
@@ -62,7 +62,7 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
                 modifier = Modifier.fillMaxWidth(),
                 enabled = false
             ) {
-                Text(stringResource(R.string.greetings_identifier_btn))
+                Text("🔮 " + stringResource(R.string.greetings_identifier_btn))
             }
         }
 
