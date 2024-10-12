@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnetbeta.R
@@ -188,9 +189,9 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
             ))
 
             Text("Ver USOS ➡\uFE0F",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp),
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable (onClick = onClickShowUsages )
+                modifier = Modifier.clickable (onClick = onClickShowUsages ).padding(bottom = 10.dp)
                 )
 
         }
@@ -246,12 +247,14 @@ fun ConfusionTextBox(confusion: Confusion) {
                     Image(
                         bitmap = imageBitmap!!,
                         contentDescription = "Imagen del ${confusion.latinName}",
-                        modifier = Modifier.padding(top = 10.dp)
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .zoomable(rememberZoomableState())
                     )
                     if (confusion.captionText != null)
                         Text(
                             text = confusion.captionText,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Justify
                         )
                 }
