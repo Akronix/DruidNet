@@ -15,4 +15,6 @@ data class DruidNetUiState(
 
     val currentSection: PlantSheetSection = DEFAULT_SECTION,
 
+    val firstLaunch: Boolean = true
+
     )

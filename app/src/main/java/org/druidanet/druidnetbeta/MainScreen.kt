@@ -1,6 +1,7 @@
 package org.druidanet.druidnetbeta
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,7 +59,10 @@ fun DruidNetApp(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(backStackEntry?.destination?.route ?: Screen.Welcome.name)
+
     val plantList by viewModel.getAllPlants().collectAsState(emptyList())
+
+    val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
 
     val druidNetUiState by viewModel.uiState.collectAsState()
 
@@ -120,7 +127,47 @@ fun DruidNetApp(
             }
 
         }
+
+        // Show disclaimer Dialog if it's first launch of the app by the user
+        if (firstLaunch) {
+            Disclaimer(
+                onDismissDisclaimer = { },
+                onAcceptDisclaimer = { viewModel.unsetFirstLaunch() } )
+        }
+
     }
+}
+
+@Composable
+fun Disclaimer(
+    onDismissDisclaimer: () -> Unit,
+    onAcceptDisclaimer: () -> Unit) {
+    AlertDialog(
+        icon = {
+            Icon(Icons.Default.Warning, contentDescription = "Warning Icon")
+        },
+        title = {
+            Text(text = "Soy una guía")
+        },
+        text = {
+            Text(text =
+                    "El fin de esta app es ayudarte a conocer los usos tradicionales de las plantas de nuestro entorno.\n" +
+                    "Es tu responsabilidad la identificación precisa y el consumo que hagas de las mismas.")
+        },
+        onDismissRequest = {
+            onDismissDisclaimer()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onAcceptDisclaimer()
+                }
+            ) {
+                Text(stringResource(R.string.dialog_accept_disclaimer))
+            }
+        },
+
+    )
 }
 
 @SuppressLint("ComposableNaming")

@@ -3,6 +3,7 @@ package org.druidanet.druidnetbeta.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.Flow
@@ -11,8 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.druidanet.druidnetbeta.DruidNetApplication
 import org.druidanet.druidnetbeta.LANGUAGE_APP
 import org.druidanet.druidnetbeta.data.DruidNetUiState
@@ -20,6 +23,7 @@ import org.druidanet.druidnetbeta.data.PlantDAO
 import org.druidanet.druidnetbeta.data.PlantData
 import org.druidanet.druidnetbeta.data.PlantEntity
 import org.druidanet.druidnetbeta.data.PlantView
+import org.druidanet.druidnetbeta.data.UserPreferencesRepository
 import org.druidanet.druidnetbeta.model.Confusion
 import org.druidanet.druidnetbeta.model.LanguageEnum
 import org.druidanet.druidnetbeta.model.Name
@@ -28,9 +32,28 @@ import org.druidanet.druidnetbeta.model.PlantBasic
 import org.druidanet.druidnetbeta.model.Usage
 import org.druidanet.druidnetbeta.model.UsageType
 
-class DruidNetViewModel(private val plantDao: PlantDAO) : ViewModel(){
+class DruidNetViewModel(
+    private val plantDao: PlantDAO,
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel(){
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
+
+    /****** VIEW MODEL CONSTRUCTOR *****/
+
+    companion object {
+        val factory : ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as DruidNetApplication)
+                DruidNetViewModel(
+                    application.database.plantDao(),
+                    application.userPreferencesRepository
+                )
+            }
+        }
+    }
+
+    /****** USER INTERACTION (UI) FUNCTIONS *****/
 
     /**
      * Set the current [selectPlant] to show information of
@@ -48,6 +71,8 @@ class DruidNetViewModel(private val plantDao: PlantDAO) : ViewModel(){
                 currentState.copy(currentSection = newSection)
             }
     }
+
+    /****** DATABASE FUNCTIONS *****/
 
     /**
      * Update the item in the [ItemsRepository]'s data source
@@ -80,15 +105,19 @@ class DruidNetViewModel(private val plantDao: PlantDAO) : ViewModel(){
         plantDao.getPlant(plantId)
 
 
-    companion object {
-        val factory : ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as DruidNetApplication)
-                DruidNetViewModel( application.database.plantDao())
-            }
+    /****** USER PREFERENCES FUNCTIONS *****/
+
+    fun unsetFirstLaunch() =
+        viewModelScope.launch {
+            userPreferencesRepository.unsetFirstLaunch()
         }
-    }
+
+    fun isFirstLaunch() =
+        userPreferencesRepository.isFirstLaunch
+
 }
+
+/****** OTHERS - HELPER FUNCTIONS *****/
 
 fun PlantView.toPlantBasic(): PlantBasic =
     PlantBasic(
