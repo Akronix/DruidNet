@@ -35,7 +35,7 @@ fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier:
         Column {
             Image(
                 bitmap = imageBitmap!!,
-                contentDescription = "Image for {plant.displayName}",
+                contentDescription = "{plant.displayName}",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(194.dp),
