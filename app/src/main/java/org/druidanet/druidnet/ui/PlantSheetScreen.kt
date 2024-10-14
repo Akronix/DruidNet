@@ -183,6 +183,18 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
                 }
             }
 
+            if (plant.curiosities != null) {
+                Spacer(modifier = Modifier.padding(
+                    dimensionResource(id = R.dimen.space_between_sections)
+                ))
+                Column {
+                    Text("Curiosidades:",
+                        style = MaterialTheme.typography.titleMedium)
+                    Text(plant.curiosities,
+                        style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
