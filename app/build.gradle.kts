@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    namespace = "org.druidanet.druidnetbeta"
+    namespace = "org.druidanet.druidnet"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.druidanet.druidnetbeta"
-        minSdk = 24
+        applicationId = "org.druidanet.druidnet"
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "0.1"

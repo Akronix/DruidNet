@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DruidNet - Beta"
+rootProject.name = "DruidNet"
 include(":app")
  

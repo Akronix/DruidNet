@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "org.druidanet.druidnetbeta",
+  "applicationId": "org.druidanet.druidnet",
   "variantName": "release",
   "elements": [
     {
