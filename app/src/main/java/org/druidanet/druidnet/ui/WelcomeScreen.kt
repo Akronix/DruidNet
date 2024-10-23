@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +58,8 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
                 Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn))
             }
             Spacer(modifier = Modifier.height(48.dp))
+            Text("Próximamente:",
+                color = Color.DarkGray)
             Button(
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
