@@ -92,12 +92,6 @@ object PlantsDataSource {
 
             /*
             Plant(++plantid,
-                latinName = "Sambucus Nigra",
-                //displayName = "Saúco",
-                commonNames = listOf("Saúco", "Saüc", "Intsusa", "Sabugueiro"),
-                R.drawable.sambucus_nigra
-            ),
-            Plant(++plantid,
                 latinName = "Silene Vulgaris",
                 //displayName = "Colleja",
                 commonNames = listOf("Colleja", "Colitx"),

@@ -78,7 +78,8 @@ fun DruidNetApp(
         bottomBar = PlantSheetBottomBar(
             currentScreen = currentScreen,
             onClickBottomNavItem = { section -> { viewModel.changeSection(section) } },
-            currentSection = druidNetUiState.currentSection
+            currentSection = druidNetUiState.currentSection,
+            hasConfusions = druidNetUiState.plantHasConfusions
         ),
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->

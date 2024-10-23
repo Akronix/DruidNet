@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -74,15 +75,18 @@ class DruidNetViewModel(
      * Update the item in the [ItemsRepository]'s data source
      */
     suspend fun updatePlantUi(selectPlant: Int) {
+        val plantObj: Plant = this.getPlant(selectPlant)
+            .filterNotNull()
+            .first()
+            .toPlant(displayName =
+                plantDao.getDisplayName(selectPlant, LANGUAGE_APP)
+                    .first(),
+                )
         _uiState.update { currentState ->
-            currentState.copy(plantUiState =
-                this.getPlant(selectPlant)
-                    .filterNotNull()
-                    .first()
-                    .toPlant(displayName =
-                        plantDao.getDisplayName(selectPlant, LANGUAGE_APP)
-                            .first(),
-                    )
+            currentState
+                .copy(
+                    plantUiState = plantObj,
+                    plantHasConfusions = plantObj.confusions.isNotEmpty()
                 )
         }
     }

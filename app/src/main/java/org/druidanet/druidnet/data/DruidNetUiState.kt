@@ -13,8 +13,10 @@ data class DruidNetUiState(
      */
     val plantUiState: Plant? = null,
 
+    val plantHasConfusions: Boolean = false,
+
     val currentSection: PlantSheetSection = DEFAULT_SECTION,
 
     val firstLaunch: Boolean = true
 
-    )
+)
