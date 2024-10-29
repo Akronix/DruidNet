@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
-//    id("androidx.room")
+    id("androidx.room")
 }
 
 android {
@@ -21,9 +21,6 @@ android {
             useSupportLibrary = true
         }
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
     }
 
     buildTypes {
@@ -72,11 +69,12 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
 }
 
-//room {
-//    schemaDirectory("$projectDir/schemas")
-//}
 
 dependencies {
 
@@ -92,11 +90,11 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Room
-    implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.core.ktx)
 
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
-    implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
+    implementation(libs.androidx.room.ktx)
 
     // Telephoto lib
     implementation("me.saket.telephoto:zoomable:0.13.0")
