@@ -1,13 +1,19 @@
 package org.druidanet.druidnet.data
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class],
-          views =[PlantView::class],
-          version = 1)
+          views = [PlantView::class],
+          version = 2,
+          exportSchema = true,
+          autoMigrations = [
+              AutoMigration (from = 1, to = 2)
+          ]
+        )
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun plantDao(): PlantDAO
@@ -16,7 +22,7 @@ abstract class AppDatabase: RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        val PREPOPULATE_DATA = PlantsDataSource.loadPlants()
+//        val PREPOPULATE_DATA = PlantsDataSource.loadPlants()
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -26,7 +32,6 @@ abstract class AppDatabase: RoomDatabase() {
                     "druid_database"
                 )
                     // Wipes and rebuilds instead of migrating if no Migration object.
-                    .fallbackToDestructiveMigration()
                     .createFromAsset("databases/druid_database.db")
                     // prepopulate the database after onCreate was called
 //                    .addCallback(object : Callback() {

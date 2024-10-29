@@ -96,7 +96,7 @@ data class UsageEntity (
 )
 
 @DatabaseView("SELECT p.plantId, p.latin_name, n.common_name, n.language, p.image_path" +
-        " FROM Plant p JOIN Name n ON p.plantId = n.plantId WHERE isDisplayName = TRUE"
+        " FROM Plant p JOIN Name n ON p.plantId = n.plantId WHERE isDisplayName = 1"
 )
 data class PlantView(
     val plantId: Int,

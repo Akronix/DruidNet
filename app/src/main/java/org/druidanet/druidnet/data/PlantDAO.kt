@@ -12,7 +12,10 @@ import org.druidanet.druidnet.model.LanguageEnum
 @Dao
 interface PlantDAO {
 
-    @Query("SELECT common_name as displayName, * FROM PlantView WHERE language = :language ORDER BY displayName")
+    @Query("SELECT * " +
+            "FROM PlantView " +
+            "WHERE language = :language " +
+            "ORDER BY common_name")
     fun getPlantCatalogData(language: LanguageEnum): Flow<List<PlantView>>
 
     @Query("SELECT common_name as displayName " +
