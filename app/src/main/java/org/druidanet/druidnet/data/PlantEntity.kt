@@ -91,7 +91,7 @@ data class UsageEntity (
     @PrimaryKey(autoGenerate = true) val usageId: Int = 1,
     @ColumnInfo(index = true) val plantId: Int,
     val type: UsageType,
-    val subType: String? = null,
+    val subType: String,
     val text: String
 )
 

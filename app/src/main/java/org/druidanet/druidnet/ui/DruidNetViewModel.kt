@@ -136,7 +136,7 @@ fun PlantData.toPlant(displayName: String): Plant =
         displayName = displayName,
 
         usages = usages
-            .map{ Usage( it.type, it.text ) }
+            .map{ Usage( it.type, it.subType, it.text ) }
             .groupBy { it.type },
         family = p.family,
 

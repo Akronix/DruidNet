@@ -59,5 +59,6 @@ data class Confusion (
 
 data class Usage (
     val type: UsageType,
+    val subType: String,
     val text: String
 )

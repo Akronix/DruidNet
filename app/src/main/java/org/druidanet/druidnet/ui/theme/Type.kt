@@ -66,7 +66,7 @@ val AppTypography = Typography(
     headlineSmall = baseline.headlineSmall.copy(fontFamily = displayFontFamily),
     titleLarge = baseline.titleLarge.copy(fontFamily = titleFontFamily),
     titleMedium = baseline.titleMedium.copy(fontFamily = titleFontFamily, fontSize = 20.sp),
-    titleSmall = baseline.titleSmall.copy(fontFamily = titleFontFamily),
+    titleSmall = baseline.titleSmall.copy(fontFamily = titleFontFamily, fontSize = 16.sp),
     bodyLarge = baseline.bodyLarge.copy(fontFamily = bodyFontFamily, lineBreak = LineBreak.Paragraph),
     bodyMedium = baseline.bodyMedium.copy(fontFamily = bodyFontFamily, lineBreak = LineBreak.Paragraph, fontSize = 15.sp),
     bodySmall = baseline.bodySmall.copy(fontFamily = bodyFontFamily, lineBreak = LineBreak.Paragraph, fontSize = 13.sp),

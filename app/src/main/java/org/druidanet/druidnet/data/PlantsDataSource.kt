@@ -53,10 +53,21 @@ object PlantsDataSource {
                         "color violeta-negruzco, en grupos colgantes.",
                 usages = mapOf(
                         Pair(UsageType.MEDICINAL,
-                            listOf(Usage(UsageType.MEDICINAL, "Infusión de sus flores para enfermedades respiratorias"))
+                            listOf(Usage(
+                                UsageType.MEDICINAL,
+                                "Sistema respiratorio",
+                                "Infusión de sus flores para enfermedades respiratorias"))
                         ),
                         Pair(UsageType.EDIBLE,
-                            listOf(Usage(UsageType.EDIBLE, "Buñuelos de flores de Saúco"))
+                            listOf(
+                                Usage(
+                                    UsageType.EDIBLE,
+                                    "Comestibles-Verduras y hortalizas",
+                                    "Buñuelos de flores de Saúco"),Usage(
+                                    UsageType.EDIBLE,
+                                    "Bebidas Alcohólicas",
+                                    "Con las flores se prepara el champán de Saúco."),
+                            )
                         )
                 ),
                 phenology = "Florece de abril a julio y fructifica en julio y agosto.",

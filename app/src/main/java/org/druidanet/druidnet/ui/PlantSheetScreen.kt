@@ -297,9 +297,16 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
                 modifier = Modifier.padding(bottom = 5.dp)
                 )
 
-            plant.usages[type]?.forEach { usage: Usage ->
-                Text(usage.text,
-                    style = MaterialTheme.typography.bodyLarge)
+            plant.usages[type]?.forEach {
+                usage: Usage ->
+                    Text("~ " + usage.subType + " ~",
+                            style = MaterialTheme.typography.titleSmall
+                    )
+                    Text(usage.text,
+                        style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.padding(
+                        dimensionResource(id = R.dimen.space_between_sections)
+                    ))
             }
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
