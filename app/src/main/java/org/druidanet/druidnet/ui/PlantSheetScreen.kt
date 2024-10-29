@@ -379,7 +379,7 @@ fun PlantSheetScreenPreview() {
     DruidNetTheme {
         PlantSheetScreen(
             PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.DESCRIPTION,
+            currentSection = PlantSheetSection.USAGES,
             onChangeSection = { { } },
             modifier = Modifier.fillMaxSize()
         )

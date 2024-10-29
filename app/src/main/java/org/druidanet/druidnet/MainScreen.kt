@@ -144,7 +144,7 @@ fun Disclaimer(
     onAcceptDisclaimer: () -> Unit) {
     AlertDialog(
         icon = {
-            Icon(Icons.Default.Warning, contentDescription = "Warning Icon")
+            Icon(Icons.Default.Warning, contentDescription = "Icono de aviso")
         },
         title = {
             Text(text = "Soy una guía")
