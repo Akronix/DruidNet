@@ -1,8 +1,6 @@
 package org.druidanet.druidnet.ui
 
 import android.annotation.SuppressLint
-import android.graphics.Color.alpha
-import androidx.collection.emptyLongSet
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,15 +9,16 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
@@ -85,8 +84,12 @@ fun SectionButton(rowScope: RowScope,
                 modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
         )},
 //    modifier: Modifier = Modifier,
-    label = { Text (resText) },
+    label = { Text (resText, fontWeight = FontWeight.Bold) },
     alwaysShowLabel = true,
+    colors = NavigationBarItemDefaults.colors(
+        unselectedTextColor = Color.Gray,
+        unselectedIconColor = Color.Gray
+        )
     )
 }
 
@@ -115,17 +118,17 @@ fun SectionBadgedButton(rowScope: RowScope,
                     Icon(
                         painterResource(id = resImg),
                         "Move to $resText section",
-                        tint = Color.Gray,
                         modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
                     )
             }
         },
 
-//    modifier: Modifier = Modifier,
-    label = { if (showBadge) Text (resText)
-            else Text(resText, color = Color.Gray)
-            },
+    label = { Text (resText, fontWeight = FontWeight.Bold) },
     alwaysShowLabel = true,
+    colors = NavigationBarItemDefaults.colors(
+        unselectedTextColor = Color.Gray,
+        unselectedIconColor = Color.Gray
+        )
     )
 }
 
