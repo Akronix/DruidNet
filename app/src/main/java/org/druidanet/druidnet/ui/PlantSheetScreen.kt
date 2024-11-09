@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -61,21 +62,26 @@ fun PlantSheetScreen(
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    
+    SelectionContainer {
 
-    when (currentSection) {
-        PlantSheetSection.DESCRIPTION -> PlantSheetDescription(
-            plant,
-            onChangeSection(PlantSheetSection.USAGES),
-            modifier.verticalScroll(rememberScrollState())
-        )
-        PlantSheetSection.USAGES -> PlantSheetUsages(
-            plant,
-            modifier.verticalScroll(rememberScrollState())
-        )
-        PlantSheetSection.CONFUSIONS -> PlantSheetConfusions(
-            plant = plant,
-            modifier = modifier.verticalScroll(rememberScrollState())
-        )
+        when (currentSection) {
+            PlantSheetSection.DESCRIPTION -> PlantSheetDescription(
+                plant,
+                onChangeSection(PlantSheetSection.USAGES),
+                modifier.verticalScroll(rememberScrollState())
+            )
+
+            PlantSheetSection.USAGES -> PlantSheetUsages(
+                plant,
+                modifier.verticalScroll(rememberScrollState())
+            )
+
+            PlantSheetSection.CONFUSIONS -> PlantSheetConfusions(
+                plant = plant,
+                modifier = modifier.verticalScroll(rememberScrollState())
+            )
+        }
     }
 }
 
