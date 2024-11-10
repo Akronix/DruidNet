@@ -205,11 +205,23 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
 
-            Text("Ver USOS ➡\uFE0F",
-                style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp),
-                textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable (onClick = onClickShowUsages ).padding(bottom = 10.dp)
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 10.dp)
+                                   .clickable(onClick = onClickShowUsages)
+            )
+            {
+                Text(
+                    "Ver USOS ",
+                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp),
+                    textDecoration = TextDecoration.Underline,
                 )
+                Icon(
+                    painter = painterResource(R.drawable.indian_arrow),
+                    contentDescription = null,
+                    modifier = Modifier.height(28.dp)
+                )
+            }
 
         }
     }
@@ -392,7 +404,7 @@ fun PlantSheetScreenPreview() {
     DruidNetTheme {
         PlantSheetScreen(
             PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.USAGES,
+            currentSection = PlantSheetSection.DESCRIPTION,
             onChangeSection = { { } },
             modifier = Modifier.fillMaxSize()
         )
