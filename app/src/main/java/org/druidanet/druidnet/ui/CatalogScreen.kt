@@ -105,6 +105,6 @@ fun CatalogPreview() {
 //@Composable
 //fun CatalogDarkThemePreview() {
 //    DruidNetTheme(darkTheme = true) {
-//        CatalogScreen()
+//        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
 //    }
 //}

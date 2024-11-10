@@ -1,6 +1,8 @@
 package org.druidanet.druidnet.ui
 
+import android.content.res.Resources.Theme
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,11 +10,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,13 +33,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
-fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifier) {
+fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier = Modifier) {
+
+    Box(
+        contentAlignment = Alignment.TopEnd,
+        modifier = Modifier
+            .fillMaxWidth()
+            .zIndex(1f)
+            .padding(top = 80.dp)
+            .offset(x = (-40).dp) // Offset from the end by a specific amount
+    ) {
+        Icon(
+            Icons.Outlined.Info,
+            "Abre información de la aplicación",
+            modifier = Modifier.clickable { onNavigationButtonClick(Screen.About) }
+            )
+    }
 
     Box(modifier = modifier) {
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
@@ -52,7 +78,7 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
             )
             Spacer(modifier = Modifier.height(48.dp))
             Button(
-                onClick = onCatalogButtonClick,
+                onClick = {onNavigationButtonClick(Screen.Catalog)},
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn))
@@ -89,7 +115,7 @@ fun WelcomeScreen(onCatalogButtonClick: () -> Unit, modifier: Modifier = Modifie
 fun WelcomePreview() {
     DruidNetTheme(darkTheme = false) {
         WelcomeScreen(
-            onCatalogButtonClick = {},
+            onNavigationButtonClick = { },
             modifier = Modifier
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center))

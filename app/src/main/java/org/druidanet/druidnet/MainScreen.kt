@@ -38,6 +38,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.druidanet.druidnet.data.DruidNetUiState
+import org.druidanet.druidnet.ui.AboutScreen
 import org.druidanet.druidnet.ui.CatalogScreen
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.PlantSheetBottomBar
@@ -49,6 +50,7 @@ enum class Screen(@StringRes val title: Int) {
     Welcome(title = R.string.app_name),
     Catalog(title = R.string.title_screen_catalog),
     PlantSheet(title = R.string.title_screen_plant_sheet),
+    About(title = R.string.title_screen_about)
 }
 
 @Composable
@@ -92,8 +94,8 @@ fun DruidNetApp(
         ) {
             composable(route = Screen.Welcome.name) {
                 WelcomeScreen(
-                    onCatalogButtonClick = {
-                        navController.navigate(Screen.Catalog.name)
+                    onNavigationButtonClick = {screen: Screen ->
+                        navController.navigate(screen.name)
                     },
                     modifier = Modifier
                         .padding(innerPadding)
@@ -121,6 +123,12 @@ fun DruidNetApp(
                     plant = druidNetUiState.plantUiState!!,
                     currentSection = druidNetUiState.currentSection,
                     onChangeSection = { section -> { viewModel.changeSection(section) } },
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
+            composable(route = Screen.About.name) {
+                AboutScreen(
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -179,7 +187,7 @@ fun DruidNetAppBar(
     uiState: DruidNetUiState,
     modifier: Modifier = Modifier
 ): @Composable () -> Unit {
-        val topBarIconPath: Int?
+        var topBarIconPath: Int? = null
         val topBarTitle: String
 
         when (currentScreen) {
@@ -188,8 +196,10 @@ fun DruidNetAppBar(
                 topBarIconPath = R.drawable.menu_book
                 topBarTitle = stringResource(currentScreen.title)
             }
+            Screen.About -> {
+                topBarTitle = stringResource(currentScreen.title)
+            }
             Screen.PlantSheet -> {
-                topBarIconPath = null
                 topBarTitle = uiState.plantUiState!!.displayName
             }
         }
