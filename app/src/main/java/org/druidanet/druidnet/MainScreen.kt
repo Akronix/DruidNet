@@ -43,6 +43,7 @@ import org.druidanet.druidnet.ui.CatalogScreen
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.PlantSheetBottomBar
 import org.druidanet.druidnet.ui.PlantSheetScreen
+import org.druidanet.druidnet.ui.ReferencesScreen
 import org.druidanet.druidnet.ui.WelcomeScreen
 
 
@@ -50,7 +51,8 @@ enum class Screen(@StringRes val title: Int) {
     Welcome(title = R.string.app_name),
     Catalog(title = R.string.title_screen_catalog),
     PlantSheet(title = R.string.title_screen_plant_sheet),
-    About(title = R.string.title_screen_about)
+    About(title = R.string.title_screen_about),
+    References(title = R.string.title_screen_references)
 }
 
 @Composable
@@ -129,6 +131,15 @@ fun DruidNetApp(
             }
             composable(route = Screen.About.name) {
                 AboutScreen(
+                    onNavigationButtonClick = {screen: Screen ->
+                        navController.navigate(screen.name)
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
+            composable(route = Screen.References.name) {
+                ReferencesScreen(
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -196,7 +207,7 @@ fun DruidNetAppBar(
                 topBarIconPath = R.drawable.menu_book
                 topBarTitle = stringResource(currentScreen.title)
             }
-            Screen.About -> {
+            Screen.About, Screen.References -> {
                 topBarTitle = stringResource(currentScreen.title)
             }
             Screen.PlantSheet -> {

@@ -28,4 +28,5 @@
     <string name="social_usage_type">SOCIAL</string>
     <string name="references_about_item_label">Referencias</string>
     <string name="title_screen_about">Información</string>
+    <string name="title_screen_references">Referencias</string>
 </resources>

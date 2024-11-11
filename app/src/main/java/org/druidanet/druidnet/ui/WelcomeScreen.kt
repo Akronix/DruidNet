@@ -46,7 +46,7 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
         modifier = Modifier
             .fillMaxWidth()
             .zIndex(1f)
-            .padding(top = 80.dp)
+            .padding(top = 40.dp)
             .offset(x = (-40).dp) // Offset from the end by a specific amount
     ) {
         Icon(

@@ -31,10 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
-fun AboutScreen ( modifier: Modifier = Modifier) {
+fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Box(
@@ -48,7 +49,7 @@ fun AboutScreen ( modifier: Modifier = Modifier) {
                 .verticalScroll(rememberScrollState())
         ) {
             AboutItem(
-                {},
+                { onNavigationButtonClick( Screen.References ) },
                 stringResource(R.string.references_about_item_label),
                 imageResource = R.drawable.library_books)
 
@@ -66,10 +67,11 @@ fun AboutItem(action: () -> Unit,
               imageResource: Int? = null,
               imageVector:  ImageVector? = null ) {
     Row (
-        modifier = Modifier.clickable(onClick = action)
-                            .padding(vertical = 20.dp)
-                            .fillMaxWidth()
-                            .wrapContentHeight()
+        modifier = Modifier
+            .clickable(onClick = action)
+            .padding(vertical = 20.dp)
+            .fillMaxWidth()
+            .wrapContentHeight()
     )
     {
         if (imageVector != null)
@@ -104,11 +106,28 @@ fun sendEmailAction(context: Context) {
     startActivity(context, intent, null)
 }
 
+@Composable
+fun ReferencesScreen ( modifier: Modifier = Modifier) {
+    Box( modifier ) {
+        Text ( """
+            * Pardo de Santayana, Manuel, Ramón Morales, Laura Aceituno, y María Molina, eds. «Fase 1». En Inventario español de los conocimientos tradicionales relativos a la biodiversidad. Ministerio de Agricultura, Alimentación y Medio Ambiente, 2014.
+            * Pardo de Santayana, Manuel, Ramón Morales, Javier Tardío, y María Molina, eds. «Fase 2 - Tomos 1, 2 y 3». En Inventario español de los conocimientos tradicionales relativos a la biodiversidad. Ministerio de Agricultura y Pesca, Alimentación y Medio Ambiente, 2018.
+            * Bertrand, Bernard. Cocinar con plantas silvestres: Reconocer, recolectar, utilizar. 2.a ed. La Fertilidad de la Tierra Ediciones, 2015.
+            * Costas, César Lema y otros/as. Bienaventurada la «maleza» porque ella te salvará la cabeza. Tórculo Artes Gráficas, 2016.
+            * Rose, Francis. Clave de plantas silvestres. Ediciones Omega, 1983.
+            * Sociedad de Etnobiología. «Conect-e»,  https://conecte.es/.
+            * Urdangarin, Rakel Dawamoru Fernández. Silvestre, comestible y creativo: Recetario para la soberanía alimentaria. 3.a ed. Tórculo Comunicación Gráfica, 2013.
+            """
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AboutPreview() {
     DruidNetTheme(darkTheme = true) {
         AboutScreen(
+            { },
             modifier = Modifier
                 .fillMaxSize()
         )

@@ -207,8 +207,9 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
 
             Row (
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 10.dp)
-                                   .clickable(onClick = onClickShowUsages)
+                modifier = Modifier.clickable(onClick = onClickShowUsages)
+                                    .padding(bottom = 10.dp)
+
             )
             {
                 Text(
