@@ -26,10 +26,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -103,21 +106,24 @@ fun sendEmailAction(context: Context) {
         putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
         putExtra(Intent.EXTRA_SUBJECT, "DruidNetApp: ")
     }
-    startActivity(context, intent, null)
+    context.startActivity(intent)
 }
 
 @Composable
 fun ReferencesScreen ( modifier: Modifier = Modifier) {
     Box( modifier ) {
-        Text ( """
-            * Pardo de Santayana, Manuel, Ramón Morales, Laura Aceituno, y María Molina, eds. «Fase 1». En Inventario español de los conocimientos tradicionales relativos a la biodiversidad. Ministerio de Agricultura, Alimentación y Medio Ambiente, 2014.
-            * Pardo de Santayana, Manuel, Ramón Morales, Javier Tardío, y María Molina, eds. «Fase 2 - Tomos 1, 2 y 3». En Inventario español de los conocimientos tradicionales relativos a la biodiversidad. Ministerio de Agricultura y Pesca, Alimentación y Medio Ambiente, 2018.
-            * Bertrand, Bernard. Cocinar con plantas silvestres: Reconocer, recolectar, utilizar. 2.a ed. La Fertilidad de la Tierra Ediciones, 2015.
-            * Costas, César Lema y otros/as. Bienaventurada la «maleza» porque ella te salvará la cabeza. Tórculo Artes Gráficas, 2016.
-            * Rose, Francis. Clave de plantas silvestres. Ediciones Omega, 1983.
-            * Sociedad de Etnobiología. «Conect-e»,  https://conecte.es/.
-            * Urdangarin, Rakel Dawamoru Fernández. Silvestre, comestible y creativo: Recetario para la soberanía alimentaria. 3.a ed. Tórculo Comunicación Gráfica, 2013.
+        Markdown(
             """
+            * Pardo de Santayana, Manuel, Ramón Morales, Laura Aceituno, y María Molina, eds. «Fase 1». En _Inventario español de los conocimientos tradicionales relativos a la biodiversidad_. Ministerio de Agricultura, Alimentación y Medio Ambiente, 2014.
+            * Pardo de Santayana, Manuel, Ramón Morales, Javier Tardío, y María Molina, eds. «Fase 2 - Tomos 1, 2 y 3». En _Inventario español de los conocimientos tradicionales relativos a la biodiversidad_. Ministerio de Agricultura y Pesca, Alimentación y Medio Ambiente, 2018.
+            * Bertrand, Bernard. _Cocinar con plantas silvestres: Reconocer, recolectar, utilizar_. 2.a ed. La Fertilidad de la Tierra Ediciones, 2015.
+            * Costas, César Lema y otros/as. _Bienaventurada la «maleza» porque ella te salvará la cabeza_. Tórculo Artes Gráficas, 2016.
+            * Rose, Francis. _Clave de plantas silvestres_. Ediciones Omega, 1983.
+            * Sociedad de Etnobiología. «Conect-e»,  https://conecte.es/.
+            * Urdangarin, Rakel Dawamoru Fernández. _Silvestre, comestible y creativo: Recetario para la soberanía alimentaria_. 3.a ed. Tórculo Comunicación Gráfica, 2013.
+            """.trimIndent(),
+            typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 30.dp)
         )
     }
 }
