@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "org.druidanet.druidnet"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 5
         versionName = "0.1.2"
 
@@ -77,6 +77,11 @@ android {
 
 
 dependencies {
+
+    // Markdown
+    implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.multiplatform.markdown.renderer.m3)
+    implementation(libs.multiplatform.markdown.renderer.android)
 
     // SplashScreen
     implementation(libs.androidx.core.splashscreen)

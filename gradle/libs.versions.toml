@@ -2,18 +2,21 @@
 agp = "8.7.2"
 coreSplashscreen = "1.0.1"
 kotlin = "1.9.0"
-coreKtx = "1.10.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.8.0"
-composeBom = "2024.04.01"
-appcompat = "1.6.1"
-material = "1.10.0"
-activity = "1.8.0"
-navigationCompose = "2.7.7"
-media3Common = "1.4.0"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.9.3"
+composeBom = "2024.10.01"
+appcompat = "1.7.0"
+material = "1.12.0"
+activity = "1.9.3"
+multiplatformMarkdownRenderer = "0.27.0"
+multiplatformMarkdownRendererAndroid = "0.27.0"
+multiplatformMarkdownRendererM3 = "0.27.0"
+navigationCompose = "2.8.3"
+media3Common = "1.4.1"
 datastoreCoreAndroid = "1.1.1"
 roomKtx = "2.6.1"
 roomRuntime = "2.6.1"
@@ -21,6 +24,7 @@ roomRuntime = "2.6.1"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -42,6 +46,9 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3Common" }
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
+multiplatform-markdown-renderer-android = { module = "com.mikepenz:multiplatform-markdown-renderer-android", version.ref = "multiplatformMarkdownRendererAndroid" }
+multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRendererM3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
