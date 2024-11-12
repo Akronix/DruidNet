@@ -171,7 +171,7 @@ fun Disclaimer(
         text = {
             Text(text =
                     "El fin de esta app es ayudarte a conocer los usos tradicionales de las plantas de nuestro entorno.\n" +
-                    "Es tu responsabilidad la identificación precisa y el consumo que hagas de las mismas.")
+                    "Es tu responsabilidad la identificación precisa y el empleo que hagas de las mismas.")
         },
         onDismissRequest = {
             onDismissDisclaimer()
