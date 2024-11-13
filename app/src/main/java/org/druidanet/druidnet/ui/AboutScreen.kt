@@ -15,22 +15,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
@@ -51,51 +51,76 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier =
                 .padding(10.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+
             AboutItem(
                 { onNavigationButtonClick( Screen.References ) },
                 stringResource(R.string.references_about_item_label),
-                imageResource = R.drawable.library_books)
+                imageResource = R.drawable.library_books,
+                additionalText = null
+            )
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color.Gray,
+                modifier = Modifier.padding(horizontal = 50.dp)
+            )
 
             AboutItem(
                 {sendEmailAction(context)},
-                "Contacto",
+                "Contacta",
+                additionalText = "¿Alguna sugerencia? ¿Quieres colaborar?",
                 imageVector = Icons.Default.Email )
         }
     }
 }
 
 @Composable
-fun AboutItem(action: () -> Unit,
-              label: String,
-              imageResource: Int? = null,
-              imageVector:  ImageVector? = null ) {
-    Row (
-        modifier = Modifier
-            .clickable(onClick = action)
-            .padding(vertical = 20.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-    )
-    {
-        if (imageVector != null)
-            Icon(
-                imageVector,
-                null,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(R.dimen.text_icon_setting_margin)
-                )
-            )
-        else if (imageResource != null)
-            Icon(
-                painter = painterResource(imageResource),
-                null,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(R.dimen.text_icon_setting_margin)
-                )
+fun AboutItem(
+    action: () -> Unit,
+    label: String,
+    imageResource: Int? = null,
+    imageVector: ImageVector? = null,
+    additionalText: String? = null
+) {
+    Column(modifier = Modifier
+                    .clickable(onClick = action)
+                    .padding(
+                        horizontal = dimensionResource(R.dimen.text_icon_setting_margin),
+                        vertical = 20.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+    ) {
+        if (additionalText != null)
+            Text(
+                additionalText,
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 15.sp),
+                modifier = Modifier.padding(bottom = 10.dp)
             )
 
-        Text(label,
-            style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp))
+        Row()
+        {
+            if (imageVector != null)
+                Icon(
+                    imageVector,
+                    null,
+                    modifier = Modifier.padding(
+                        end = 20.dp
+                    )
+                )
+            else if (imageResource != null)
+                Icon(
+                    painter = painterResource(imageResource),
+                    null,
+                    modifier = Modifier.padding(
+                        end = 20.dp
+                    )
+                )
+
+            Text(
+                label,
+                style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
+            )
+        }
     }
 }
 
