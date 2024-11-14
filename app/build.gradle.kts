@@ -13,8 +13,8 @@ android {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "0.1.2"
+        versionCode = 7
+        versionName = "0.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,9 +26,7 @@ android {
     buildTypes {
         release {
 
-            ndk {
-                debugSymbolLevel = "FULL"
-            }
+            ndk.debugSymbolLevel = "FULL"
 
             isDebuggable = false
 
@@ -69,6 +67,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    ndkVersion = rootProject.extra["ndkVersion"] as String
     room {
         schemaDirectory("$projectDir/schemas")
     }
