@@ -35,3 +35,6 @@ google-services.json
 # sqlitedb
 *.db-shm
 *.db-wal
+
+# "beta" release
+app/beta

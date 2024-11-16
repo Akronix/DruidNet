@@ -13,7 +13,7 @@ android {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
         targetSdk = 35
-        versionCode = 7
+        versionCode = 8
         versionName = "0.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -24,6 +24,29 @@ android {
     }
 
     buildTypes {
+
+        create("beta") {
+
+            initWith(getByName("debug"))
+
+//            applicationIdSuffix = ".beta"
+//            versionNameSuffix = "-beta"
+
+            ndk.debugSymbolLevel = "FULL"
+
+            isDebuggable = false
+
+            // Enables code shrinking, obfuscation, and optimization for only
+            // your project's release build type. Make sure to use a build
+            // variant with `isDebuggable=false`.
+            isMinifyEnabled = false
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            isShrinkResources = false
+
+        }
+
         release {
 
             ndk.debugSymbolLevel = "FULL"
