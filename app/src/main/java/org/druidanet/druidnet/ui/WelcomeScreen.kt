@@ -84,15 +84,15 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
                 Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn))
             }
             Spacer(modifier = Modifier.height(48.dp))
-            Text("Próximamente:",
-                color = Color.DarkGray)
-            Button(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                enabled = false
-            ) {
-                Text("🔮 " + stringResource(R.string.greetings_identifier_btn))
-            }
+//            Text("Próximamente:",
+//                color = Color.DarkGray)
+//            Button(
+//                onClick = {},
+//                modifier = Modifier.fillMaxWidth(),
+//                enabled = false
+//            ) {
+//                Text("🔮 " + stringResource(R.string.greetings_identifier_btn))
+//            }
         }
 
     }
