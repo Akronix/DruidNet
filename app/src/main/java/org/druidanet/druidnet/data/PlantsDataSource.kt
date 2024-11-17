@@ -31,7 +31,7 @@ object PlantsDataSource {
                 family = "Caprifoliaceae",
                 toxic = true,
                 toxic_text = "Todas las partes verdes del Saúco, incluidos los frutos verdes, " +
-                        "contienen el glucósido cianogénico sambunigrina que es tóxico cuando se come crudo. " +
+                        "contienen el glucósido cianogénico sambunigrina que es **tóxico cuando se come crudo**. " +
                         "Estos compuestos pierden su toxicidad cuando se cocinan.",
                 displayName = "Saúco",
                 commonNames = arrayOf(
@@ -89,7 +89,7 @@ object PlantsDataSource {
                 confusions = arrayOf(
                     Confusion(
                         latinName= "Sambucus ebulus",
-                        text="Se puede confundir con el Sauquillo, Yezgo o Saúco menor (Sambucus ebulus), cuyos frutos son tóxicos. Tratándose éste último de una herbáceea, sin parte leñosa;" +
+                        text="Se puede confundir con el Sauquillo, Yezgo o Saúco menor (_Sambucus ebulus_), cuyos frutos son tóxicos. Tratándose éste último de una herbáceea, sin parte leñosa;" +
                                 " mientras que el Saúco (Sambucus Nigra) tiene porte arbustivo o arbóreo. " +
                                 "Además los frutos del Saúco caen en racimos hacia abajo, mientras que los del Sauquillo crecen hacia arriba.",
                         imagePath = "sambucus_ebulus2",

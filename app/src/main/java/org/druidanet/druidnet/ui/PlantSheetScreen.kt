@@ -39,6 +39,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
@@ -149,10 +151,9 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
-            Text(
+            Markdown(
                 plant.description,
-                style = MaterialTheme.typography.bodyMedium
-
+                typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
             )
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
@@ -160,12 +161,12 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
             Column {
                 Text("Distribución y Habitat:",
                     style = MaterialTheme.typography.titleMedium)
-                Text(plant.habitat,
-                    style = MaterialTheme.typography.bodyMedium
+                Markdown(plant.habitat,
+                    typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
                 )
-                Text(plant.distribution,
-                    style = MaterialTheme.typography.bodyMedium
-                    )
+                Markdown(plant.distribution,
+                    typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
+                )
             }
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
@@ -173,8 +174,8 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
             Column {
                 Text("Fenología:",
                     style = MaterialTheme.typography.titleMedium)
-                Text(plant.phenology,
-                    style = MaterialTheme.typography.bodyMedium)
+                Markdown(plant.phenology,
+                    typography = markdownTypography(text = MaterialTheme.typography.bodyMedium))
             }
 
             if (plant.observations != null) {
@@ -184,8 +185,8 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
                 Column {
                     Text("Observaciones:",
                         style = MaterialTheme.typography.titleMedium)
-                    Text(plant.observations,
-                        style = MaterialTheme.typography.bodyMedium)
+                    Markdown(plant.observations,
+                        typography = markdownTypography(text = MaterialTheme.typography.bodyMedium))
                 }
             }
 
@@ -196,8 +197,8 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
                 Column {
                     Text("Curiosidades:",
                         style = MaterialTheme.typography.titleMedium)
-                    Text(plant.curiosities,
-                        style = MaterialTheme.typography.bodyMedium)
+                    Markdown(plant.curiosities,
+                        typography = markdownTypography(text = MaterialTheme.typography.bodyMedium))
                 }
             }
 
@@ -265,9 +266,9 @@ fun ConfusionTextBox(confusion: Confusion) {
                 fontStyle = Italic,
                 modifier = Modifier.padding(bottom = 5.dp)
             )
-            Text(
-                text = confusion.text,
-                style = MaterialTheme.typography.bodyLarge
+            Markdown(
+                content = confusion.text,
+                typography = markdownTypography(text = MaterialTheme.typography.bodyLarge),
             )
             if (confusion.imagePath != null) {
                 val imageBitmap = LocalContext.current.assetsToBitmap(confusion.imagePath)
@@ -282,10 +283,12 @@ fun ConfusionTextBox(confusion: Confusion) {
                             .zoomable(rememberZoomableState())
                     )
                     if (confusion.captionText != null)
-                        Text(
-                            text = confusion.captionText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Justify
+                        Markdown(
+                            content = confusion.captionText,
+                            typography = markdownTypography(paragraph =
+                            MaterialTheme.typography.bodyMedium
+                                .copy(textAlign = TextAlign.Justify)
+                            )
                         )
                 }
             }
@@ -321,8 +324,8 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
                     Text("~ " + usage.subType + " ~",
                             style = MaterialTheme.typography.titleSmall
                     )
-                    Text(usage.text,
-                        style = MaterialTheme.typography.bodyLarge)
+                    Markdown(usage.text,
+                        typography = markdownTypography(text = MaterialTheme.typography.bodyLarge))
                     Spacer(modifier = Modifier.padding(
                         dimensionResource(id = R.dimen.space_between_sections)
                     ))
@@ -364,9 +367,13 @@ fun ToxicTextBox(toxicText: String) {
                     modifier = Modifier.align(Alignment.CenterVertically)
                     )
             }
-            Text(toxicText,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center)
+            Markdown(
+                content = toxicText,
+                typography = markdownTypography(paragraph =
+                    MaterialTheme.typography.bodyMedium
+                    .copy(textAlign = TextAlign.Center)
+                )
+            )
         }
     }
 }
@@ -405,7 +412,7 @@ fun PlantSheetScreenPreview() {
     DruidNetTheme {
         PlantSheetScreen(
             PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.DESCRIPTION,
+            currentSection = PlantSheetSection.USAGES,
             onChangeSection = { { } },
             modifier = Modifier.fillMaxSize()
         )
