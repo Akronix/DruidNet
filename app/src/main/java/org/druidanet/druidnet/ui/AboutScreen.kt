@@ -53,8 +53,8 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier =
         ) {
 
             AboutItem(
-                { onNavigationButtonClick( Screen.References ) },
-                stringResource(R.string.references_about_item_label),
+                { onNavigationButtonClick( Screen.Bibliography ) },
+                stringResource(R.string.title_screen_bibliography),
                 imageResource = R.drawable.library_books,
                 additionalText = null
             )
@@ -135,7 +135,7 @@ fun sendEmailAction(context: Context) {
 }
 
 @Composable
-fun ReferencesScreen ( modifier: Modifier = Modifier) {
+fun BibliographyScreen (modifier: Modifier = Modifier) {
     Box( modifier ) {
         Markdown(
             """

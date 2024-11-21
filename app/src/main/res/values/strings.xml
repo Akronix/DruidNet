@@ -26,7 +26,6 @@
     <string name="environmental_usage_type">MEDIOAMBIENTAL</string>
     <string name="ornamental_usage_type">ORNAMENTAL</string>
     <string name="social_usage_type">SOCIAL</string>
-    <string name="references_about_item_label">Referencias</string>
     <string name="title_screen_about">Información</string>
-    <string name="title_screen_references">Referencias</string>
+    <string name="title_screen_bibliography">Bibliografía</string>
 </resources>

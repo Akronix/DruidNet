@@ -43,7 +43,7 @@ import org.druidanet.druidnet.ui.CatalogScreen
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.PlantSheetBottomBar
 import org.druidanet.druidnet.ui.PlantSheetScreen
-import org.druidanet.druidnet.ui.ReferencesScreen
+import org.druidanet.druidnet.ui.BibliographyScreen
 import org.druidanet.druidnet.ui.WelcomeScreen
 
 
@@ -52,7 +52,7 @@ enum class Screen(@StringRes val title: Int) {
     Catalog(title = R.string.title_screen_catalog),
     PlantSheet(title = R.string.title_screen_plant_sheet),
     About(title = R.string.title_screen_about),
-    References(title = R.string.title_screen_references)
+    Bibliography(title = R.string.title_screen_bibliography)
 }
 
 @Composable
@@ -138,8 +138,8 @@ fun DruidNetApp(
                         .fillMaxSize()
                 )
             }
-            composable(route = Screen.References.name) {
-                ReferencesScreen(
+            composable(route = Screen.Bibliography.name) {
+                BibliographyScreen(
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -207,7 +207,7 @@ fun DruidNetAppBar(
                 topBarIconPath = R.drawable.menu_book
                 topBarTitle = stringResource(currentScreen.title)
             }
-            Screen.About, Screen.References -> {
+            Screen.About, Screen.Bibliography -> {
                 topBarTitle = stringResource(currentScreen.title)
             }
             Screen.PlantSheet -> {
