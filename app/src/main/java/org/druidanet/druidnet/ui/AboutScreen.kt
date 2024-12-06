@@ -37,6 +37,8 @@ import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
+import androidx.compose.foundation.text.selection.SelectionContainer
+
 
 @Composable
 fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier = Modifier) {
@@ -137,25 +139,25 @@ fun sendEmailAction(context: Context) {
 
 @Composable
 fun BibliographyScreen (modifier: Modifier = Modifier) {
-    Box( modifier ) {
-        Markdown(
-            """
-            * Pardo de Santayana, Manuel, Ramón Morales, Laura Aceituno, y María Molina, eds. «Fase 1». En _Inventario español de los conocimientos tradicionales relativos a la biodiversidad_. Ministerio de Agricultura, Alimentación y Medio Ambiente, 2014.
-            * Pardo de Santayana, Manuel, Ramón Morales, Javier Tardío, y María Molina, eds. «Fase 2 - Tomos 1, 2 y 3». En _Inventario español de los conocimientos tradicionales relativos a la biodiversidad_. Ministerio de Agricultura y Pesca, Alimentación y Medio Ambiente, 2018.
-            * Bernard Bertrand. _Cocinar con plantas silvestres: Reconocer, recolectar, utilizar_. 2.a ed. La Fertilidad de la Tierra Ediciones, 2015.
-            * César Lema Costas y otros/as. _Bienaventurada la «maleza» porque ella te salvará la cabeza_. Tórculo Artes Gráficas, 2016.
-            * Francis Rose. _Clave de plantas silvestres_. Ediciones Omega, 1983.
-            * Sociedad de Etnobiología. «Conect-e»,  https://conecte.es/.
-            * Rakel Dawamoru Fernández Urdangarin. _Silvestre, comestible y creativo: Recetario para la soberanía alimentaria_. 3.a ed. Tórculo Comunicación Gráfica, 2013.
-            * Luis Villar Pérez y otros. _Plantas medicinales del Pirineo aragonés y demás tierras oscenses_, 1987.
-            * Pio Font Quer. _Plantas medicinales. Ediciones Península_, septiembre 2014. Edición orgininal: Editorial Labor, 1961.
-            """.trimIndent(),
-            typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
-            modifier = Modifier
-                .padding(vertical = 10.dp, horizontal = 30.dp)
-                .verticalScroll(state = ScrollState(0))
-
-        )
+    Box( modifier.verticalScroll(state = ScrollState(0)) ) {
+        SelectionContainer {
+            Markdown(
+                """
+                * Pardo de Santayana, Manuel, Ramón Morales, Laura Aceituno, y María Molina, eds. «Fase 1». En _Inventario español de los conocimientos tradicionales relativos a la biodiversidad_. Ministerio de Agricultura, Alimentación y Medio Ambiente, 2014.
+                * Pardo de Santayana, Manuel, Ramón Morales, Javier Tardío, y María Molina, eds. «Fase 2 - Tomos 1, 2 y 3». En _Inventario español de los conocimientos tradicionales relativos a la biodiversidad_. Ministerio de Agricultura y Pesca, Alimentación y Medio Ambiente, 2018.
+                * Bernard Bertrand. _Cocinar con plantas silvestres: Reconocer, recolectar, utilizar_. 2.a ed. La Fertilidad de la Tierra Ediciones, 2015.
+                * César Lema Costas y otros/as. _Bienaventurada la «maleza» porque ella te salvará la cabeza_. Tórculo Artes Gráficas, 2016.
+                * Francis Rose. _Clave de plantas silvestres_. Ediciones Omega, 1983.
+                * Sociedad de Etnobiología. «Conect-e»,  https://conecte.es/.
+                * Rakel Dawamoru Fernández Urdangarin. _Silvestre, comestible y creativo: Recetario para la soberanía alimentaria_. 3.a ed. Tórculo Comunicación Gráfica, 2013.
+                * Luis Villar Pérez y otros. _Plantas medicinales del Pirineo aragonés y demás tierras oscenses_, 1987.
+                * Pio Font Quer. _Plantas medicinales. Ediciones Península_, septiembre 2014. Edición orgininal: Editorial Labor, 1961.
+                """.trimIndent(),
+                typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 30.dp)
+            )
+        }
     }
 }
 
