@@ -28,4 +28,5 @@
     <string name="social_usage_type">SOCIAL</string>
     <string name="title_screen_about">Información</string>
     <string name="title_screen_bibliography">Bibliografía</string>
+    <string name="title_screen_language">Idioma de los nombres</string>
 </resources>

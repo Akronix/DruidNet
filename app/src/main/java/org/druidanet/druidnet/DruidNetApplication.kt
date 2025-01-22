@@ -10,6 +10,7 @@ import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.model.LanguageEnum
 
 public val LANGUAGE_APP = LanguageEnum.CASTELLANO
+public val DEFAULT_LANGUAGE = LanguageEnum.CASTELLANO // Should be set to the system language
 
 private const val USER_PREFERENCES_NAME = "preferences"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(

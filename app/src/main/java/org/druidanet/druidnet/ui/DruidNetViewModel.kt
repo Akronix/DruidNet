@@ -24,6 +24,7 @@ import org.druidanet.druidnet.data.PlantData
 import org.druidanet.druidnet.data.PlantView
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.model.Confusion
+import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantBasic
@@ -114,6 +115,11 @@ class DruidNetViewModel(
 
     fun isFirstLaunch() =
         userPreferencesRepository.isFirstLaunch
+
+    fun setLanguage(language: LanguageEnum) =
+        viewModelScope.launch {
+            userPreferencesRepository.setDisplayNameLanguage(language)
+        }
 
 }
 
