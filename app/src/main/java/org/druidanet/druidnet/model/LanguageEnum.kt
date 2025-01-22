@@ -5,5 +5,6 @@ enum class LanguageEnum (val abbr: String){
     CATALAN ( abbr = "CAT"),
     EUSKERA ( abbr = "EUS"),
     GALLEGO (abbr = "GAL"),
-    ASTURIANO (abbr = "AST")
+    ASTURIANO (abbr = "AST"),
+    LATIN (abbr = "LAT")
 }

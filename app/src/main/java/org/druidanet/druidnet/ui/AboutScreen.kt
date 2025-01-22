@@ -38,6 +38,7 @@ import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.filled.LocationOn
 
 
 @Composable
@@ -54,6 +55,18 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier =
                 .padding(10.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+
+            AboutItem(
+                { switchLanguage() },
+                stringResource(R.string.title_screen_language),
+                imageVector = Icons.Default.LocationOn
+            )
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color.Gray,
+                modifier = Modifier.padding(horizontal = 50.dp)
+            )
 
             AboutItem(
                 { onNavigationButtonClick( Screen.Bibliography ) },
@@ -75,6 +88,14 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier =
                 imageVector = Icons.Default.Email )
         }
     }
+}
+
+fun switchLanguage() {
+
+    // Show options
+
+    // set selected language
+//    viewModel.setLanguage(selectedLanguage)
 }
 
 @Composable

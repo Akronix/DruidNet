@@ -23,7 +23,7 @@ data class Plant (
     val latinName: String,
 
     val commonNames: Array<Name>,
-    override val displayName: String = commonNames[0].name,
+    override val displayName: String = latinName,
 
     val usages: Map<UsageType, List<Usage>>,
     val family: String,

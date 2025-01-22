@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -50,8 +51,8 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
             .offset(x = (-40).dp) // Offset from the end by a specific amount
     ) {
         Icon(
-            Icons.Outlined.Info,
-            "Abre información de la aplicación",
+            Icons.Outlined.Settings,
+            "Abre ajustes de la aplicación",
             modifier = Modifier.clickable { onNavigationButtonClick(Screen.About) }
             )
     }
