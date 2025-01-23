@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">DruidNet</string>
     <string name="dialog_accept_disclaimer">Comprendo</string>
-    <string name="welcome">Recuperando los saberes tradicionales de las plantas silvestres</string>
+    <string name="welcome">Recuperando los saberes ancestrales de las plantas silvestres</string>
     <string name="greetings_catalog_btn">Guía de plantas</string>
     <string name="greetings_identifier_btn">Identificador de plantas</string>
     <string name="title_screen_catalog">Catálogo</string>
