@@ -66,8 +66,8 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
                 .verticalScroll(rememberScrollState())
         ) {
             Image(
-                painter = painterResource(R.drawable.druid),
-                contentDescription = "An image of a druid")
+                painter = painterResource(R.drawable.druids),
+                contentDescription = "An image of a druid and a druidess",)
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = stringResource(R.string.welcome),
