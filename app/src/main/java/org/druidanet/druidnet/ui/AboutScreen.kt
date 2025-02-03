@@ -77,7 +77,7 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
             AboutItem(
                 action = { showDialog = true },
                 stringResource(R.string.title_screen_language),
-                imageVector = Icons.Default.LocationOn
+                imageResource = R.drawable.language
             )
 
             AboutSectionHeader("Acerca de " + stringResource(R.string.app_name))
