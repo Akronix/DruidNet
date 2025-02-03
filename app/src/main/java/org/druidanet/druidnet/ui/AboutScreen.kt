@@ -231,7 +231,7 @@ fun AboutItem(
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
-        Row()
+        Row(verticalAlignment = Alignment.CenterVertically,)
         {
             if (imageVector != null)
                 Icon(
