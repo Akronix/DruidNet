@@ -134,6 +134,7 @@ fun DruidNetApp(
                     onNavigationButtonClick = {screen: Screen ->
                         navController.navigate(screen.name)
                     },
+                    viewModel = viewModel,
                     modifier = Modifier
                         .fillMaxSize()
                 )

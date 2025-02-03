@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -9,19 +8,22 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.druidanet.druidnet.DruidNetApplication
-import org.druidanet.druidnet.LANGUAGE_APP
 import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.data.PlantDAO
 import org.druidanet.druidnet.data.PlantData
 import org.druidanet.druidnet.data.PlantView
+import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
@@ -34,8 +36,26 @@ class DruidNetViewModel(
     private val plantDao: PlantDAO,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel(){
+
+    /****** STATE VARIABLES *****/
+
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
+
+    val preferencesState: StateFlow<PreferencesState> = userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
+        PreferencesState(displayLanguage = displayLanguage)
+    }
+    .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = runBlocking {
+            PreferencesState(
+                displayLanguage = userPreferencesRepository.getDisplayNameLanguagePreference.first()
+            )
+        }
+    )
+
+    public var LANGUAGE_APP = preferencesState.value.displayLanguage
 
     /****** VIEW MODEL CONSTRUCTOR *****/
 
@@ -76,13 +96,16 @@ class DruidNetViewModel(
      * Update the item in the [ItemsRepository]'s data source
      */
     suspend fun updatePlantUi(selectPlant: Int) {
+        val displayName = if (LANGUAGE_APP != LanguageEnum.LATIN) {
+            plantDao.getDisplayName(selectPlant, LANGUAGE_APP).first()
+        } else {
+            plantDao.getLatinName(selectPlant).first()
+        }
+
         val plantObj: Plant = this.getPlant(selectPlant)
             .filterNotNull()
             .first()
-            .toPlant(displayName =
-                plantDao.getDisplayName(selectPlant, LANGUAGE_APP)
-                    .first(),
-                )
+            .toPlant(displayName = displayName)
         _uiState.update { currentState ->
             currentState
                 .copy(
@@ -94,10 +117,11 @@ class DruidNetViewModel(
 
     // Get all plants from db
     fun getAllPlants() =
-        plantDao.getPlantCatalogData(LANGUAGE_APP)
-                .map { list ->
-                    list.map { it.toPlantBasic() }
-                }
+        if (LANGUAGE_APP != LanguageEnum.LATIN) {
+            plantDao.getPlantCatalogData(LANGUAGE_APP)
+        } else {
+            plantDao.getPlantCatalogLatin()
+        }
 
     /**
      * Retrieve a specific plant from the given data source that matches with the [plantId].
@@ -116,11 +140,16 @@ class DruidNetViewModel(
     fun isFirstLaunch() =
         userPreferencesRepository.isFirstLaunch
 
-    fun setLanguage(language: LanguageEnum) =
+    fun setLanguage(language: LanguageEnum) {
         viewModelScope.launch {
-            userPreferencesRepository.setDisplayNameLanguage(language)
+            userPreferencesRepository.updateDisplayNameLanguagePreference(language)
+            LANGUAGE_APP = language
         }
 
+    }
+
+    fun getDisplayNameLanguage() : LanguageEnum = LANGUAGE_APP /* It should use userPreferencesRepository.getDisplayNameLanguagePreference ??
+                                                                    but then we have to query this value using a flow coroutine */
 }
 
 /****** OTHERS - HELPER FUNCTIONS *****/

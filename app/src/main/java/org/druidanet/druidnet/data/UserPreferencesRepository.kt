@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.druidanet.druidnet.DEFAULT_LANGUAGE
 import org.druidanet.druidnet.model.LanguageEnum
@@ -48,38 +49,40 @@ class UserPreferencesRepository (
     }
 
 
-    val mapUserPreferences (preferences: Preferences): UserPreferences {
-        val displayNameLanguage = dataStore.data
-            .catch {
-                if (it is IOException) {
-                    Log.e(TAG, "Error reading preferences.", it)
-                    emit(emptyPreferences())
-                } else {
-                    throw it
-                }
-            }
-            .map { preferences ->
-                LanguageEnum.valueOf(preferences[DISPLAY_NAME_LANGUAGE]?: DEFAULT_LANGUAGE.toString())
-            }
-        return UserPreferences(displayNameLanguage)
-    }
+    // ALTERNATIVE WAY TO OBTAIN ALL USER PREFERENCES AT ONCE (TO BE USED LATER)
+//    fun mapUserPreferences (preferences: Preferences): UserPreferences {
+//        val displayNameLanguage = dataStore.data
+//            .catch {
+//                if (it is IOException) {
+//                    Log.e(TAG, "Error reading preferences.", it)
+//                    emit(emptyPreferences())
+//                } else {
+//                    throw it
+//                }
+//            }
+//            .map { preferences ->
+//                LanguageEnum.valueOf(preferences[DISPLAY_NAME_LANGUAGE]?: DEFAULT_LANGUAGE.toString())
+//            }
+//        return UserPreferences(displayNameLanguage)
+//    }
 
-    val getUserPreferencesFlow: Flow<UserPreferences> = dataStore.data
-        .catch {
-            if (it is IOException) {
-                Log.e(TAG, "Error reading preferences.", it)
-                emit(emptyPreferences())
-            } else {
-                throw it
-            }
-        }
-        .map { preferences ->
-            val displayLanguagePreference = LanguageEnum.valueOf(preferences[DISPLAY_NAME_LANGUAGE]?: DEFAULT_LANGUAGE.toString())
-            UserPreferences(displayLanguage = displayLanguagePreference)
-        }
-
-    val fetchInitialPreferences: UserPreferences =
-        getUserPreferencesFlow.first()
+//    val getUserPreferencesFlow: Flow<UserPreferences> = dataStore.data
+//        .catch {
+//            if (it is IOException) {
+//                Log.e(TAG, "Error reading preferences.", it)
+//                emit(emptyPreferences())
+//            } else {
+//                throw it
+//            }
+//        }
+//        .map { preferences ->
+//            val displayLanguagePreference = LanguageEnum.valueOf(preferences[DISPLAY_NAME_LANGUAGE]?: DEFAULT_LANGUAGE.toString())
+//            val isFirstLaunchPreference = preferences[IS_FIRST_LAUNCH] ?: true
+//            UserPreferences(displayLanguage = displayLanguagePreference)
+//        }
+//
+//    suspend fun fetchInitialPreferences(): UserPreferences =
+//        getUserPreferencesFlow.first()
 
 
     val getDisplayNameLanguagePreference: Flow<LanguageEnum> = dataStore.data

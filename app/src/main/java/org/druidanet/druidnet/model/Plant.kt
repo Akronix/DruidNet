@@ -3,8 +3,6 @@ package org.druidanet.druidnet.model
 interface PlantBase {
     val plantId: Int
 
-//    val latinName: String,
-
     val displayName: String
 
     val imagePath: String

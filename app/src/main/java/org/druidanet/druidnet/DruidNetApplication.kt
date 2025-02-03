@@ -5,11 +5,12 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
+import androidx.lifecycle.ViewModel
 import org.druidanet.druidnet.data.AppDatabase
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.model.LanguageEnum
 
-public val LANGUAGE_APP = LanguageEnum.CASTELLANO
 public val DEFAULT_LANGUAGE = LanguageEnum.CASTELLANO // Should be set to the system language
 
 private const val USER_PREFERENCES_NAME = "preferences"

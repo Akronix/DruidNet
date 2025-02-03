@@ -29,4 +29,5 @@
     <string name="title_screen_about">Información</string>
     <string name="title_screen_bibliography">Bibliografía</string>
     <string name="title_screen_language">Idioma de los nombres</string>
+    <string name="dialog_change_language">Cambiar</string>
 </resources>

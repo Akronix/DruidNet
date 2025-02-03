@@ -3,6 +3,7 @@ package org.druidanet.druidnet.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,14 +14,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,21 +41,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
+import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
+import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.filled.LocationOn
-
 
 @Composable
-fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier = Modifier) {
+fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+
+    var showDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -56,17 +72,15 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier =
                 .verticalScroll(rememberScrollState())
         ) {
 
+            AboutSectionHeader("Ajustes")
+
             AboutItem(
-                { switchLanguage() },
+                action = { showDialog = true },
                 stringResource(R.string.title_screen_language),
                 imageVector = Icons.Default.LocationOn
             )
 
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = Color.Gray,
-                modifier = Modifier.padding(horizontal = 50.dp)
-            )
+            AboutSectionHeader("Acerca de " + stringResource(R.string.app_name))
 
             AboutItem(
                 { onNavigationButtonClick( Screen.Bibliography ) },
@@ -87,15 +101,100 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier =
                 additionalText = "¿Alguna sugerencia? ¿Quieres colaborar?",
                 imageVector = Icons.Default.Email )
         }
+
+        if (showDialog) {
+            SwitchLanguageDialog(viewModel, {showDialog = false })
+        }
     }
 }
 
-fun switchLanguage() {
+@Composable
+fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) {
 
-    // Show options
+    val radioOptions =
+        arrayOf(LanguageEnum.CASTELLANO, LanguageEnum.CATALAN, LanguageEnum.GALLEGO, LanguageEnum.EUSKERA, LanguageEnum.LATIN)
+    val initialLanguage = viewModel.getDisplayNameLanguage()
 
-    // set selected language
-//    viewModel.setLanguage(selectedLanguage)
+    val (selectedLanguage : LanguageEnum, onOptionSelected) = remember { mutableStateOf(initialLanguage) }
+
+    // Show dialog
+    AlertDialog(
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    // Close dialog
+                    closeDialog()
+                }
+            ) {
+                Text("Cancelar")
+            }
+        },
+        onDismissRequest = {
+            // Close dialog
+            closeDialog()
+        },
+        title = {
+            Text("Idioma de los nombres",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleLarge)
+        },
+        text = {
+            Column (Modifier.selectableGroup())
+
+            // Show Radio Button
+            {
+                radioOptions.forEach { language ->
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (language == selectedLanguage),
+                                onClick = { onOptionSelected(language) },
+                                role = Role.RadioButton
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    )
+                    {
+                        RadioButton(
+                            selected = (language == selectedLanguage),
+                            onClick = null,
+                        )
+                        Text(
+                            language.toString(),
+                            style = MaterialTheme.typography.bodyMedium.merge(),
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    // set selected language
+                    viewModel.setLanguage(selectedLanguage)
+                    closeDialog()
+                }
+            ) {
+                Text(stringResource(R.string.dialog_change_language))
+            }
+        },
+
+    )
+
+}
+
+@Composable
+fun AboutSectionHeader(sectionName: String) {
+    Text(sectionName,
+        style = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp),
+        color = Color.Gray,
+        modifier = Modifier.padding(
+            horizontal = dimensionResource(R.dimen.text_icon_setting_margin)
+        )
+    )
 }
 
 @Composable
@@ -182,14 +281,15 @@ fun BibliographyScreen (modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AboutPreview() {
-    DruidNetTheme(darkTheme = true) {
-        AboutScreen(
-            { },
-            modifier = Modifier
-                .fillMaxSize()
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun AboutPreview() {
+//    DruidNetTheme(darkTheme = true) {
+//        AboutScreen(
+//            { },
+//            null,
+//            modifier = Modifier
+//                .fillMaxSize()
+//        )
+//    }
+//}

@@ -5,6 +5,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import org.druidanet.druidnet.model.LanguageEnum
+import org.druidanet.druidnet.model.PlantBasic
 
 /**
  * Database access object to access the Plant in the DruidNet database
@@ -12,18 +13,28 @@ import org.druidanet.druidnet.model.LanguageEnum
 @Dao
 interface PlantDAO {
 
-    @Query("SELECT * " +
+    @Query("SELECT DISTINCT common_name as displayName, plantId, image_path as imagePath " +
             "FROM PlantView " +
             "WHERE language = :language " +
-            "ORDER BY common_name")
-    fun getPlantCatalogData(language: LanguageEnum): Flow<List<PlantView>>
+            "ORDER BY displayName")
+    fun getPlantCatalogData(language: LanguageEnum): Flow<List<PlantBasic>>
 
-    @Query("SELECT common_name as displayName " +
-            "FROM PlantView" +
+
+    @Query("SELECT DISTINCT latin_name as displayName, plantId, image_path as imagePath" +
+            " FROM PlantView" +
+            " ORDER BY latin_name")
+    fun getPlantCatalogLatin(): Flow<List<PlantBasic>>
+
+    @Query("SELECT common_name as displayName" +
+            " FROM PlantView" +
             " WHERE language = :language" +
             " AND plantId=:plantId")
     fun getDisplayName(plantId: Int, language: LanguageEnum): Flow<String>
 
+    @Query("SELECT latin_name" +
+            " FROM PlantView" +
+            " WHERE plantId=:plantId")
+    fun getLatinName(plantId: Int): Flow<String>
 
     @Query("SELECT * FROM Plant WHERE plantId = :plantId")
     @Transaction
