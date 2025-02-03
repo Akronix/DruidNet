@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -234,6 +235,7 @@ fun DruidNetAppBar(
 
                         Text(
                             text = topBarTitle,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.displaySmall,
                             modifier = Modifier.padding(start = 6.dp)
                         )
