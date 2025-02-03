@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,9 +81,10 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
             Spacer(modifier = Modifier.height(48.dp))
             Button(
                 onClick = {onNavigationButtonClick(Screen.Catalog)},
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(48.dp)
             ) {
-                Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn))
+                Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn),
+                    style = MaterialTheme.typography.labelMedium)
             }
             Spacer(modifier = Modifier.height(48.dp))
 //            Text("Próximamente:",
