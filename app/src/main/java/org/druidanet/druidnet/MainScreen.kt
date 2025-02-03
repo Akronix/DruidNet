@@ -184,7 +184,8 @@ fun Disclaimer(
                     onAcceptDisclaimer()
                 }
             ) {
-                Text(stringResource(R.string.dialog_accept_disclaimer))
+                Text(stringResource(R.string.dialog_accept_disclaimer),
+                    style = MaterialTheme.typography.labelMedium)
             }
         },
 

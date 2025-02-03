@@ -8,6 +8,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
@@ -84,7 +85,7 @@ fun SectionButton(rowScope: RowScope,
                 modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
         )},
 //    modifier: Modifier = Modifier,
-    label = { Text (resText, fontWeight = FontWeight.Bold) },
+    label = { Text (resText, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) },
     alwaysShowLabel = true,
     colors = NavigationBarItemDefaults.colors(
         unselectedTextColor = Color.Gray,
@@ -123,7 +124,7 @@ fun SectionBadgedButton(rowScope: RowScope,
             }
         },
 
-    label = { Text (resText, fontWeight = FontWeight.Bold) },
+    label = { Text (resText, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) },
     alwaysShowLabel = true,
     colors = NavigationBarItemDefaults.colors(
         unselectedTextColor = Color.Gray,

@@ -126,7 +126,9 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
                     closeDialog()
                 }
             ) {
-                Text("Cancelar")
+                Text("Cancelar",
+                   style = MaterialTheme.typography.labelMedium
+                )
             }
         },
         onDismissRequest = {
@@ -140,10 +142,9 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
                 style = MaterialTheme.typography.titleLarge)
         },
         text = {
-            Column (Modifier.selectableGroup())
-
+            Column (Modifier.selectableGroup()
+            ) {
             // Show Radio Button
-            {
                 radioOptions.forEach { language ->
                     Row (
                         modifier = Modifier
@@ -153,8 +154,8 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
                                 onClick = { onOptionSelected(language) },
                                 role = Role.RadioButton
                             )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(start = 40.dp, bottom = 15.dp, top = 15.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     )
                     {
                         RadioButton(
@@ -162,8 +163,8 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
                             onClick = null,
                         )
                         Text(
-                            language.toString(),
-                            style = MaterialTheme.typography.bodyMedium.merge(),
+                            language.displayWord,
+                            style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
@@ -178,7 +179,9 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
                     closeDialog()
                 }
             ) {
-                Text(stringResource(R.string.dialog_change_language))
+                Text(
+                    stringResource(R.string.dialog_change_language),
+                    style = MaterialTheme.typography.labelMedium)
             }
         },
 
@@ -241,7 +244,7 @@ fun AboutItem(
 
             Text(
                 label,
-                style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
+                style = MaterialTheme.typography.labelLarge
             )
         }
     }
@@ -280,6 +283,16 @@ fun BibliographyScreen (modifier: Modifier = Modifier) {
         }
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun AboutPreview() {
+//    DruidNetTheme(darkTheme = true) {
+//        SwitchLanguageDialog(
+//            { }
+//        )
+//    }
+//}
 
 //@Preview(showBackground = true)
 //@Composable
