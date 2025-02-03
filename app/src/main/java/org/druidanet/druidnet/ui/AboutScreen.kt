@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -86,6 +87,13 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
                 { onNavigationButtonClick( Screen.Bibliography ) },
                 stringResource(R.string.title_screen_bibliography),
                 imageResource = R.drawable.library_books,
+                additionalText = null
+            )
+
+            AboutItem(
+                { onNavigationButtonClick( Screen.Credits ) },
+                stringResource(R.string.title_screen_credits),
+                imageVector = Icons.Default.Star,
                 additionalText = null
             )
 
@@ -261,6 +269,51 @@ fun sendEmailAction(context: Context) {
 }
 
 @Composable
+fun CreditsScreen (modifier: Modifier = Modifier) {
+    Box( modifier.verticalScroll(state = ScrollState(0)) ) {
+        Markdown(
+            """
+            # Lider del proyecto y desarrollador
+            **Abel Serrano Juste**
+            
+            <br/>
+            
+            ---
+            
+            <br/>
+            
+            # Datos de plantas
+            **Belén Martínez Sigüenza** (_Taxus baccata_ y _Pistacia lentiscus_)
+            
+            <br/>
+            
+            ---
+            
+            <br/>
+            
+            # Ilustración
+            **Sandra Revuelto Sánchez** (_Druidesa_)
+            
+            <br/>
+            
+            ---
+            
+            <br/>
+            
+            # Experiencia de Usuario (UX)
+            **Stefania** (_Pantallas de fichas de plantas_)
+            
+            """.trimIndent(),
+            typography = markdownTypography(
+                h1 = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                paragraph = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp)),
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 30.dp)
+        )
+    }
+}
+
+@Composable
 fun BibliographyScreen (modifier: Modifier = Modifier) {
     Box( modifier.verticalScroll(state = ScrollState(0)) ) {
         SelectionContainer {
@@ -284,15 +337,14 @@ fun BibliographyScreen (modifier: Modifier = Modifier) {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun AboutPreview() {
-//    DruidNetTheme(darkTheme = true) {
-//        SwitchLanguageDialog(
-//            { }
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun AboutPreview() {
+    DruidNetTheme(darkTheme = false) {
+        CreditsScreen(
+        )
+    }
+}
 
 //@Preview(showBackground = true)
 //@Composable
