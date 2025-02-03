@@ -219,7 +219,7 @@ fun AboutItem(
         if (additionalText != null)
             Text(
                 additionalText,
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 15.sp),
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 

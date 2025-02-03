@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -173,7 +174,8 @@ fun Disclaimer(
         text = {
             Text(text =
                     "El fin de esta app es ayudarte a conocer los usos tradicionales de las plantas de nuestro entorno.\n" +
-                    "Es tu responsabilidad la identificación precisa y el empleo que hagas de las mismas.")
+                    "Es tu responsabilidad la identificación precisa y el empleo que hagas de las mismas.",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp))
         },
         onDismissRequest = {
             onDismissDisclaimer()
