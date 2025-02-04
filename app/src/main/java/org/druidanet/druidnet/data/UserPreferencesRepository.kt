@@ -11,9 +11,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import org.druidanet.druidnet.DEFAULT_LANGUAGE
 import org.druidanet.druidnet.model.LanguageEnum
 import java.io.IOException
+import java.util.Locale
+
+private val DEFAULT_LANGUAGE = when (Locale.getDefault().getLanguage()) {
+    "es" -> LanguageEnum.CASTELLANO
+    "ca" -> LanguageEnum.CATALAN
+    "ga" -> LanguageEnum.GALLEGO
+    "eu" -> LanguageEnum.EUSKERA
+    else -> LanguageEnum.CASTELLANO
+}
 
 
 data class UserPreferences (
