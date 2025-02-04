@@ -3,13 +3,11 @@ package org.druidanet.druidnet.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,7 +18,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -44,17 +41,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
-import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.model.LanguageEnum
-import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
 fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
@@ -171,7 +164,7 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
                             onClick = null,
                         )
                         Text(
-                            language.displayWord,
+                            language.displayLanguage,
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(start = 16.dp)
                         )
@@ -337,14 +330,15 @@ fun BibliographyScreen (modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AboutPreview() {
-    DruidNetTheme(darkTheme = false) {
-        CreditsScreen(
-        )
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun AboutPreview() {
+//    DruidNetTheme(darkTheme = false) {
+//        CreditsScreen(
+//        )
+//    }
+//}
 
 //@Preview(showBackground = true)
 //@Composable
