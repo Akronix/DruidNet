@@ -31,4 +31,5 @@
     <string name="title_screen_language">Idioma de los nombres</string>
     <string name="dialog_change_language">Cambiar</string>
     <string name="title_screen_credits">Créditos</string>
+    <string name="about_screen_faqs">Preguntas Frecuentes</string>
 </resources>

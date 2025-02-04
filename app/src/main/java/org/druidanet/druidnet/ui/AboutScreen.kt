@@ -84,6 +84,13 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
             )
 
             AboutItem(
+                { openURIAction(context, "https://druidnet.es/preguntas-frecuentes/") },
+                stringResource(R.string.about_screen_faqs),
+                imageResource = R.drawable.help,
+                additionalText = null
+            )
+
+            AboutItem(
                 { onNavigationButtonClick( Screen.Credits ) },
                 stringResource(R.string.title_screen_credits),
                 imageVector = Icons.Default.Star,
@@ -249,6 +256,14 @@ fun AboutItem(
             )
         }
     }
+}
+
+fun openURIAction(context: Context, uri: String) {
+
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse(uri)
+    }
+    context.startActivity(intent)
 }
 
 fun sendEmailAction(context: Context) {
