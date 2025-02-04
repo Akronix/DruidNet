@@ -309,7 +309,7 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
             <br/>
             
             # Experiencia de Usuario (UX)
-            **Stefania** (_Pantallas de fichas de plantas_)
+            **Stefania Kasouni** (_Pantallas de fichas de plantas_)
             
             """.trimIndent(),
             typography = markdownTypography(
