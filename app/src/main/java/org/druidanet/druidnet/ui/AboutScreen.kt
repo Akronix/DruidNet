@@ -97,6 +97,13 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
                 additionalText = null
             )
 
+            AboutItem(
+                { openURIAction(context, "https://opencollective.com/druidnet#category-CONTRIBUTE") },
+                stringResource(R.string.about_screen_donate),
+                imageResource = R.drawable.donate,
+                additionalText = null
+            )
+
             HorizontalDivider(
                 thickness = 1.dp,
                 color = Color.Gray,

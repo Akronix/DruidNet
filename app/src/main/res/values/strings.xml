@@ -32,4 +32,5 @@
     <string name="dialog_change_language">Cambiar</string>
     <string name="title_screen_credits">Créditos</string>
     <string name="about_screen_faqs">Preguntas Frecuentes</string>
+    <string name="about_screen_donate">Donaciones</string>
 </resources>
