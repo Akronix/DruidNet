@@ -5,9 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -41,6 +44,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.m3.Markdown
@@ -48,6 +53,7 @@ import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.model.LanguageEnum
+import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
 fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
@@ -285,15 +291,15 @@ fun sendEmailAction(context: Context) {
 
 @Composable
 fun CreditsScreen (modifier: Modifier = Modifier) {
-    Box( modifier.verticalScroll(state = ScrollState(0)) ) {
-        Markdown(
-            """
+        Column (modifier = Modifier.fillMaxHeight() // Take up the full available height
+            .verticalScroll(state = ScrollState(0)),
+                 verticalArrangement = Arrangement.SpaceBetween,){
+            Markdown(
+                """
             # Lider del proyecto y desarrollador
             **Abel Serrano Juste**
             
             <br/>
-            
-            ---
             
             <br/>
             
@@ -302,8 +308,6 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
             
             <br/>
             
-            ---
-            
             <br/>
             
             # Ilustración
@@ -311,22 +315,44 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
             
             <br/>
             
-            ---
-            
             <br/>
             
             # Experiencia de Usuario (UX)
             **Stefania Kasouni** (_Pantallas de fichas de plantas_)
+          
+            <br/>
             
             """.trimIndent(),
-            typography = markdownTypography(
-                h1 = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
-                paragraph = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp)),
-            modifier = Modifier
-                .padding(vertical = 10.dp, horizontal = 30.dp)
-        )
+                typography = markdownTypography(
+                    h1 = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                    paragraph = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp)
+                ),
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 30.dp)
+            )
+            Markdown(
+                """
+                ---
+    
+                <br/>
+ 
+                &nbsp;El contenido textual está redactado a partir de varias fuentes y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+                &nbsp;El contenido gráfico está realizado a partir de imágenes propias o de imágenes de dominio público y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+                &nbsp;El código es software libre y está disponible en: https://github.com/Akronix/DruidNet
+                &nbsp;Puedes atribuir el contenido con la siguiente línea:
+                [Nombre contenido] por [Nombre de autor]. «DruidNet» - 2024. y enlace a la licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)."
+        """.trimIndent(),
+                typography = markdownTypography(
+                    paragraph = MaterialTheme.typography.bodySmall,
+                    link = MaterialTheme.typography.bodySmall.copy(
+                        textDecoration = TextDecoration. Underline
+                    )
+                ),
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 30.dp)
+            )
+        }
     }
-}
 
 @Composable
 fun BibliographyScreen (modifier: Modifier = Modifier) {
@@ -352,15 +378,15 @@ fun BibliographyScreen (modifier: Modifier = Modifier) {
     }
 }
 
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun AboutPreview() {
-//    DruidNetTheme(darkTheme = false) {
-//        CreditsScreen(
-//        )
-//    }
-//}
+
+@Preview(showBackground = true)
+@Composable
+fun AboutPreview() {
+    DruidNetTheme(darkTheme = false) {
+        CreditsScreen(
+        )
+    }
+}
 
 //@Preview(showBackground = true)
 //@Composable
