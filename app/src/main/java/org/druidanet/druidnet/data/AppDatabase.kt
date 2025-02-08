@@ -5,10 +5,12 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import org.druidanet.druidnet.data.bibliography.BibliographyDAO
+import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 
-@Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class],
+@Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class, BibliographyEntity::class],
           views = [PlantView::class],
-          version = 3,
+          version = 4,
           exportSchema = true,
           autoMigrations = [
               AutoMigration (from = 1, to = 2),
@@ -18,6 +20,7 @@ import androidx.room.RoomDatabase
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun plantDao(): PlantDAO
+    abstract fun biblioDao(): BibliographyDAO
 
     companion object {
         @Volatile
@@ -33,6 +36,8 @@ abstract class AppDatabase: RoomDatabase() {
                     "druid_database"
                 )
                     // Wipes and rebuilds instead of migrating if no Migration object.
+                    .fallbackToDestructiveMigration()
+                    // prepopulate the database after onCreate was called
                     .createFromAsset("databases/druid_database.db")
                     // prepopulate the database after onCreate was called
 //                    .addCallback(object : Callback() {

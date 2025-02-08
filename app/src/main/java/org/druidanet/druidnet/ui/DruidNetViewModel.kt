@@ -25,6 +25,8 @@ import org.druidanet.druidnet.data.PlantData
 import org.druidanet.druidnet.data.PlantView
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
+import org.druidanet.druidnet.data.bibliography.BibliographyDAO
+import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
@@ -34,6 +36,7 @@ import org.druidanet.druidnet.model.Usage
 
 class DruidNetViewModel(
     private val plantDao: PlantDAO,
+    private val biblioDao: BibliographyDAO,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel(){
 
@@ -65,6 +68,7 @@ class DruidNetViewModel(
                 val application = (this[APPLICATION_KEY] as DruidNetApplication)
                 DruidNetViewModel(
                     application.database.plantDao(),
+                    application.database.biblioDao(),
                     application.userPreferencesRepository
                 )
             }
@@ -128,6 +132,9 @@ class DruidNetViewModel(
      */
     fun getPlant(plantId: Int): Flow<PlantData?> =
         plantDao.getPlant(plantId)
+
+    fun getBibliography() : Flow<List<BibliographyEntity>> =
+        biblioDao.getAllBibliographyEntries()
 
 
     /****** USER PREFERENCES FUNCTIONS *****/

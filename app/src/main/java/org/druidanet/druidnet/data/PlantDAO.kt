@@ -8,7 +8,7 @@ import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.PlantBasic
 
 /**
- * Database access object to access the Plant in the DruidNet database
+ * Database Access Object to access the Plant Entities in the DruidNet database
  */
 @Dao
 interface PlantDAO {
@@ -44,6 +44,5 @@ interface PlantDAO {
     // existing Item into the database Room ignores the conflict.
 //    @Insert(onConflict = OnConflictStrategy.IGNORE)
 //    fun populateData(plants: List<PlantData>)
-
 
 }

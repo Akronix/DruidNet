@@ -54,15 +54,6 @@ data class NameEntity (
     val language: LanguageEnum
 )
 
-//@Entity
-//data class Reference(
-//    @PrimaryKey val refId: String,
-//    val title: String,
-//    val year: Int,
-//    val authors: Array<String>,
-//    val editorial: String
-//)
-
 @Entity(
     tableName = "Confusion",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
@@ -71,7 +62,7 @@ data class NameEntity (
                                     onDelete = ForeignKey.CASCADE)),
             indices = [Index(value = ["latin_name"], unique = true)])
 data class ConfusionEntity(
-    @PrimaryKey(autoGenerate = true) val confusionId: Int = 0,
+    @PrimaryKey(autoGenerate = true) val confusionId: Int = 1,
     @ColumnInfo(index = true) val plantId: Int,
     @ColumnInfo(name = "latin_name") val latinName: String,
     val text: String,

@@ -1,0 +1,409 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "c8493be640df686be139d90aafca20df",
+    "entities": [
+      {
+        "tableName": "Plant",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plantId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `latin_name` TEXT NOT NULL, `family` TEXT NOT NULL, `description` TEXT NOT NULL, `habitat` TEXT NOT NULL, `phenology` TEXT NOT NULL, `distribution` TEXT NOT NULL, `toxic` INTEGER NOT NULL, `toxic_text` TEXT, `observations` TEXT, `curiosities` TEXT, `image_path` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "plantId",
+            "columnName": "plantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latinName",
+            "columnName": "latin_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "family",
+            "columnName": "family",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "habitat",
+            "columnName": "habitat",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phenology",
+            "columnName": "phenology",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "distribution",
+            "columnName": "distribution",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toxic",
+            "columnName": "toxic",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toxicText",
+            "columnName": "toxic_text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "observations",
+            "columnName": "observations",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "curiosities",
+            "columnName": "curiosities",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imagePath",
+            "columnName": "image_path",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "plantId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Plant_latin_name",
+            "unique": true,
+            "columnNames": [
+              "latin_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Plant_latin_name` ON `${TABLE_NAME}` (`latin_name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Usage",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`usageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `type` TEXT NOT NULL, `subType` TEXT NOT NULL, `text` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "usageId",
+            "columnName": "usageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plantId",
+            "columnName": "plantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subType",
+            "columnName": "subType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "usageId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Usage_plantId",
+            "unique": false,
+            "columnNames": [
+              "plantId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Usage_plantId` ON `${TABLE_NAME}` (`plantId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Plant",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "plantId"
+            ],
+            "referencedColumns": [
+              "plantId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "Name",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nameId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `common_name` TEXT NOT NULL, `isDisplayName` INTEGER NOT NULL DEFAULT 1, `language` TEXT NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "nameId",
+            "columnName": "nameId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plantId",
+            "columnName": "plantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "commonName",
+            "columnName": "common_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDisplayName",
+            "columnName": "isDisplayName",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "nameId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Name_plantId",
+            "unique": false,
+            "columnNames": [
+              "plantId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Name_plantId` ON `${TABLE_NAME}` (`plantId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Plant",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "plantId"
+            ],
+            "referencedColumns": [
+              "plantId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "Confusion",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`confusionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `latin_name` TEXT NOT NULL, `text` TEXT NOT NULL, `image_path` TEXT, `caption_text` TEXT, FOREIGN KEY(`plantId`) REFERENCES `Plant`(`plantId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "confusionId",
+            "columnName": "confusionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plantId",
+            "columnName": "plantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latinName",
+            "columnName": "latin_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imagePath",
+            "columnName": "image_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "captionText",
+            "columnName": "caption_text",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "confusionId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Confusion_latin_name",
+            "unique": true,
+            "columnNames": [
+              "latin_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Confusion_latin_name` ON `${TABLE_NAME}` (`latin_name`)"
+          },
+          {
+            "name": "index_Confusion_plantId",
+            "unique": false,
+            "columnNames": [
+              "plantId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Confusion_plantId` ON `${TABLE_NAME}` (`plantId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Plant",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "plantId"
+            ],
+            "referencedColumns": [
+              "plantId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "Bibliography",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`refId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `title` TEXT NOT NULL, `authors` TEXT, `publisher` TEXT, `date` TEXT, `isbn` TEXT, `edition` TEXT, `url` TEXT, `subtitle` TEXT, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "refId",
+            "columnName": "refId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "authors",
+            "columnName": "authors",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "publisher",
+            "columnName": "publisher",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isbn",
+            "columnName": "isbn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "edition",
+            "columnName": "edition",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subtitle",
+            "columnName": "subtitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "refId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [
+      {
+        "viewName": "PlantView",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT p.plantId, p.latin_name, n.common_name, n.language, p.image_path FROM Plant p JOIN Name n ON p.plantId = n.plantId WHERE isDisplayName = 1"
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8493be640df686be139d90aafca20df')"
+    ]
+  }
+}

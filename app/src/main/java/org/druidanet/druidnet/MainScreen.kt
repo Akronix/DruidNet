@@ -68,6 +68,9 @@ fun DruidNetApp(
     val currentScreen = Screen.valueOf(backStackEntry?.destination?.route ?: Screen.Welcome.name)
 
     val plantList by viewModel.getAllPlants().collectAsState(emptyList())
+    val bibliography by viewModel.getBibliography().collectAsState(emptyList())
+    val bibliographyStr = if (!bibliography.isEmpty()) bibliography.map( {"* " + it.toMarkdownString()})
+        .reduce( { acc : String, ref: String -> "$acc\n$ref"}) else ""
 
     val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
 
@@ -145,6 +148,7 @@ fun DruidNetApp(
             }
             composable(route = Screen.Bibliography.name) {
                 BibliographyScreen(
+                    bibliographyStr = bibliographyStr,
                     modifier = Modifier
                         .fillMaxSize()
                 )
