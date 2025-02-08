@@ -13,7 +13,7 @@ android {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
+        versionCode = 11
         versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -25,27 +25,28 @@ android {
 
     buildTypes {
 
-        create("beta") {
-
-            initWith(getByName("debug"))
-
-//            applicationIdSuffix = ".beta"
-            versionNameSuffix = "-beta"
-
-            ndk.debugSymbolLevel = "FULL"
-
-            isDebuggable = false
-
-            // Enables code shrinking, obfuscation, and optimization for only
-            // your project's release build type. Make sure to use a build
-            // variant with `isDebuggable=false`.
-            isMinifyEnabled = false
-
-            // Enables resource shrinking, which is performed by the
-            // Android Gradle plugin.
-            isShrinkResources = false
-
-        }
+        // Bad idea; the updates has to have the same build variant every time.
+//        create("beta") {
+//
+//            initWith(getByName("debug"))
+//
+////            applicationIdSuffix = ".beta"
+//            versionNameSuffix = "-beta"
+//
+//            ndk.debugSymbolLevel = "FULL"
+//
+//            isDebuggable = false
+//
+//            // Enables code shrinking, obfuscation, and optimization for only
+//            // your project's release build type. Make sure to use a build
+//            // variant with `isDebuggable=false`.
+//            isMinifyEnabled = false
+//
+//            // Enables resource shrinking, which is performed by the
+//            // Android Gradle plugin.
+//            isShrinkResources = false
+//
+//        }
 
         release {
 
