@@ -16,7 +16,8 @@ interface PlantDAO {
     @Query("SELECT DISTINCT common_name as displayName, plantId, image_path as imagePath " +
             "FROM PlantView " +
             "WHERE language = :language " +
-            "ORDER BY displayName")
+            "ORDER BY displayName " +
+            "COLLATE LOCALIZED")
     fun getPlantCatalogData(language: LanguageEnum): Flow<List<PlantBasic>>
 
 
