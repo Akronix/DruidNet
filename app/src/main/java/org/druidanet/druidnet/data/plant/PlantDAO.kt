@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.data
+package org.druidanet.druidnet.data.plant
 
 import androidx.room.Dao
 import androidx.room.Query

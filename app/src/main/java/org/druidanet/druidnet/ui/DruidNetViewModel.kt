@@ -20,9 +20,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.DruidNetUiState
-import org.druidanet.druidnet.data.PlantDAO
-import org.druidanet.druidnet.data.PlantData
-import org.druidanet.druidnet.data.PlantView
+import org.druidanet.druidnet.data.plant.PlantDAO
+import org.druidanet.druidnet.data.plant.PlantData
+import org.druidanet.druidnet.data.plant.PlantView
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO

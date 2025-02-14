@@ -7,6 +7,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
+import org.druidanet.druidnet.data.plant.ConfusionEntity
+import org.druidanet.druidnet.data.plant.NameEntity
+import org.druidanet.druidnet.data.plant.PlantDAO
+import org.druidanet.druidnet.data.plant.PlantEntity
+import org.druidanet.druidnet.data.plant.PlantView
+import org.druidanet.druidnet.data.plant.UsageEntity
 
 @Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class, BibliographyEntity::class],
           views = [PlantView::class],

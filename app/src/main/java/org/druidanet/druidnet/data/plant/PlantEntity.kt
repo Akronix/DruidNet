@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.data
+package org.druidanet.druidnet.data.plant
 
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView

@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.data
+package org.druidanet.druidnet.data.plant
 
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
@@ -6,7 +6,6 @@ import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.model.UsageType
-
 
 /**
  * [PlantsDataSource] generates a list of [Plant]
@@ -52,23 +51,31 @@ object PlantsDataSource {
                         "redondeados, color blanco y crema. Fruto en drupas de 5-7 mm, esferoidales, " +
                         "color violeta-negruzco, en grupos colgantes.",
                 usages = mapOf(
-                        Pair(UsageType.MEDICINAL,
-                            listOf(Usage(
+                    Pair(
+                        UsageType.MEDICINAL,
+                        listOf(
+                            Usage(
                                 UsageType.MEDICINAL,
                                 "Sistema respiratorio",
-                                "Infusión de sus flores para enfermedades respiratorias"))
-                        ),
-                        Pair(UsageType.EDIBLE,
-                            listOf(
-                                Usage(
-                                    UsageType.EDIBLE,
-                                    "Comestibles-Verduras y hortalizas",
-                                    "Buñuelos de flores de Saúco"),Usage(
-                                    UsageType.EDIBLE,
-                                    "Bebidas Alcohólicas",
-                                    "Con las flores se prepara el champán de Saúco."),
+                                "Infusión de sus flores para enfermedades respiratorias"
                             )
                         )
+                    ),
+                    Pair(
+                        UsageType.EDIBLE,
+                        listOf(
+                            Usage(
+                                UsageType.EDIBLE,
+                                "Comestibles-Verduras y hortalizas",
+                                "Buñuelos de flores de Saúco"
+                            ),
+                            Usage(
+                                UsageType.EDIBLE,
+                                "Bebidas Alcohólicas",
+                                "Con las flores se prepara el champán de Saúco."
+                            ),
+                        )
+                    )
                 ),
                 phenology = "Florece de abril a julio y fructifica en julio y agosto.",
                 habitat = "Indiferente edáfico, vive en suelos húmedos de los pisos basal y mon" +
@@ -88,8 +95,8 @@ object PlantsDataSource {
                         "en la isla de El Hierro. Ambas subespecies tienen usos similares.",
                 confusions = arrayOf(
                     Confusion(
-                        latinName= "Sambucus ebulus",
-                        text="Se puede confundir con el Sauquillo, Yezgo o Saúco menor (_Sambucus ebulus_), cuyos frutos son tóxicos. Tratándose éste último de una herbáceea, sin parte leñosa;" +
+                        latinName = "Sambucus ebulus",
+                        text = "Se puede confundir con el Sauquillo, Yezgo o Saúco menor (_Sambucus ebulus_), cuyos frutos son tóxicos. Tratándose éste último de una herbáceea, sin parte leñosa;" +
                                 " mientras que el Saúco (Sambucus Nigra) tiene porte arbustivo o arbóreo. " +
                                 "Además los frutos del Saúco caen en racimos hacia abajo, mientras que los del Sauquillo crecen hacia arriba.",
                         imagePath = "sambucus_ebulus2",

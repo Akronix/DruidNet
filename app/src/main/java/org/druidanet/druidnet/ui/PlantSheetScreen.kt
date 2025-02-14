@@ -44,7 +44,7 @@ import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.data.PlantsDataSource
+import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
