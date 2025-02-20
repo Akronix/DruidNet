@@ -33,6 +33,9 @@ import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
+import org.druidanet.druidnet.utils.mergeOrderedLists
+import java.text.Collator
+import java.util.Locale
 
 class DruidNetViewModel(
     private val plantDao: PlantDAO,
@@ -121,8 +124,15 @@ class DruidNetViewModel(
                 plantDao.getPlantCatalogData(LANGUAGE_APP),
                 plantDao.getPlantCatalogLatinNotInLanguage(LANGUAGE_APP))
             { plantsInLanguage, plantsInLatin ->
-                plantsInLanguage.map { plant -> PlantCard(plant.plantId, plant.displayName, plant.imagePath, false) } +
-                plantsInLatin.map { plant -> PlantCard(plant.plantId, plant.displayName, plant.imagePath, true) }
+                if (plantsInLatin.isEmpty())
+                    plantsInLanguage.map { PlantCard(it.plantId, it.displayName, it.imagePath, false) }
+                else
+                    mergeOrderedLists(
+                        plantsInLanguage.map { PlantCard(it.plantId, it.displayName, it.imagePath, false) },
+                        plantsInLatin.map { PlantCard(it.plantId, it.displayName, it.imagePath, true) },
+                        compareBy = compareBy(
+                            Collator.getInstance(Locale("es", "ES"))) { it.displayName }
+                    )
             }
 
         } else {

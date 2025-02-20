@@ -116,10 +116,7 @@ fun DruidNetApp(
             }
             composable(route = Screen.Catalog.name) {
                 CatalogScreen(
-                    plantList = plantList.sortedWith(
-                        compareBy(
-                            Collator.getInstance(Locale("es", "ES")))
-                        { it.displayName }),
+                    plantList = plantList,
                     onClickPlantCard = { plant ->
                         viewModel.setSelectedPlant(plant.plantId)
                         coroutineScope.launch {
