@@ -41,13 +41,15 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.ui.AboutScreen
+import org.druidanet.druidnet.ui.BibliographyScreen
 import org.druidanet.druidnet.ui.CatalogScreen
+import org.druidanet.druidnet.ui.CreditsScreen
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.PlantSheetBottomBar
 import org.druidanet.druidnet.ui.PlantSheetScreen
-import org.druidanet.druidnet.ui.BibliographyScreen
-import org.druidanet.druidnet.ui.CreditsScreen
 import org.druidanet.druidnet.ui.WelcomeScreen
+import java.text.Collator
+import java.util.Locale
 
 
 enum class Screen(@StringRes val title: Int) {
@@ -114,11 +116,14 @@ fun DruidNetApp(
             }
             composable(route = Screen.Catalog.name) {
                 CatalogScreen(
-                    plantList = plantList,
+                    plantList = plantList.sortedWith(
+                        compareBy(
+                            Collator.getInstance(Locale("es", "ES")))
+                        { it.displayName }),
                     onClickPlantCard = { plant ->
                         viewModel.setSelectedPlant(plant.plantId)
                         coroutineScope.launch {
-                            viewModel.updatePlantUi(plant.plantId)
+                            viewModel.updatePlantUi(plant.plantId, plant.displayName)
                             navController.navigate(Screen.PlantSheet.name)
                         }
                     },

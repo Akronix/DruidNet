@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -20,18 +21,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.DruidNetUiState
-import org.druidanet.druidnet.data.plant.PlantDAO
-import org.druidanet.druidnet.data.plant.PlantData
-import org.druidanet.druidnet.data.plant.PlantView
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
+import org.druidanet.druidnet.data.plant.PlantDAO
+import org.druidanet.druidnet.data.plant.PlantData
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
-import org.druidanet.druidnet.model.PlantBasic
+import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 
 class DruidNetViewModel(
@@ -99,12 +99,7 @@ class DruidNetViewModel(
     /**
      * Update the item in the [ItemsRepository]'s data source
      */
-    suspend fun updatePlantUi(selectPlant: Int) {
-        val displayName = if (LANGUAGE_APP != LanguageEnum.LATIN) {
-            plantDao.getDisplayName(selectPlant, LANGUAGE_APP).first()
-        } else {
-            plantDao.getLatinName(selectPlant).first()
-        }
+    suspend fun updatePlantUi(selectPlant: Int, displayName: String) {
 
         val plantObj: Plant = this.getPlant(selectPlant)
             .filterNotNull()
@@ -120,11 +115,20 @@ class DruidNetViewModel(
     }
 
     // Get all plants from db
-    fun getAllPlants() =
+    fun getAllPlants() : Flow<List<PlantCard>> =
         if (LANGUAGE_APP != LanguageEnum.LATIN) {
-            plantDao.getPlantCatalogData(LANGUAGE_APP)
+            combine(
+                plantDao.getPlantCatalogData(LANGUAGE_APP),
+                plantDao.getPlantCatalogLatinNotInLanguage(LANGUAGE_APP))
+            { plantsInLanguage, plantsInLatin ->
+                plantsInLanguage.map { plant -> PlantCard(plant.plantId, plant.displayName, plant.imagePath, false) } +
+                plantsInLatin.map { plant -> PlantCard(plant.plantId, plant.displayName, plant.imagePath, true) }
+            }
+
         } else {
-            plantDao.getPlantCatalogLatin()
+            plantDao.getPlantCatalogLatin().map {
+                list -> list.map { plant -> PlantCard(plant.plantId, plant.displayName, plant.imagePath, true) }
+            }
         }
 
     /**
@@ -160,13 +164,6 @@ class DruidNetViewModel(
 }
 
 /****** OTHERS - HELPER FUNCTIONS *****/
-
-fun PlantView.toPlantBasic(): PlantBasic =
-    PlantBasic(
-        plantId = plantId,
-        displayName = common_name,
-        imagePath = image_path
-    )
 
 fun PlantData.toPlant(displayName: String): Plant =
     Plant(

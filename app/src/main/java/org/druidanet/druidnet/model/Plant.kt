@@ -6,13 +6,22 @@ interface PlantBase {
     val displayName: String
 
     val imagePath: String
+
 }
 
-data class PlantBasic(
+open class PlantBasic(
     override val plantId: Int,
     override val displayName: String,
-    override val imagePath: String
+    override val imagePath: String,
 ) : PlantBase
+
+
+data class PlantCard(
+    override val plantId: Int,
+    override val displayName: String,
+    override val imagePath: String,
+    val isLatinName: Boolean
+) : PlantBasic(plantId, displayName, imagePath)
 
 
 data class Plant (
@@ -38,10 +47,10 @@ data class Plant (
     val observations: String? = null,
     val curiosities: String? = null,
 
-    override val imagePath: String
+    override val imagePath: String,
 
     // otherImages
-): PlantBase
+): PlantBasic(plantId, displayName, imagePath)
 
 data class Name (
     val name: String,

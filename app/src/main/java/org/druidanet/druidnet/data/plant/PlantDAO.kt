@@ -26,6 +26,17 @@ interface PlantDAO {
             " ORDER BY latin_name")
     fun getPlantCatalogLatin(): Flow<List<PlantBasic>>
 
+
+    @Query("SELECT plantId, latin_name as displayName, image_path as imagePath" +
+            " FROM PlantView " +
+            " EXCEPT" +
+            " SELECT plantId, latin_name as displayName, image_path as imagePath " +
+            " FROM PlantView" +
+            " WHERE language = :language" +
+            " ORDER BY displayName")
+    fun getPlantCatalogLatinNotInLanguage(language: LanguageEnum): Flow<List<PlantBasic>>
+
+
     @Query("SELECT common_name as displayName" +
             " FROM PlantView" +
             " WHERE language = :language" +

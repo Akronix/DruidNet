@@ -15,16 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.druidanet.druidnet.data.plant.PlantsDataSource
-import org.druidanet.druidnet.model.PlantBase
+import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 
 @Composable
-fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier: Modifier) {
+fun PlantCard(plant: PlantCard, onClickPlantCard: (PlantCard) -> Unit, modifier: Modifier) {
 
     val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
 
@@ -45,7 +46,8 @@ fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier:
                 text = plant.displayName,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontStyle = if (plant.isLatinName) FontStyle.Italic else FontStyle.Normal
             )
 
         }
@@ -54,8 +56,8 @@ fun PlantCard(plant: PlantBase, onClickPlantCard: (PlantBase) -> Unit, modifier:
 
 @Composable
 fun PlantsList(
-    plantsList: List<PlantBase>,
-    onClickPlantCard: (PlantBase) -> Unit,
+    plantsList: List<PlantCard>,
+    onClickPlantCard: (PlantCard) -> Unit,
     modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(plantsList) { plant ->
@@ -73,8 +75,8 @@ fun PlantsList(
 
 @Composable
 fun CatalogScreen(
-    plantList: List<PlantBase>,
-    onClickPlantCard: (PlantBase) -> Unit,
+    plantList: List<PlantCard>,
+    onClickPlantCard: (PlantCard) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -94,7 +96,10 @@ fun CatalogScreen(
 @Composable
 fun CatalogPreview() {
     DruidNetTheme {
-        CatalogScreen(plantList = PlantsDataSource.loadPlants(), onClickPlantCard = { })
+        CatalogScreen(
+            plantList = PlantsDataSource.loadPlants()
+                .map { PlantCard(it.plantId, it.displayName, it.imagePath, false) },
+            onClickPlantCard = { })
     }
 }
 
