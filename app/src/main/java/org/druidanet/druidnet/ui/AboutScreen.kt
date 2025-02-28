@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui
 
+import Screen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -51,8 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
+import org.druidanet.druidnet.BibliographyDestination
+import org.druidanet.druidnet.CreditsDestination
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -85,7 +87,7 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
             AboutSectionHeader("Acerca de " + stringResource(R.string.app_name))
 
             AboutItem(
-                { onNavigationButtonClick( Screen.Bibliography ) },
+                { onNavigationButtonClick( BibliographyDestination ) },
                 stringResource(R.string.title_screen_bibliography),
                 imageResource = R.drawable.library_books,
                 additionalText = null
@@ -99,7 +101,7 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
             )
 
             AboutItem(
-                { onNavigationButtonClick( Screen.Credits ) },
+                { onNavigationButtonClick( CreditsDestination ) },
                 stringResource(R.string.title_screen_credits),
                 imageVector = Icons.Default.Star,
                 additionalText = null

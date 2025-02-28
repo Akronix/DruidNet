@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui
 
+import Screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -21,8 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import org.druidanet.druidnet.PlantSheetDestination
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
@@ -34,7 +35,7 @@ fun PlantSheetBottomBar(
     currentSection: PlantSheetSection,
     hasConfusions: Boolean
 ) : @Composable () -> Unit {
-    if (currentScreen == Screen.PlantSheet)
+    if (currentScreen == PlantSheetDestination)
         return {
             BottomAppBar(
                 actions = {
@@ -144,7 +145,7 @@ fun PlantSheetBottomBarPreview() {
     DruidNetTheme {
         Scaffold(
             bottomBar = PlantSheetBottomBar(
-                Screen.PlantSheet,
+                PlantSheetDestination,
                 onClickBottomNavItem = { _ -> {  } },
                 currentSection = PlantSheetSection.DESCRIPTION,
                 hasConfusions = samplePlant.confusions.isNotEmpty()

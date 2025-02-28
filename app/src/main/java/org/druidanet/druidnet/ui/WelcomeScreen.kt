@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui
 
+import Screen
 import android.content.res.Resources.Theme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -36,8 +37,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import org.druidanet.druidnet.AboutDestination
+import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.Screen
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
@@ -54,7 +56,7 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
         Icon(
             Icons.Outlined.Settings,
             "Abre ajustes de la aplicación",
-            modifier = Modifier.clickable { onNavigationButtonClick(Screen.About) }
+            modifier = Modifier.clickable { onNavigationButtonClick(AboutDestination) }
             )
     }
 
@@ -80,7 +82,7 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit, modifier: Modifier 
             )
             Spacer(modifier = Modifier.height(48.dp))
             Button(
-                onClick = {onNavigationButtonClick(Screen.Catalog)},
+                onClick = {onNavigationButtonClick(CatalogDestination)},
                 modifier = Modifier.fillMaxWidth().height(48.dp)
             ) {
                 Text("\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn),
