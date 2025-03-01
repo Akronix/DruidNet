@@ -2,8 +2,6 @@ package org.druidanet.druidnet
 
 import Screen
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -86,6 +84,15 @@ object PlantSheetDestination : Screen {
     val routeWithArgs = "$route/{$plantArg}"
 }
 
+val screensByRoute : Map<String, Screen> =
+    mapOf(
+        WelcomeDestination.route to WelcomeDestination,
+        CatalogDestination.route to CatalogDestination,
+        PlantSheetDestination.route to PlantSheetDestination,
+        AboutDestination.route to AboutDestination
+    )
+
+
 //enum class Screen(@StringRes val title: Int) {
 //    Welcome(title = R.string.app_name),
 //    Catalog(title = R.string.title_screen_catalog),
@@ -101,9 +108,8 @@ fun DruidNetApp(
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreenRoute : String = backStackEntry?.destination?.route ?: WelcomeDestination.route
 
-    val currentScreen : Screen = backStackEntry?.toRoute() ?: WelcomeDestination
+    val currentScreen : Screen = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
 
     val plantList by viewModel.getAllPlants().collectAsState(emptyList())
     val bibliography by viewModel.getBibliography().collectAsState(emptyList())
@@ -121,7 +127,7 @@ fun DruidNetApp(
 
     Scaffold(
         topBar = DruidNetAppBar(
-            currentScreenRoute = currentScreenRoute,
+            currentScreen = currentScreen,
             navigateUp = { navController.navigateUp() },
             uiState = druidNetUiState
         ),
@@ -249,22 +255,20 @@ fun Disclaimer(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DruidNetAppBar(
-    currentScreenRoute: String,
+    currentScreen: Screen,
     navigateUp: () -> Unit,
     uiState: DruidNetUiState,
     modifier: Modifier = Modifier
 ): @Composable () -> Unit {
 
-        Log.i("D", currentScreenRoute)
+        if (currentScreen == WelcomeDestination) return {} // No top bar in Welcome screen
 
-        if (currentScreenRoute == WelcomeDestination.route) return {} // No top bar in Welcome screen
-
-        val topBarTitle: String = when (currentScreenRoute) {
-            PlantSheetDestination.route -> uiState.plantUiState!!.displayName
-            else -> currentScreenRoute
+        val topBarTitle: String = when (currentScreen) {
+            PlantSheetDestination -> uiState.plantUiState!!.displayName
+            else -> stringResource(currentScreen.title)
         }
 
-        val topBarIconPath: Int? = if (currentScreenRoute == CatalogDestination.route) R.drawable.menu_book else null
+        val topBarIconPath: Int? = if (currentScreen == CatalogDestination) R.drawable.menu_book else null
 
         return {
             CenterAlignedTopAppBar(
