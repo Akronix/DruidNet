@@ -34,11 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.ui.AboutScreen
@@ -49,8 +50,6 @@ import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.PlantSheetBottomBar
 import org.druidanet.druidnet.ui.PlantSheetScreen
 import org.druidanet.druidnet.ui.WelcomeScreen
-import java.text.Collator
-import java.util.Locale
 
 object WelcomeDestination : Screen {
     override val route = "welcome"
@@ -77,10 +76,18 @@ object CreditsDestination : Screen {
     override val title = R.string.title_screen_credits
 }
 
+// We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
+//@Serializable
+//data class PlantSheetDestination(val plantId: Int = 0) : Screen {
+//    override val route = "plant_sheet"
+//    override val title = R.string.title_screen_plant_sheet
+//    val routeWithArgs = "$route/{$plantId}"
+//}
+
 object PlantSheetDestination : Screen {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
-    const val plantArg = "latin_name"
+    const val plantArg = "plantId"
     val routeWithArgs = "$route/{$plantArg}"
 }
 
@@ -88,8 +95,10 @@ val screensByRoute : Map<String, Screen> =
     mapOf(
         WelcomeDestination.route to WelcomeDestination,
         CatalogDestination.route to CatalogDestination,
-        PlantSheetDestination.route to PlantSheetDestination,
-        AboutDestination.route to AboutDestination
+        PlantSheetDestination.routeWithArgs to PlantSheetDestination,
+        AboutDestination.route to AboutDestination,
+        BibliographyDestination.route to BibliographyDestination,
+        CreditsDestination.route to CreditsDestination
     )
 
 
@@ -164,7 +173,7 @@ fun DruidNetApp(
                         viewModel.setSelectedPlant(plant.plantId)
                         coroutineScope.launch {
                             viewModel.updatePlantUi(plant.plantId, plant.displayName)
-                            navController.navigate(PlantSheetDestination.route)
+                            navController.navigate("${PlantSheetDestination.route}/${plant.plantId}")
                         }
                     },
                     modifier = Modifier
@@ -172,7 +181,12 @@ fun DruidNetApp(
                         .wrapContentSize(Alignment.Center)
                 )
             }
-            composable(route = PlantSheetDestination.route) {
+            composable(route = PlantSheetDestination.routeWithArgs,
+                        arguments = listOf(navArgument(PlantSheetDestination.plantArg){
+                        type = NavType.IntType
+                        })
+            ){
+
                 PlantSheetScreen(
                     plant = druidNetUiState.plantUiState!!,
                     currentSection = druidNetUiState.currentSection,

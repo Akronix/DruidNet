@@ -1,4 +1,5 @@
 plugins {
+//    kotlin("plugin.serialization") version "1.9.0"
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
@@ -100,6 +101,9 @@ android {
 
 
 dependencies {
+
+    // Serializable
+//    implementation(libs.kotlinx.serialization.json)
 
     // Markdown
     implementation(libs.multiplatform.markdown.renderer)

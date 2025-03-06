@@ -1,3 +1,6 @@
+import androidx.annotation.StringRes
+import org.druidanet.druidnet.R
+
 /**
  * Interface to describe the navigation destinations for the app
  */
