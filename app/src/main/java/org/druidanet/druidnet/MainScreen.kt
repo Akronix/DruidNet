@@ -149,6 +149,7 @@ fun DruidNetApp(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
 
+        // Clear NavHost of viewModel and uistate, so all this nav Graph can be moved to DruidNetNavGraph.kt
         NavHost(
             navController = navController,
             startDestination = WelcomeDestination.route,
@@ -172,7 +173,7 @@ fun DruidNetApp(
                     onClickPlantCard = { plant ->
                         viewModel.setSelectedPlant(plant.plantId)
                         coroutineScope.launch {
-                            viewModel.updatePlantUi(plant.plantId, plant.displayName)
+                            viewModel.updatePlantUi(plant.plantId, plant.displayName) // TO BE REMOVED
                             navController.navigate("${PlantSheetDestination.route}/${plant.plantId}")
                         }
                     },
@@ -187,6 +188,8 @@ fun DruidNetApp(
                         })
             ){
 
+                // generate plant Instance from the plantId argument in the route
+                // After, think how to make hyperlinks from [[Taxus baccata]] in text to plant_sheet/{taxus_baccata_id} navigation deep links
                 PlantSheetScreen(
                     plant = druidNetUiState.plantUiState!!,
                     currentSection = druidNetUiState.currentSection,
