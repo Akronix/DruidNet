@@ -1,5 +1,6 @@
 [versions]
-agp = "8.8.1"
+agp = "8.9.0"
+retrofit = "2.11.0"
 coreSplashscreen = "1.0.1"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
@@ -49,6 +50,7 @@ androidx-datastore-core-android = { group = "androidx.datastore", name = "datast
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-android = { module = "com.mikepenz:multiplatform-markdown-renderer-android", version.ref = "multiplatformMarkdownRendererAndroid" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRendererM3" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

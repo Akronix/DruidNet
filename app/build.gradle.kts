@@ -1,5 +1,5 @@
 plugins {
-//    kotlin("plugin.serialization") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.10"
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
@@ -103,7 +103,13 @@ android {
 dependencies {
 
     // Serializable
-//    implementation(libs.kotlinx.serialization.json)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    // Retrofit
+    implementation(libs.retrofit)
+    // Retrofit with Kotlin serialization Converter
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:latest.version")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     // Markdown
     implementation(libs.multiplatform.markdown.renderer)
