@@ -1,6 +1,7 @@
 package org.druidanet.druidnet.ui
 
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -102,15 +103,16 @@ class DruidNetViewModel(
     }
 
     /****** NETWORK FUNCTIONS *****/
-    fun getDatabaseUpdate() {
+    fun getDatabaseUpdate(snackbarHost: SnackbarHostState) {
         viewModelScope.launch {
-            try {
-                val lastUpdate = BackendApi.retrofitService.getLastUpdate()
-                Log.i("DruidNet", "Last update: $lastUpdate")
+             try {
+                 val lastUpdate = BackendApi.retrofitService.getLastUpdate()
+                 Log.i("DruidNet", "Last update: $lastUpdate")
+                 snackbarHost.showSnackbar("Fecha última actualización: $lastUpdate")
             } catch (e: IOException) {
-                Log.e("DruidNet", "Error getting last update: ${e.message}")
+                 Log.e("DruidNet", "Error getting last update: ${e.message}")
+                 snackbarHost.showSnackbar("Error actualizando la base de datos")
             }
-
         }
     }
 
