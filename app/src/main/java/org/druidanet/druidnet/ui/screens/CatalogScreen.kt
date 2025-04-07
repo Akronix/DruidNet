@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.ui
+package org.druidanet.druidnet.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

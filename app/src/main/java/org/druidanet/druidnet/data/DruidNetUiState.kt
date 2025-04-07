@@ -2,8 +2,8 @@ package org.druidanet.druidnet.data
 
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
-import org.druidanet.druidnet.ui.DEFAULT_SECTION
-import org.druidanet.druidnet.ui.PlantSheetSection
+import org.druidanet.druidnet.ui.screens.DEFAULT_SECTION
+import org.druidanet.druidnet.ui.screens.PlantSheetSection
 
 data class DruidNetUiState(
     /** Selected plant to show */

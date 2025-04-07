@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -33,7 +34,10 @@ import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
+import org.druidanet.druidnet.network.BackendApi
+import org.druidanet.druidnet.ui.screens.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
+import java.io.IOException
 import java.text.Collator
 import java.util.Locale
 
@@ -96,6 +100,20 @@ class DruidNetViewModel(
                 currentState.copy(currentSection = newSection)
             }
     }
+
+    /****** NETWORK FUNCTIONS *****/
+    fun getDatabaseUpdate() {
+        viewModelScope.launch {
+            try {
+                val lastUpdate = BackendApi.retrofitService.getLastUpdate()
+                Log.i("DruidNet", "Last update: $lastUpdate")
+            } catch (e: IOException) {
+                Log.e("DruidNet", "Error getting last update: ${e.message}")
+            }
+
+        }
+    }
+
 
     /****** DATABASE FUNCTIONS *****/
 

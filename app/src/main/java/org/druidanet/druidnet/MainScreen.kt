@@ -42,14 +42,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import org.druidanet.druidnet.data.DruidNetUiState
-import org.druidanet.druidnet.ui.AboutScreen
-import org.druidanet.druidnet.ui.BibliographyScreen
-import org.druidanet.druidnet.ui.CatalogScreen
-import org.druidanet.druidnet.ui.CreditsScreen
+import org.druidanet.druidnet.ui.screens.AboutScreen
+import org.druidanet.druidnet.ui.screens.BibliographyScreen
+import org.druidanet.druidnet.ui.screens.CatalogScreen
+import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.DruidNetViewModel
-import org.druidanet.druidnet.ui.PlantSheetBottomBar
-import org.druidanet.druidnet.ui.PlantSheetScreen
-import org.druidanet.druidnet.ui.WelcomeScreen
+import org.druidanet.druidnet.ui.screens.PlantSheetBottomBar
+import org.druidanet.druidnet.ui.screens.PlantSheetScreen
+import org.druidanet.druidnet.ui.screens.WelcomeScreen
 
 object WelcomeDestination : Screen {
     override val route = "welcome"
@@ -160,6 +160,7 @@ fun DruidNetApp(
                     onNavigationButtonClick = {screen: Screen ->
                         navController.navigate(screen.route)
                     },
+                    updateDatabase = {viewModel.getDatabaseUpdate()},
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()

@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.ui
+package org.druidanet.druidnet.ui.screens
 
 import Screen
 import android.content.Context
@@ -7,7 +7,6 @@ import android.net.Uri
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,6 +56,7 @@ import org.druidanet.druidnet.CreditsDestination
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.LanguageEnum
+import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
@@ -121,7 +121,7 @@ fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetV
             )
 
             AboutItem(
-                {sendEmailAction(context)},
+                { sendEmailAction(context) },
                 "Contacta",
                 additionalText = "¿Alguna sugerencia? ¿Quieres colaborar?",
                 imageVector = Icons.Default.Email )

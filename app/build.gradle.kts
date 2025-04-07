@@ -107,9 +107,11 @@ dependencies {
 
     // Retrofit
     implementation(libs.retrofit)
+    implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
+
     // Retrofit with Kotlin serialization Converter
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:latest.version")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Markdown
     implementation(libs.multiplatform.markdown.renderer)
