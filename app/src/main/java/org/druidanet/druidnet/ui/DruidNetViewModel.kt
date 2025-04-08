@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.room.RoomDatabase
+import androidx.room.withTransaction
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,6 +24,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.data.PreferencesState
@@ -36,6 +41,7 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
+import org.druidanet.druidnet.network.PlantDataDTO
 import org.druidanet.druidnet.ui.screens.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
@@ -45,7 +51,8 @@ import java.util.Locale
 class DruidNetViewModel(
     private val plantDao: PlantDAO,
     private val biblioDao: BibliographyDAO,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val roomDatabase: RoomDatabase
 ) : ViewModel(){
 
     /****** STATE VARIABLES *****/
@@ -77,7 +84,8 @@ class DruidNetViewModel(
                 DruidNetViewModel(
                     application.database.plantDao(),
                     application.database.biblioDao(),
-                    application.userPreferencesRepository
+                    application.userPreferencesRepository,
+                    application.database
                 )
             }
         }
@@ -103,12 +111,43 @@ class DruidNetViewModel(
     }
 
     /****** NETWORK FUNCTIONS *****/
-    fun getDatabaseUpdate(snackbarHost: SnackbarHostState) {
+    fun checkAndUpdateDatabase(snackbarHost: SnackbarHostState) {
         viewModelScope.launch {
-             try {
-                 val lastUpdate = BackendApi.retrofitService.getLastUpdate()
-                 Log.i("DruidNet", "Last update: $lastUpdate")
-                 snackbarHost.showSnackbar("Fecha última actualización: $lastUpdate")
+            try {
+                val res = BackendApi.retrofitService.getLastUpdate()
+                Log.i("DruidNet", "Last update: ${res.versionDB}")
+                snackbarHost.showSnackbar("Fecha última actualización: ${res.versionDB}")
+                // If current version older than new update version:
+//                 if (res.versionDB > currentVersion) {
+                     //  1. Download all plants and bibliography entries
+//                    if (res.plantsChanged) data = BackendApi.retrofitService.downloadPlantData() else data = get
+                    val data = BackendApi.retrofitService.downloadPlantData()
+                    val biblio = if (res.biblioChanged) BackendApi.retrofitService.downloadBiblio() else getBibliography().first()
+                    snackbarHost.showSnackbar("Datos descargados")
+
+                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
+                    Log.i("DruidNet", "Downloaded data:\n $data")
+
+                     //  2. Download images
+//                 val imageList = res.images
+//                 BackendApi.retrofitService.downloadImages(imageList)
+
+                     // (The next two steps, ideally, would be done in one atomic transaction)
+//                 withContext(Dispatchers.IO) {
+                    roomDatabase.withTransaction {
+
+                         //  3. Delete all data in localdb
+                        clearDB()
+                         //  4. Substitute new data in localdb
+                        plantDao.populatePlants(data.plants)
+                        plantDao.populateConfusions(data.confusions)
+                        plantDao.populateNames(data.names)
+                        plantDao.populateUsages(data.usages)
+                        biblioDao.populateData(biblio)
+                        snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
+                     }
+//                 }
+//                 }
             } catch (e: IOException) {
                  Log.e("DruidNet", "Error getting last update: ${e.message}")
                  snackbarHost.showSnackbar("Error actualizando la base de datos")
@@ -169,6 +208,8 @@ class DruidNetViewModel(
 
     fun getBibliography() : Flow<List<BibliographyEntity>> =
         biblioDao.getAllBibliographyEntries()
+
+    fun clearDB() = roomDatabase.clearAllTables()
 
 
     /****** USER PREFERENCES FUNCTIONS *****/

@@ -169,7 +169,7 @@ fun DruidNetApp(
                         navController.navigate(screen.route)
                     },
                     updateDatabase = {
-                        viewModel.getDatabaseUpdate(snackbarHost = snackbarHostState)
+                        viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
                     },
                     modifier = Modifier
                         .padding(innerPadding)
