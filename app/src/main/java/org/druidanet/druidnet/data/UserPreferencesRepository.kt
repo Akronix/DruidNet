@@ -23,7 +23,6 @@ private val DEFAULT_LANGUAGE = when (Locale.getDefault().getLanguage()) {
     else -> LanguageEnum.CASTELLANO
 }
 
-
 data class UserPreferences (
     val displayLanguage: LanguageEnum
 )

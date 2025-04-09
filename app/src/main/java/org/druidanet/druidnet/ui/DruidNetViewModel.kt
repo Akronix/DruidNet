@@ -27,13 +27,16 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
 import org.druidanet.druidnet.DruidNetApplication
+import org.druidanet.druidnet.data.BibliographyRepository
 import org.druidanet.druidnet.data.DruidNetUiState
+import org.druidanet.druidnet.data.PlantsRepository
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
+import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
@@ -41,7 +44,6 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
-import org.druidanet.druidnet.network.PlantDataDTO
 import org.druidanet.druidnet.ui.screens.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
@@ -52,6 +54,8 @@ class DruidNetViewModel(
     private val plantDao: PlantDAO,
     private val biblioDao: BibliographyDAO,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val plantsRepository: PlantsRepository,
+    private val biblioRepository: BibliographyRepository,
     private val roomDatabase: RoomDatabase
 ) : ViewModel(){
 
@@ -85,6 +89,8 @@ class DruidNetViewModel(
                     application.database.plantDao(),
                     application.database.biblioDao(),
                     application.userPreferencesRepository,
+                    application.plantsRepository,
+                    application.biblioRepository,
                     application.database
                 )
             }
@@ -114,6 +120,7 @@ class DruidNetViewModel(
     fun checkAndUpdateDatabase(snackbarHost: SnackbarHostState) {
         viewModelScope.launch {
             try {
+                /* TO RETHINK ALL THIS CODE */
                 val res = BackendApi.retrofitService.getLastUpdate()
                 Log.i("DruidNet", "Last update: ${res.versionDB}")
                 snackbarHost.showSnackbar("Fecha última actualización: ${res.versionDB}")
@@ -121,8 +128,8 @@ class DruidNetViewModel(
 //                 if (res.versionDB > currentVersion) {
                      //  1. Download all plants and bibliography entries
 //                    if (res.plantsChanged) data = BackendApi.retrofitService.downloadPlantData() else data = get
-                    val data = BackendApi.retrofitService.downloadPlantData()
-                    val biblio = if (res.biblioChanged) BackendApi.retrofitService.downloadBiblio() else getBibliography().first()
+                    val data = plantsRepository.fetchPlantData()
+                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
                     snackbarHost.showSnackbar("Datos descargados")
 
                     Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
