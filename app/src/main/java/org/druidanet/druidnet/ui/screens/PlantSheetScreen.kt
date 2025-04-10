@@ -104,7 +104,7 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
         ){
             Image(
                 contentScale = ContentScale.FillWidth,
-                bitmap = imageBitmap!!,
+                bitmap = imageBitmap,
                 contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -276,7 +276,7 @@ fun ConfusionTextBox(confusion: Confusion) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        bitmap = imageBitmap!!,
+                        bitmap = imageBitmap,
                         contentDescription = "Imagen del ${confusion.latinName}",
                         modifier = Modifier
                             .padding(top = 10.dp)
@@ -378,6 +378,7 @@ fun ToxicTextBox(toxicText: String) {
     }
 }
 
+/* For expanding the image of the plant to full screen */
 @Composable
 fun FullScreenImage(imageBitmap : ImageBitmap) {
     Surface {

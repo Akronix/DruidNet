@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.RoomDatabase
+import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -125,20 +126,19 @@ class DruidNetViewModel(
                 // If current version older than new update version:
 //                 if (res.versionDB > currentVersion) {
                      //  1. Download all plants and bibliography entries
-//                    if (res.plantsChanged) data = BackendApi.retrofitService.downloadPlantData() else data = get
 
-//                    val data = plantsRepository.fetchPlantData()
-//                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
-//                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
+                    val data = plantsRepository.fetchPlantData()
+                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
+                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
 
-//                    snackbarHost.showSnackbar("Base de Datos descargada")
+                    snackbarHost.showSnackbar("Base de Datos descargada")
 
                 //  2. Download images
                     val imageList = res.images
                     Log.i("DruidNet", "Downloading images:\n $imageList")
                     imagesRepository.fetchImages(imageList)
 
-                /*
+
                      // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
                     roomDatabase.withTransaction {
@@ -153,9 +153,7 @@ class DruidNetViewModel(
                         biblioDao.populateData(biblio)
                      }
                      snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
-                 */
-//                 }
-//                 }
+//              }
             } catch (e: SerializationException) {
                 Log.e("DruidNet", "Error: ${e.message}")
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")

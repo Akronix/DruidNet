@@ -10,9 +10,10 @@ import java.io.IOException
 private const val ASSETS_IMAGE_PATH = "images/plants"
 
 class ImagesLocalDataSource(
-    private val assetsDir: AssetManager,
+    private val assetsManager: AssetManager,
     private val localStorageDir: String
 ){
+
     fun saveImage(body: ResponseBody, imgName: String) : String {
         var input: InputStream? = null
         try {
@@ -33,7 +34,9 @@ class ImagesLocalDataSource(
 
     fun listLocalImages(): List<String> {
         return (File(localStorageDir).list()?.toList() ?: emptyList()) +
-        (assetsDir.list(ASSETS_IMAGE_PATH)?.toList() ?: emptyList())
+        (assetsManager.list(ASSETS_IMAGE_PATH)?.toList() ?: emptyList())
     }
+
+    fun getAbsolutePathToImg(): String = localStorageDir
 
 }

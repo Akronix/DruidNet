@@ -12,7 +12,7 @@ class ImagesRepository(
         Log.i("ImagesRepository", "Local images: $localImages")
         val newImages : List<String> = imageList.filter { !localImages.contains(it) }
         Log.i("ImagesRepository", "new images: $newImages")
-        for (imgSrc in imageList) {
+        for (imgSrc in newImages) {
             val resImg = remoteDataSource.downloadImage(imgSrc)
             if (resImg != null) {
                 val result = localDataSource.saveImage(resImg, imgSrc)
@@ -21,6 +21,8 @@ class ImagesRepository(
             else
                 throw IOException("Failed to download: $imgSrc")
         }
-
     }
+
+    fun getAbsolutePathToImg() : String =
+        localDataSource.getAbsolutePathToImg()
 }
