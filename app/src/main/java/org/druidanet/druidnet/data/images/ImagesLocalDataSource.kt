@@ -1,10 +1,12 @@
 package org.druidanet.druidnet.data.images
 
 import okhttp3.ResponseBody
+import java.io.File
 import java.io.InputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
+private val assetsDir = "assets"
 
 class ImagesLocalDataSource (
     private val localStorageDir: String
@@ -25,6 +27,11 @@ class ImagesLocalDataSource (
         finally {
             input?.close()
         }
+    }
+
+    fun listLocalImages(): List<String> {
+        return (File(localStorageDir).list()?.toList() ?: emptyList()) +
+        (File(assetsDir).list()?.toList() ?: emptyList())
     }
 
 }

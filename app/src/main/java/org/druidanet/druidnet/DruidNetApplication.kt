@@ -6,10 +6,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import org.druidanet.druidnet.data.AppDatabase
-import org.druidanet.druidnet.data.BibliographyRepository
-import org.druidanet.druidnet.data.PlantsRepository
+import org.druidanet.druidnet.data.bibliography.BibliographyRepository
+import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.images.ImagesLocalDataSource
+import org.druidanet.druidnet.data.images.ImagesRemoteDataSource
 import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 
@@ -26,7 +27,10 @@ class DruidNetApplication: Application() {
     val biblioRepository by lazy { BibliographyRepository() }
     val imagesRepository by lazy {
         ImagesRepository(
-            ImagesLocalDataSource(this.applicationContext.filesDir.absolutePath)
+            ImagesRemoteDataSource(),
+            ImagesLocalDataSource(
+                this.applicationContext.getDir("images", Context.MODE_PRIVATE).absolutePath
+            )
         )
     }
 

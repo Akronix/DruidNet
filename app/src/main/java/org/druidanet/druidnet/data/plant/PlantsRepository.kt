@@ -1,6 +1,5 @@
-package org.druidanet.druidnet.data
+package org.druidanet.druidnet.data.plant
 
-import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 import org.druidanet.druidnet.network.PlantDataDTO
 
 class PlantsRepository(

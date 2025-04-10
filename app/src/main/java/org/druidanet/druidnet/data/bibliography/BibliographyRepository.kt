@@ -1,6 +1,5 @@
-package org.druidanet.druidnet.data
+package org.druidanet.druidnet.data.bibliography
 
-import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.network.BackendApi
 
 class BibliographyRepository {

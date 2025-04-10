@@ -9,8 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.RoomDatabase
-import androidx.room.withTransaction
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,12 +22,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 import org.druidanet.druidnet.DruidNetApplication
-import org.druidanet.druidnet.data.BibliographyRepository
+import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.DruidNetUiState
-import org.druidanet.druidnet.data.PlantsRepository
+import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
@@ -37,7 +33,6 @@ import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
-import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
@@ -155,8 +150,8 @@ class DruidNetViewModel(
                         plantDao.populateNames(data.names)
                         plantDao.populateUsages(data.usages)
                         biblioDao.populateData(biblio)
-                        snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
                      }
+                     snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
                  */
 //                 }
 //                 }
