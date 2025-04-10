@@ -16,8 +16,10 @@ import retrofit2.http.Url
 private const val BASE_URL = "https://backend.druidnet.es/"
 //private const val BASE_URL = "https://127.0.0.1:5555/"
 
+private val retroJson = Json { ignoreUnknownKeys = true }
+
 private val retrofit = Retrofit.Builder()
-    .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+    .addConverterFactory(retroJson.asConverterFactory("application/json".toMediaType()))
     .baseUrl(BASE_URL)
     .build()
 
