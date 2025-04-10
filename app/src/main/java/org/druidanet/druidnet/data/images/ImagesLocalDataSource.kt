@@ -1,14 +1,16 @@
 package org.druidanet.druidnet.data.images
 
+import android.content.res.AssetManager
 import okhttp3.ResponseBody
 import java.io.File
 import java.io.InputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
-private val assetsDir = "assets"
+private const val ASSETS_IMAGE_PATH = "images/plants"
 
-class ImagesLocalDataSource (
+class ImagesLocalDataSource(
+    private val assetsDir: AssetManager,
     private val localStorageDir: String
 ){
     fun saveImage(body: ResponseBody, imgName: String) : String {
@@ -31,7 +33,7 @@ class ImagesLocalDataSource (
 
     fun listLocalImages(): List<String> {
         return (File(localStorageDir).list()?.toList() ?: emptyList()) +
-        (File(assetsDir).list()?.toList() ?: emptyList())
+        (assetsDir.list(ASSETS_IMAGE_PATH)?.toList() ?: emptyList())
     }
 
 }

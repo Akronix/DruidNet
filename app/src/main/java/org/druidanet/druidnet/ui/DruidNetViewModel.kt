@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.DruidNetUiState
@@ -155,9 +156,12 @@ class DruidNetViewModel(
                  */
 //                 }
 //                 }
+            } catch (e: SerializationException) {
+                Log.e("DruidNet", "Error: ${e.message}")
+                snackbarHost.showSnackbar("Error procesando los datos de descarga")
             } catch (e: IOException) {
-                 Log.e("DruidNet", "Error: ${e.message}")
-                 snackbarHost.showSnackbar("Error actualizando la base de datos")
+                Log.e("DruidNet", "Error: ${e.message}")
+                snackbarHost.showSnackbar("Error actualizando la base de datos")
             }
         }
     }

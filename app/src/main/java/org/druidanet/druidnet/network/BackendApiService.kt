@@ -23,7 +23,7 @@ private val retrofit = Retrofit.Builder()
 
 // Retrofit interface
 interface BackendApiService {
-    @GET("database/lastupdate")
+    @GET("dbinfo.json")
     suspend fun getLastUpdate() : DataBaseUpdateInfo
 
     @GET("database/allbiblio")

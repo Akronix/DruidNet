@@ -29,6 +29,7 @@ class DruidNetApplication: Application() {
         ImagesRepository(
             ImagesRemoteDataSource(),
             ImagesLocalDataSource(
+                this.applicationContext.assets ,
                 this.applicationContext.getDir("images", Context.MODE_PRIVATE).absolutePath
             )
         )
