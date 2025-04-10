@@ -34,6 +34,7 @@ import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
+import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
 import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
@@ -56,6 +57,7 @@ class DruidNetViewModel(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val plantsRepository: PlantsRepository,
     private val biblioRepository: BibliographyRepository,
+    private val imagesRepository: ImagesRepository,
     private val roomDatabase: RoomDatabase
 ) : ViewModel(){
 
@@ -91,6 +93,7 @@ class DruidNetViewModel(
                     application.userPreferencesRepository,
                     application.plantsRepository,
                     application.biblioRepository,
+                    application.imagesRepository,
                     application.database
                 )
             }
@@ -122,23 +125,24 @@ class DruidNetViewModel(
             try {
                 /* TO RETHINK ALL THIS CODE */
                 val res = BackendApi.retrofitService.getLastUpdate()
-                Log.i("DruidNet", "Last update: ${res.versionDB}")
-                snackbarHost.showSnackbar("Fecha última actualización: ${res.versionDB}")
+                Log.i("DruidNet", "Last update: $res")
                 // If current version older than new update version:
 //                 if (res.versionDB > currentVersion) {
                      //  1. Download all plants and bibliography entries
 //                    if (res.plantsChanged) data = BackendApi.retrofitService.downloadPlantData() else data = get
-                    val data = plantsRepository.fetchPlantData()
-                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
-                    snackbarHost.showSnackbar("Datos descargados")
 
-                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
-                    Log.i("DruidNet", "Downloaded data:\n $data")
+//                    val data = plantsRepository.fetchPlantData()
+//                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
+//                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
 
-                     //  2. Download images
-//                 val imageList = res.images
-//                 BackendApi.retrofitService.downloadImages(imageList)
+//                    snackbarHost.showSnackbar("Base de Datos descargada")
 
+                //  2. Download images
+                    val imageList = res.images
+                    Log.i("DruidNet", "Downloading images:\n $imageList")
+                    imagesRepository.fetchImages(imageList)
+
+                /*
                      // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
                     roomDatabase.withTransaction {
@@ -153,10 +157,11 @@ class DruidNetViewModel(
                         biblioDao.populateData(biblio)
                         snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
                      }
+                 */
 //                 }
 //                 }
             } catch (e: IOException) {
-                 Log.e("DruidNet", "Error getting last update: ${e.message}")
+                 Log.e("DruidNet", "Error: ${e.message}")
                  snackbarHost.showSnackbar("Error actualizando la base de datos")
             }
         }

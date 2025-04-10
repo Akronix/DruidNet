@@ -9,6 +9,8 @@ import org.druidanet.druidnet.data.AppDatabase
 import org.druidanet.druidnet.data.BibliographyRepository
 import org.druidanet.druidnet.data.PlantsRepository
 import org.druidanet.druidnet.data.UserPreferencesRepository
+import org.druidanet.druidnet.data.images.ImagesLocalDataSource
+import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 
 
@@ -22,6 +24,11 @@ class DruidNetApplication: Application() {
     val userPreferencesRepository by lazy { UserPreferencesRepository(dataStore) }
     val plantsRepository by lazy { PlantsRepository(PlantsRemoteDataSource()) }
     val biblioRepository by lazy { BibliographyRepository() }
+    val imagesRepository by lazy {
+        ImagesRepository(
+            ImagesLocalDataSource(this.applicationContext.filesDir.absolutePath)
+        )
+    }
 
     override fun getApplicationContext(): Context {
         return super.getApplicationContext()
