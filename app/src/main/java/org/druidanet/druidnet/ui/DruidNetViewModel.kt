@@ -63,7 +63,7 @@ class DruidNetViewModel(
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
 
-    val preferencesState: StateFlow<PreferencesState> = userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
+    private val preferencesState: StateFlow<PreferencesState> = userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
         PreferencesState(displayLanguage = displayLanguage)
     }
     .stateIn(
@@ -121,19 +121,20 @@ class DruidNetViewModel(
         viewModelScope.launch {
             try {
                 /* TO RETHINK ALL THIS CODE */
+                val currentDBVersion : Long = userPreferencesRepository.getDatabaseVersion.first()
                 val res = BackendApi.retrofitService.getLastUpdate()
-                Log.i("DruidNet", "Last update: $res")
+                Log.i("DruidNet", "Last update: ${res.versionDB}. Current version: $currentDBVersion")
                 // If current version older than new update version:
-//                 if (res.versionDB > currentVersion) {
-                     //  1. Download all plants and bibliography entries
+                 if (res.versionDB > currentDBVersion) {
 
+                     //  1. Download all plants and bibliography entries
                     val data = plantsRepository.fetchPlantData()
                     val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
                     Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
 
                     snackbarHost.showSnackbar("Base de Datos descargada")
 
-                //  2. Download images
+                    //  2. Download images
                     val imageList = res.images
                     Log.i("DruidNet", "Downloading images:\n $imageList")
                     imagesRepository.fetchImages(imageList)
@@ -152,8 +153,11 @@ class DruidNetViewModel(
                         plantDao.populateUsages(data.usages)
                         biblioDao.populateData(biblio)
                      }
+                     userPreferencesRepository.updateDatabaseVersion(res.versionDB)
                      snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
-//              }
+                } else {
+                    Log.i("DruidNet", "La base de datos está al día.")
+                 }
             } catch (e: SerializationException) {
                 Log.e("DruidNet", "Error: ${e.message}")
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")
@@ -167,9 +171,6 @@ class DruidNetViewModel(
 
     /****** DATABASE FUNCTIONS *****/
 
-    /**
-     * Update the item in the [ItemsRepository]'s data source
-     */
     suspend fun updatePlantUi(selectPlant: Int, displayName: String) {
 
         val plantObj: Plant = this.getPlant(selectPlant)
