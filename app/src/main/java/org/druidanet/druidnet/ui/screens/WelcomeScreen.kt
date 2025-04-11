@@ -38,7 +38,6 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
 fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
-                  updateDatabase: () -> Unit,
                   modifier: Modifier = Modifier) {
 
     Box(
@@ -85,12 +84,6 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
                     style = MaterialTheme.typography.labelMedium)
             }
             Spacer(modifier = Modifier.height(48.dp))
-            Button(onClick = updateDatabase,
-                modifier = Modifier.fillMaxWidth(),
-                ) {
-                Text("Atualizar base de datos",
-                    style = MaterialTheme.typography.labelMedium)
-            }
 //            Text("Próximamente:",
 //                color = Color.DarkGray)
 //            Button(
@@ -123,7 +116,6 @@ fun WelcomePreview() {
     DruidNetTheme(darkTheme = false) {
         WelcomeScreen(
             onNavigationButtonClick = { },
-            updateDatabase = { },
             modifier = Modifier
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center))

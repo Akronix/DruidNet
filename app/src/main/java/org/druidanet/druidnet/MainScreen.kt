@@ -23,8 +23,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -53,6 +56,9 @@ import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.screens.PlantSheetBottomBar
 import org.druidanet.druidnet.ui.screens.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
 
 object WelcomeDestination : Screen {
     override val route = "welcome"
@@ -137,6 +143,8 @@ fun DruidNetApp(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var justStartedApp by remember { mutableStateOf(true)}
+
     //canNavigateBack = navController.previousBackStackEntry != null,
 
     Scaffold(
@@ -167,9 +175,6 @@ fun DruidNetApp(
                 WelcomeScreen(
                     onNavigationButtonClick = {screen: Screen ->
                         navController.navigate(screen.route)
-                    },
-                    updateDatabase = {
-                        viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
                     },
                     modifier = Modifier
                         .padding(innerPadding)
@@ -230,6 +235,14 @@ fun DruidNetApp(
                 )
             }
 
+        }
+
+        // Run database check & update when the app starts
+        if (justStartedApp){
+            LaunchedEffect(Unit) {
+                justStartedApp = false
+                viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
+            }
         }
 
         // Show disclaimer Dialog if it's first launch of the app by the user

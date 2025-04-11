@@ -123,22 +123,22 @@ class DruidNetViewModel(
                 /* TO RETHINK ALL THIS CODE */
                 val currentDBVersion : Long = userPreferencesRepository.getDatabaseVersion.first()
                 val res = BackendApi.retrofitService.getLastUpdate()
-                Log.i("DruidNet", "Last update: ${res.versionDB}. Current version: $currentDBVersion")
+                Log.i("DruidNet", "Checking new versions of the database...Last update: ${res.versionDB}. Current version: $currentDBVersion")
+
                 // If current version older than new update version:
                  if (res.versionDB > currentDBVersion) {
+
+                    snackbarHost.showSnackbar("Descargando actualización de la base de datos...")
 
                      //  1. Download all plants and bibliography entries
                     val data = plantsRepository.fetchPlantData()
                     val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
                     Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
 
-                    snackbarHost.showSnackbar("Base de Datos descargada")
-
                     //  2. Download images
                     val imageList = res.images
                     Log.i("DruidNet", "Downloading images:\n $imageList")
                     imagesRepository.fetchImages(imageList)
-
 
                      // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
