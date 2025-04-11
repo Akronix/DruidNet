@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
@@ -9,17 +8,8 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.work.Data
 import androidx.room.RoomDatabase
 import androidx.room.withTransaction
-import androidx.work.Constraints
-import androidx.work.CoroutineWorker
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,7 +23,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.bibliography.BibliographyRepository
@@ -66,8 +55,7 @@ class DruidNetViewModel(
     private val plantsRepository: PlantsRepository,
     private val biblioRepository: BibliographyRepository,
     private val imagesRepository: ImagesRepository,
-    private val roomDatabase: RoomDatabase,
-    private val applicationContext : Context
+    private val roomDatabase: RoomDatabase
 ) : ViewModel(){
 
     /****** STATE VARIABLES *****/
@@ -103,8 +91,7 @@ class DruidNetViewModel(
                     application.plantsRepository,
                     application.biblioRepository,
                     application.imagesRepository,
-                    application.database,
-                    application.applicationContext
+                    application.database
                 )
             }
         }
@@ -131,98 +118,54 @@ class DruidNetViewModel(
 
     /****** NETWORK FUNCTIONS *****/
     fun checkAndUpdateDatabase(snackbarHost: SnackbarHostState) {
+        viewModelScope.launch {
+            try {
+                /* TO RETHINK ALL THIS CODE */
+                val currentDBVersion : Long = userPreferencesRepository.getDatabaseVersion.first()
+                val res = BackendApi.retrofitService.getLastUpdate()
+                Log.i("DruidNet", "Checking new versions of the database...Last update: ${res.versionDB}. Current version: $currentDBVersion")
 
-        class UpdateDatabaseWorker( context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-            override suspend fun doWork(): Result {
+                // If current version older than new update version:
+                 if (res.versionDB > currentDBVersion) {
 
-                return withContext(Dispatchers.IO) {
+                    snackbarHost.showSnackbar("Descargando actualización de la base de datos...")
 
-                    try {
-                        /* TO RETHINK ALL THIS CODE */
-                        val currentDBVersion: Long =
-                            userPreferencesRepository.getDatabaseVersion.first()
-                        val res = BackendApi.retrofitService.getLastUpdate()
-                        Log.i(
-                            "DruidNet",
-                            "Last update: ${res.versionDB}. Current version: $currentDBVersion"
-                        )
-                        // If current version older than new update version:
-                        if (res.versionDB > currentDBVersion) {
+                     //  1. Download all plants and bibliography entries
+                    val data = plantsRepository.fetchPlantData()
+                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
+                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
 
-                            //  1. Download all plants and bibliography entries
-                            val data = plantsRepository.fetchPlantData()
-                            val biblio =
-                                if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
-                            Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
+                    //  2. Download images
+                    val imageList = res.images
+                    Log.i("DruidNet", "Downloading images:\n $imageList")
+                    imagesRepository.fetchImages(imageList)
 
-                            //snackbarHost.showSnackbar("Base de Datos descargada")
-
-                            // 2. Download images
-                            val imageList = res.images
-                            Log.i("DruidNet", "Downloading images:\n $imageList")
-                            imagesRepository.fetchImages(imageList)
-
-
-                            // (The next two steps, ideally, would be done in one atomic transaction)
+                     // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
-                            roomDatabase.withTransaction {
+                    roomDatabase.withTransaction {
 
-                                //  3. Delete all data in localdb
-                                clearDB()
-                                //  4. Substitute new data in localdb
-                                plantDao.populatePlants(data.plants)
-                                plantDao.populateConfusions(data.confusions)
-                                plantDao.populateNames(data.names)
-                                plantDao.populateUsages(data.usages)
-                                biblioDao.populateData(biblio)
-                            }
-
-                            userPreferencesRepository.updateDatabaseVersion(res.versionDB)
-                            //snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
-                            Log.i("DruidNet", "Database updated successfully")
-                            return@withContext Result.success()
-
-                        } else {
-                            Log.i("DruidNet", "Database is up to date.")
-                            return@withContext Result.success()
-                        }
-                    } catch (e: SerializationException) {
-                        Log.e("DruidNet", "Serialization Error: ${e.message}", e)
-                        snackbarHost.showSnackbar("Error procesando los datos de descarga")
-                        return@withContext Result.failure()
-                    } catch (e: IOException) {
-                        Log.e("DruidNet", "IO Error: ${e.message}", e)
-                        snackbarHost.showSnackbar("Error actualizando la base de datos")
-                        return@withContext Result.failure()
-                    }
-                }
+                         //  3. Delete all data in localdb
+                        clearDB()
+                         //  4. Substitute new data in localdb
+                        plantDao.populatePlants(data.plants)
+                        plantDao.populateConfusions(data.confusions)
+                        plantDao.populateNames(data.names)
+                        plantDao.populateUsages(data.usages)
+                        biblioDao.populateData(biblio)
+                     }
+                     userPreferencesRepository.updateDatabaseVersion(res.versionDB)
+                     snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
+                } else {
+                    Log.i("DruidNet", "La base de datos está al día.")
+                 }
+            } catch (e: SerializationException) {
+                Log.e("DruidNet", "Serialization Error: ${e.message}", e)
+                snackbarHost.showSnackbar("Error procesando los datos de descarga")
+            } catch (e: IOException) {
+                Log.e("DruidNet", "IO Error: ${e.message}", e)
+                snackbarHost.showSnackbar("Error actualizando la base de datos")
             }
-
         }
-
-        fun startDatabaseUpdateWork() {
-            val workManager = WorkManager.getInstance(applicationContext)
-
-            /*
-            val workChain = workManager.beginUniqueWork(
-                "UPDATE_DATABASE",
-                ExistingWorkPolicy.REPLACE,
-                workRequest.build()
-            )
-             */
-
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
-            val workRequest = OneTimeWorkRequest.Builder(UpdateDatabaseWorker::class.java)
-                .setConstraints(constraints)
-                .build()
-
-            workManager.enqueue(workRequest)
-        }
-
-        startDatabaseUpdateWork()
     }
 
 
