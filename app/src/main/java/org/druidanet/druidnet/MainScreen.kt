@@ -259,14 +259,11 @@ fun Disclaimer(
                     "Es tu responsabilidad la identificación precisa y el empleo que hagas de las mismas.",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp))
         },
-        onDismissRequest = {
-            onDismissDisclaimer()
-        },
+        onDismissRequest = onDismissDisclaimer,
         confirmButton = {
             TextButton(
-                onClick = {
-                    onAcceptDisclaimer()
-                }
+                onClick = onAcceptDisclaimer
+
             ) {
                 Text(stringResource(R.string.dialog_accept_disclaimer),
                     style = MaterialTheme.typography.labelMedium)

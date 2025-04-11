@@ -159,10 +159,10 @@ class DruidNetViewModel(
                     Log.i("DruidNet", "La base de datos está al día.")
                  }
             } catch (e: SerializationException) {
-                Log.e("DruidNet", "Error: ${e.message}")
+                Log.e("DruidNet", "Serialization Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")
             } catch (e: IOException) {
-                Log.e("DruidNet", "Error: ${e.message}")
+                Log.e("DruidNet", "IO Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error actualizando la base de datos")
             }
         }
