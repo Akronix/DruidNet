@@ -102,6 +102,9 @@ android {
 
 dependencies {
 
+    // WorkManager dependency
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
+
     // Coil
 //    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
 //    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
