@@ -11,10 +11,11 @@ fun Context.getResourceId(filename:String): Int {
     return resID
 }
 
+// TO REMOVE and change by something better (painter to pass to images or Coil)
 fun Context.assetsToBitmap(filename:String): ImageBitmap {
     val assetManager = this.assets
     val imgFn = "$filename.webp"
-    val localStorageDir = "/data/user/0/org.druidanet.druidnet/app_images"
+    val localStorageDir = this.getDir("images", Context.MODE_PRIVATE).absolutePath
 
     val inputStream = if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
         assetManager.open("images/plants/$imgFn")
