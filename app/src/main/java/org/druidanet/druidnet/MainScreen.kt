@@ -18,11 +18,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,14 +48,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import org.druidanet.druidnet.data.DruidNetUiState
-import org.druidanet.druidnet.ui.AboutScreen
-import org.druidanet.druidnet.ui.BibliographyScreen
-import org.druidanet.druidnet.ui.CatalogScreen
-import org.druidanet.druidnet.ui.CreditsScreen
+import org.druidanet.druidnet.ui.screens.AboutScreen
+import org.druidanet.druidnet.ui.screens.BibliographyScreen
+import org.druidanet.druidnet.ui.screens.CatalogScreen
+import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.DruidNetViewModel
-import org.druidanet.druidnet.ui.PlantSheetBottomBar
-import org.druidanet.druidnet.ui.PlantSheetScreen
-import org.druidanet.druidnet.ui.WelcomeScreen
+import org.druidanet.druidnet.ui.screens.PlantSheetBottomBar
+import org.druidanet.druidnet.ui.screens.PlantSheetScreen
+import org.druidanet.druidnet.ui.screens.WelcomeScreen
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
 
 object WelcomeDestination : Screen {
     override val route = "welcome"
@@ -132,6 +141,10 @@ fun DruidNetApp(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var justStartedApp by remember { mutableStateOf(true)}
+
     //canNavigateBack = navController.previousBackStackEntry != null,
 
     Scaffold(
@@ -146,6 +159,9 @@ fun DruidNetApp(
             currentSection = druidNetUiState.currentSection,
             hasConfusions = druidNetUiState.plantHasConfusions
         ),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
 
@@ -221,6 +237,14 @@ fun DruidNetApp(
 
         }
 
+        // Run database check & update when the app starts
+        if (justStartedApp){
+            LaunchedEffect(Unit) {
+                justStartedApp = false
+                viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
+            }
+        }
+
         // Show disclaimer Dialog if it's first launch of the app by the user
         if (firstLaunch) {
             Disclaimer(
@@ -248,14 +272,11 @@ fun Disclaimer(
                     "Es tu responsabilidad la identificación precisa y el empleo que hagas de las mismas.",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp))
         },
-        onDismissRequest = {
-            onDismissDisclaimer()
-        },
+        onDismissRequest = onDismissDisclaimer,
         confirmButton = {
             TextButton(
-                onClick = {
-                    onAcceptDisclaimer()
-                }
+                onClick = onAcceptDisclaimer
+
             ) {
                 Text(stringResource(R.string.dialog_accept_disclaimer),
                     style = MaterialTheme.typography.labelMedium)

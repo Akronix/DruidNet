@@ -6,10 +6,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.druidanet.druidnet.model.LanguageEnum
 import java.io.IOException
@@ -23,7 +23,6 @@ private val DEFAULT_LANGUAGE = when (Locale.getDefault().getLanguage()) {
     else -> LanguageEnum.CASTELLANO
 }
 
-
 data class UserPreferences (
     val displayLanguage: LanguageEnum
 )
@@ -34,6 +33,7 @@ class UserPreferencesRepository (
     private companion object {
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val DISPLAY_NAME_LANGUAGE = stringPreferencesKey("display_name_language")
+        val DATABASE_VERSION = longPreferencesKey ("database_version")
         const val TAG = "UserPreferencesRepo"
     }
 
@@ -112,6 +112,26 @@ class UserPreferencesRepository (
     suspend fun updateDisplayNameLanguagePreference(language: LanguageEnum) {
         dataStore.edit { preferences ->
             preferences[DISPLAY_NAME_LANGUAGE] = language.toString()
+        }
+    }
+
+    val getDatabaseVersion: Flow<Long> = dataStore.data
+        .catch {
+            if (it is IOException) {
+                Log.e(TAG, "Error reading preferences.", it)
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }
+        .map { preferences ->
+            preferences[DATABASE_VERSION]?:0 // Inital value to 0
+        }
+
+
+    suspend fun updateDatabaseVersion(dbVersion: Long) {
+        dataStore.edit { preferences ->
+            preferences[DATABASE_VERSION] = dbVersion
         }
     }
 

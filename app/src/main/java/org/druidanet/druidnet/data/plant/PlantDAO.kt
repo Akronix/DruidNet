@@ -1,6 +1,9 @@
 package org.druidanet.druidnet.data.plant
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
@@ -52,9 +55,18 @@ interface PlantDAO {
     @Transaction
     fun getPlant(plantId: Int): Flow<PlantData>
 
-    // Specify the conflict strategy as IGNORE, when the user tries to add an
-    // existing Item into the database Room ignores the conflict.
-//    @Insert(onConflict = OnConflictStrategy.IGNORE)
-//    fun populateData(plants: List<PlantData>)
+    /*** INSERT DATA ***/
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun populatePlants(plants: List<PlantEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun populateNames(names: List<NameEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun populateConfusions(names: List<ConfusionEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun populateUsages(names: List<UsageEntity>)
 
 }

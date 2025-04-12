@@ -8,15 +8,19 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.UsageType
 
+@Serializable
 @Entity(tableName = "Plant",
     indices = [Index(value = ["latin_name"], unique = true)]
 )
 data class PlantEntity(
     @PrimaryKey(autoGenerate = true) val plantId: Int = 1,
     @ColumnInfo(name = "latin_name")
+    @SerialName("latin_name")
     val latinName: String,
 
     val family: String,
@@ -28,6 +32,7 @@ data class PlantEntity(
 
     val toxic: Boolean = false,
     @ColumnInfo(name = "toxic_text")
+    @SerialName("toxic_text")
     val toxicText: String? = null,
 
 
@@ -35,11 +40,13 @@ data class PlantEntity(
     val curiosities: String? = null,
 
     @ColumnInfo(name = "image_path")
+    @SerialName("image_path")
     val imagePath: String
 
     // otherImages
 )
 
+@Serializable
 @Entity(
     tableName = "Name",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
@@ -49,11 +56,12 @@ data class PlantEntity(
 data class NameEntity (
     @PrimaryKey(autoGenerate = true) val nameId: Int = 0,
     @ColumnInfo(index = true) val plantId: Int,
-    @ColumnInfo(name = "common_name") val commonName: String,
+    @ColumnInfo(name = "common_name") @SerialName("common_name") val commonName: String,
     @ColumnInfo(defaultValue = "1") val isDisplayName: Boolean,
     val language: LanguageEnum
 )
 
+@Serializable
 @Entity(
     tableName = "Confusion",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
@@ -64,14 +72,20 @@ data class NameEntity (
 data class ConfusionEntity(
     @PrimaryKey(autoGenerate = true) val confusionId: Int = 1,
     @ColumnInfo(index = true) val plantId: Int,
-    @ColumnInfo(name = "latin_name") val latinName: String,
+
+    @ColumnInfo(name = "latin_name") @SerialName("latin_name") val latinName: String,
     val text: String,
+
     @ColumnInfo(name = "image_path")
+    @SerialName("image_path")
     val imagePath: String?,
+
     @ColumnInfo(name = "caption_text")
+    @SerialName("caption_text")
     val captionText: String?
 )
 
+@Serializable
 @Entity(
     tableName = "Usage",
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,

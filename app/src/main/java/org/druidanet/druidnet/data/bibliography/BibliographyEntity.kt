@@ -3,10 +3,12 @@ package org.druidanet.druidnet.data.bibliography
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 @Entity(
 tableName = "Bibliography",
 )
+@Serializable
 data class BibliographyEntity(
     @PrimaryKey(autoGenerate = true) val refId: Int = 1,
     val type: String,
