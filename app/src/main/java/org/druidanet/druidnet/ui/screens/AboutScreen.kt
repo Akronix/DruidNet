@@ -308,7 +308,7 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
             <br/>
             
             # Datos de plantas
-            **Belén Martínez Sigüenza** (_Taxus baccata_ y _Pistacia lentiscus_)
+            **Belén Martínez Sigüenza** (_Gentiana lutea_, _Ruscus aculeatus_, _Taxus baccata_ y _Pistacia lentiscus_)
             
             <br/>
             
