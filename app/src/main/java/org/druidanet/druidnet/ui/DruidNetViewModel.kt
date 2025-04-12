@@ -76,7 +76,7 @@ class DruidNetViewModel(
         }
     )
 
-    public var LANGUAGE_APP = preferencesState.value.displayLanguage
+    var LANGUAGE_APP = preferencesState.value.displayLanguage
 
     /****** VIEW MODEL CONSTRUCTOR *****/
 
@@ -132,7 +132,7 @@ class DruidNetViewModel(
 
                      //  1. Download all plants and bibliography entries
                     val data = plantsRepository.fetchPlantData()
-                    val biblio = if (res.biblioChanged) biblioRepository.getBiblioData() else getBibliography().first()
+                    val biblio = biblioRepository.getBiblioData()
                     Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
 
                     //  2. Download images
