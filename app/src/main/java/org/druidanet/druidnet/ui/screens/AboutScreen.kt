@@ -340,10 +340,13 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
     
                 <br/>
  
-                &nbsp;El contenido textual está redactado a partir de varias fuentes y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-                &nbsp;El contenido gráfico está realizado a partir de imágenes propias o de imágenes de dominio público y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-                &nbsp;El código es software libre y está disponible en: https://github.com/Akronix/DruidNet
-                &nbsp;Puedes atribuir el contenido con la siguiente línea:
+                El contenido textual está redactado a partir de varias fuentes y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+                
+                El contenido gráfico está realizado a partir de imágenes propias o de imágenes de dominio público y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+                
+                El código es software libre y está disponible en: https://github.com/Akronix/DruidNet
+                
+                Puedes atribuir el contenido con la siguiente línea:
                 [Nombre contenido] por [Nombre de autor]. «DruidNet» - 2024. y enlace a la licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)."
         """.trimIndent(),
                 typography = markdownTypography(
@@ -384,7 +387,7 @@ fun BibliographyScreen (bibliographyStr: String, modifier: Modifier = Modifier) 
 
 @Preview(showBackground = true)
 @Composable
-fun AboutPreview() {
+fun BiblioPreview() {
     DruidNetTheme(darkTheme = false) {
         BibliographyScreen(
             BibliographyEntity(
@@ -400,6 +403,14 @@ fun AboutPreview() {
                 "Fase 1"
             ).toMarkdownString()
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CreditsPreview() {
+    DruidNetTheme(darkTheme = false) {
+        CreditsScreen()
     }
 }
 
