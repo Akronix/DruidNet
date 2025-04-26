@@ -166,6 +166,8 @@ class DruidNetViewModel(
             } catch (e: SerializationException) {
                 Log.e("DruidNet", "Serialization Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")
+            } catch (e: java.net.UnknownHostException) {
+                Log.e("DruidNet", "No internet connection.", e)
             } catch (e: IOException) {
                 Log.e("DruidNet", "IO Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error actualizando la base de datos")
