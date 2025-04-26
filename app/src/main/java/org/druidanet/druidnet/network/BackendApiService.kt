@@ -8,9 +8,9 @@ import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.Response
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.Path
 import retrofit2.http.Streaming
-import retrofit2.http.Url
 
 
 private const val BASE_URL = "https://backend.druidnet.es/"
@@ -43,5 +43,23 @@ interface BackendApiService {
 object BackendApi {
     val retrofitService : BackendApiService by lazy {
         retrofit.create(BackendApiService::class.java)
+    }
+}
+
+private val retrofitScalar = Retrofit.Builder()
+    .addConverterFactory(ScalarsConverterFactory.create() )
+    .baseUrl(BASE_URL)
+    .build()
+
+// Retrofit interface
+interface BackendScalarApiService {
+    @GET("credits.md")
+    suspend fun getCreditsMd() : String
+
+}
+
+object BackendScalarApi {
+    val retrofitService : BackendScalarApiService by lazy {
+        retrofitScalar.create(BackendScalarApiService::class.java)
     }
 }

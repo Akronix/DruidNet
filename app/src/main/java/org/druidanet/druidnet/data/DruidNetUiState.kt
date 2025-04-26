@@ -4,6 +4,7 @@ import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.ui.screens.DEFAULT_SECTION
 import org.druidanet.druidnet.ui.screens.PlantSheetSection
+import org.druidanet.druidnet.utils.DEFAULT_CREDITS_TXT
 
 data class DruidNetUiState(
     /** Selected plant to show */
@@ -18,7 +19,9 @@ data class DruidNetUiState(
 
     val currentSection: PlantSheetSection = DEFAULT_SECTION,
 
-    val firstLaunch: Boolean = true
+    val firstLaunch: Boolean = true,
+
+    val creditsTxt: String = DEFAULT_CREDITS_TXT,
 )
 
 data class PreferencesState(

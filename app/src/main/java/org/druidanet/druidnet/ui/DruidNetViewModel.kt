@@ -25,16 +25,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.DruidNetApplication
-import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.DruidNetUiState
-import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
+import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
+import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
@@ -42,6 +42,7 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
+import org.druidanet.druidnet.network.BackendScalarApi
 import org.druidanet.druidnet.ui.screens.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
@@ -56,32 +57,33 @@ class DruidNetViewModel(
     private val biblioRepository: BibliographyRepository,
     private val imagesRepository: ImagesRepository,
     private val roomDatabase: RoomDatabase
-) : ViewModel(){
+) : ViewModel() {
 
     /****** STATE VARIABLES *****/
 
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
 
-    private val preferencesState: StateFlow<PreferencesState> = userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
-        PreferencesState(displayLanguage = displayLanguage)
-    }
-    .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = runBlocking {
-            PreferencesState(
-                displayLanguage = userPreferencesRepository.getDisplayNameLanguagePreference.first()
-            )
+    private val preferencesState: StateFlow<PreferencesState> =
+        userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
+            PreferencesState(displayLanguage = displayLanguage)
         }
-    )
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = runBlocking {
+                    PreferencesState(
+                        displayLanguage = userPreferencesRepository.getDisplayNameLanguagePreference.first()
+                    )
+                }
+            )
 
     var LANGUAGE_APP = preferencesState.value.displayLanguage
 
     /****** VIEW MODEL CONSTRUCTOR *****/
 
     companion object {
-        val factory : ViewModelProvider.Factory = viewModelFactory {
+        val factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as DruidNetApplication)
                 DruidNetViewModel(
@@ -110,7 +112,7 @@ class DruidNetViewModel(
     }
 
     fun changeSection(newSection: PlantSheetSection) {
-        if (newSection != uiState.value.currentSection )
+        if (newSection != uiState.value.currentSection)
             _uiState.update { currentState ->
                 currentState.copy(currentSection = newSection)
             }
@@ -121,16 +123,19 @@ class DruidNetViewModel(
         viewModelScope.launch {
             try {
                 /* TO RETHINK ALL THIS CODE */
-                val currentDBVersion : Long = userPreferencesRepository.getDatabaseVersion.first()
+                val currentDBVersion: Long = userPreferencesRepository.getDatabaseVersion.first()
                 val res = BackendApi.retrofitService.getLastUpdate()
-                Log.i("DruidNet", "Checking new versions of the database...Last update: ${res.versionDB}. Current version: $currentDBVersion")
+                Log.i(
+                    "DruidNet",
+                    "Checking new versions of the database...Last update: ${res.versionDB}. Current version: $currentDBVersion"
+                )
 
                 // If current version older than new update version:
-                 if (res.versionDB > currentDBVersion) {
+                if (res.versionDB > currentDBVersion) {
 
                     snackbarHost.showSnackbar("Descargando actualización de la base de datos...")
 
-                     //  1. Download all plants and bibliography entries
+                    //  1. Download all plants and bibliography entries
                     val data = plantsRepository.fetchPlantData()
                     val biblio = biblioRepository.getBiblioData()
                     Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
@@ -140,24 +145,24 @@ class DruidNetViewModel(
                     Log.i("DruidNet", "Downloading images:\n $imageList")
                     imagesRepository.fetchImages(imageList)
 
-                     // (The next two steps, ideally, would be done in one atomic transaction)
+                    // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
                     roomDatabase.withTransaction {
 
-                         //  3. Delete all data in localdb
+                        //  3. Delete all data in localdb
                         clearDB()
-                         //  4. Substitute new data in localdb
+                        //  4. Substitute new data in localdb
                         plantDao.populatePlants(data.plants)
                         plantDao.populateConfusions(data.confusions)
                         plantDao.populateNames(data.names)
                         plantDao.populateUsages(data.usages)
                         biblioDao.populateData(biblio)
-                     }
-                     userPreferencesRepository.updateDatabaseVersion(res.versionDB)
-                     snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
+                    }
+                    userPreferencesRepository.updateDatabaseVersion(res.versionDB)
+                    snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
                 } else {
                     Log.i("DruidNet", "La base de datos está al día.")
-                 }
+                }
             } catch (e: SerializationException) {
                 Log.e("DruidNet", "Serialization Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")
@@ -187,26 +192,56 @@ class DruidNetViewModel(
     }
 
     // Get all plants from db
-    fun getAllPlants() : Flow<List<PlantCard>> =
+    fun getAllPlants(): Flow<List<PlantCard>> =
         if (LANGUAGE_APP != LanguageEnum.LATIN) {
             combine(
                 plantDao.getPlantCatalogData(LANGUAGE_APP),
-                plantDao.getPlantCatalogLatinNotInLanguage(LANGUAGE_APP))
+                plantDao.getPlantCatalogLatinNotInLanguage(LANGUAGE_APP)
+            )
             { plantsInLanguage, plantsInLatin ->
                 if (plantsInLatin.isEmpty())
-                    plantsInLanguage.map { PlantCard(it.plantId, it.displayName, it.imagePath, false) }
+                    plantsInLanguage.map {
+                        PlantCard(
+                            it.plantId,
+                            it.displayName,
+                            it.imagePath,
+                            false
+                        )
+                    }
                 else
                     mergeOrderedLists(
-                        plantsInLanguage.map { PlantCard(it.plantId, it.displayName, it.imagePath, false) },
-                        plantsInLatin.map { PlantCard(it.plantId, it.displayName, it.imagePath, true) },
+                        plantsInLanguage.map {
+                            PlantCard(
+                                it.plantId,
+                                it.displayName,
+                                it.imagePath,
+                                false
+                            )
+                        },
+                        plantsInLatin.map {
+                            PlantCard(
+                                it.plantId,
+                                it.displayName,
+                                it.imagePath,
+                                true
+                            )
+                        },
                         compareBy = compareBy(
-                            Collator.getInstance(Locale("es", "ES"))) { it.displayName }
+                            Collator.getInstance(Locale("es", "ES"))
+                        ) { it.displayName }
                     )
             }
 
         } else {
-            plantDao.getPlantCatalogLatin().map {
-                list -> list.map { plant -> PlantCard(plant.plantId, plant.displayName, plant.imagePath, true) }
+            plantDao.getPlantCatalogLatin().map { list ->
+                list.map { plant ->
+                    PlantCard(
+                        plant.plantId,
+                        plant.displayName,
+                        plant.imagePath,
+                        true
+                    )
+                }
             }
         }
 
@@ -216,7 +251,7 @@ class DruidNetViewModel(
     fun getPlant(plantId: Int): Flow<PlantData?> =
         plantDao.getPlant(plantId)
 
-    fun getBibliography() : Flow<List<BibliographyEntity>> =
+    fun getBibliography(): Flow<List<BibliographyEntity>> =
         biblioDao.getAllBibliographyEntries()
 
     fun clearDB() = roomDatabase.clearAllTables()
@@ -240,38 +275,51 @@ class DruidNetViewModel(
 
     }
 
-    fun getDisplayNameLanguage() : LanguageEnum = LANGUAGE_APP /* It should use userPreferencesRepository.getDisplayNameLanguagePreference ??
+    fun getDisplayNameLanguage(): LanguageEnum = LANGUAGE_APP /* It should use userPreferencesRepository.getDisplayNameLanguagePreference ??
                                                                     but then we have to query this value using a flow coroutine */
+    fun getCreditsText(): String {
+        viewModelScope.launch {
+            try {
+                val res = BackendScalarApi.retrofitService.getCreditsMd()
+                _uiState.update { currentState ->
+                    currentState.copy(creditsTxt = res)
+                }
+
+            } catch (e: Exception) {
+                Log.e("DruidNet", "Error: ${e.message}", e)
+            }
+        }
+        return uiState.value.creditsTxt
+    }
 }
+    /****** OTHERS - HELPER FUNCTIONS *****/
 
-/****** OTHERS - HELPER FUNCTIONS *****/
+    fun PlantData.toPlant(displayName: String): Plant =
+        Plant(
+            plantId = p.plantId,
+            latinName = p.latinName,
 
-fun PlantData.toPlant(displayName: String): Plant =
-    Plant(
-        plantId = p.plantId,
-        latinName = p.latinName,
+            commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
 
-        commonNames = names.map {Name(it.commonName, it.language)}.toTypedArray(),
+            displayName = displayName,
 
-        displayName = displayName,
+            usages = usages
+                .map { Usage(it.type, it.subType, it.text) }
+                .groupBy { it.type },
+            family = p.family,
 
-        usages = usages
-            .map{ Usage( it.type, it.subType, it.text ) }
-            .groupBy { it.type },
-        family = p.family,
+            toxic = p.toxic,
+            toxic_text = p.toxicText,
 
-        toxic = p.toxic,
-        toxic_text = p.toxicText,
+            description = p.description,
+            habitat = p.habitat,
+            phenology = p.phenology,
+            distribution = p.distribution,
+            confusions = confusions.map {
+                Confusion(it.latinName, it.text, it.imagePath, it.captionText)
+            }.toTypedArray(),
+            observations = p.observations,
+            curiosities = p.curiosities,
 
-        description = p.description,
-        habitat = p.habitat,
-        phenology = p.phenology,
-        distribution = p.distribution,
-        confusions = confusions.map {
-            Confusion(it.latinName, it.text, it.imagePath, it.captionText)
-        }.toTypedArray(),
-        observations = p.observations,
-        curiosities = p.curiosities,
-
-        imagePath = p.imagePath
-    )
+            imagePath = p.imagePath
+        )
