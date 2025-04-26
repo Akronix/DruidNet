@@ -58,6 +58,13 @@ import org.druidanet.druidnet.ui.screens.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.navigation.navDeepLink
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.Serializable
+import org.druidanet.druidnet.data.plant.PlantsDataSource
+import org.druidanet.druidnet.model.Plant
+import org.druidanet.druidnet.ui.toPlant
 
 
 object WelcomeDestination : Screen {
@@ -93,6 +100,7 @@ object CreditsDestination : Screen {
 //    val routeWithArgs = "$route/{$plantId}"
 //}
 
+@Serializable
 object PlantSheetDestination : Screen {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
@@ -200,16 +208,23 @@ fun DruidNetApp(
             composable(route = PlantSheetDestination.routeWithArgs,
                         arguments = listOf(navArgument(PlantSheetDestination.plantArg){
                         type = NavType.IntType
-                        })
+                        }),
+                        deepLinks = listOf(
+                            navDeepLink {
+                                uriPattern = "druidnet://druidnet/plant_sheet/{plantId}"
+                                action = android.content.Intent.ACTION_VIEW
+                            }
+                        )
             ){
-
+                val plantId: Int? = it.arguments?.getInt("plantId")
                 PlantSheetScreen(
-                    plant = druidNetUiState.plantUiState!!,
-                    currentSection = druidNetUiState.currentSection,
-                    onChangeSection = { section -> { viewModel.changeSection(section) } },
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
+                        plant = druidNetUiState.plantUiState ?: viewModel.loadDefaultPlant(),
+                        currentSection = druidNetUiState.currentSection,
+                        onChangeSection = { section -> { viewModel.changeSection(section) } },
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+
             }
             composable(route = AboutDestination.route) {
                 AboutScreen(
