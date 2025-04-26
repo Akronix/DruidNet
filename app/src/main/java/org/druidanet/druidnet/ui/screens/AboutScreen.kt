@@ -319,7 +319,7 @@ fun CreditsScreen ( creditsText: String, modifier: Modifier = Modifier) {
                 El código es software libre y está disponible en: https://github.com/Akronix/DruidNet
                 
                 Puedes atribuir el contenido con la siguiente línea:
-                [Nombre contenido] por [Nombre de autor]. «DruidNet» - 2025. y enlace a la licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)."
+                [Nombre contenido](druidnet://druidnet/plant_sheet/1) por [Nombre de autor]. «DruidNet» - 2025. y enlace a la licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)."
         """.trimIndent(),
                 typography = markdownTypography(
                     paragraph = MaterialTheme.typography.bodySmall,

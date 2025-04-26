@@ -34,6 +34,7 @@ import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
+import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
@@ -293,6 +294,18 @@ class DruidNetViewModel(
         }
         return uiState.value.creditsTxt
     }
+
+    fun loadDefaultPlant(): Plant {
+        val defaultPlant = PlantsDataSource.loadPlants()[0]
+        _uiState.update { currentState ->
+            currentState
+                .copy(
+                    plantUiState = defaultPlant,
+                    plantHasConfusions = defaultPlant.confusions.isNotEmpty()
+                )
+        }
+        return defaultPlant
+        }
 }
     /****** OTHERS - HELPER FUNCTIONS *****/
 
