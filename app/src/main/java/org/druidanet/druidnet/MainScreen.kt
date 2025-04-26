@@ -230,6 +230,7 @@ fun DruidNetApp(
             }
             composable(route = CreditsDestination.route) {
                 CreditsScreen(
+                    creditsText = viewModel.getCreditsText(),
                     modifier = Modifier
                         .fillMaxSize()
                 )

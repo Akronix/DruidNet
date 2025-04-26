@@ -58,6 +58,7 @@ import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
+import org.druidanet.druidnet.utils.DEFAULT_CREDITS_TXT
 
 @Composable
 fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
@@ -294,39 +295,11 @@ fun sendEmailAction(context: Context) {
 }
 
 @Composable
-fun CreditsScreen (modifier: Modifier = Modifier) {
+fun CreditsScreen ( creditsText: String, modifier: Modifier = Modifier) {
         Column (modifier = modifier.fillMaxHeight() // Take up the full available height
             .verticalScroll(state = ScrollState(0)),
                  verticalArrangement = Arrangement.SpaceBetween,){
-            Markdown(
-                """
-            # Lider del proyecto y desarrollador
-            **Abel Serrano Juste**
-            
-            <br/>
-            
-            <br/>
-            
-            # Datos de plantas
-            **Belén Martínez Sigüenza** (_Gentiana lutea_, _Ruscus aculeatus_, _Taxus baccata_ y _Pistacia lentiscus_)
-            
-            <br/>
-            
-            <br/>
-            
-            # Ilustración
-            **Sandra Revuelto Sánchez** (_Druidesa_)
-            
-            <br/>
-            
-            <br/>
-            
-            # Experiencia de Usuario (UX)
-            **Stefania Kasouni** (_Pantallas de fichas de plantas_)
-          
-            <br/>
-            
-            """.trimIndent(),
+            Markdown(creditsText,
                 typography = markdownTypography(
                     h1 = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
                     paragraph = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp)
@@ -336,10 +309,9 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
             )
             Markdown(
                 """
-                ---
-    
                 <br/>
- 
+                ---
+                <br/>
                 El contenido textual está redactado a partir de varias fuentes y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
                 
                 El contenido gráfico está realizado a partir de imágenes propias o de imágenes de dominio público y tiene licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
@@ -347,7 +319,7 @@ fun CreditsScreen (modifier: Modifier = Modifier) {
                 El código es software libre y está disponible en: https://github.com/Akronix/DruidNet
                 
                 Puedes atribuir el contenido con la siguiente línea:
-                [Nombre contenido] por [Nombre de autor]. «DruidNet» - 2024. y enlace a la licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)."
+                [Nombre contenido] por [Nombre de autor]. «DruidNet» - 2025. y enlace a la licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)."
         """.trimIndent(),
                 typography = markdownTypography(
                     paragraph = MaterialTheme.typography.bodySmall,
@@ -410,7 +382,9 @@ fun BiblioPreview() {
 @Composable
 fun CreditsPreview() {
     DruidNetTheme(darkTheme = false) {
-        CreditsScreen()
+        CreditsScreen(
+            DEFAULT_CREDITS_TXT
+        )
     }
 }
 
