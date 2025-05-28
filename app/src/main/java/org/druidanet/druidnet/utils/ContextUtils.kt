@@ -20,7 +20,10 @@ fun Context.assetsToBitmap(filename:String): ImageBitmap {
     val inputStream = if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
         assetManager.open("images/plants/$imgFn")
     else
-        File("$localStorageDir/$imgFn").inputStream()
+        if (File("$localStorageDir/$imgFn").exists())
+            File("$localStorageDir/$imgFn").inputStream()
+        else
+            assetManager.open("images/broken_image.jpg")
 
     val bitmap = BitmapFactory.decodeStream(inputStream)
     inputStream.close()
