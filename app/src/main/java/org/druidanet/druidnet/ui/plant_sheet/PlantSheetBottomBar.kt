@@ -151,7 +151,7 @@ fun PlantSheetBottomBarPreview() {
                 hasConfusions = samplePlant.confusions.isNotEmpty()
             ),
         ) {
-            PlantSheetScreen(
+            PlantSheetBody(
                 plant = samplePlant,
                 currentSection = PlantSheetSection.DESCRIPTION,
                 onChangeSection = { { } },

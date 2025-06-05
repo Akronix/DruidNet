@@ -26,10 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -46,25 +46,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.data.DruidNetUiState
+import org.druidanet.druidnet.ui.DruidNetViewModel
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetBottomBar
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
-import org.druidanet.druidnet.ui.DruidNetViewModel
-import org.druidanet.druidnet.ui.screens.PlantSheetBottomBar
-import org.druidanet.druidnet.ui.screens.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.navigation.navDeepLink
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.serialization.Serializable
-import org.druidanet.druidnet.data.plant.PlantsDataSource
-import org.druidanet.druidnet.model.Plant
-import org.druidanet.druidnet.ui.toPlant
 
 
 object WelcomeDestination : Screen {
@@ -104,7 +97,7 @@ object CreditsDestination : Screen {
 object PlantSheetDestination : Screen {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
-    const val plantArg = "plantId"
+    const val plantArg = "plantLatinName"
     val routeWithArgs = "$route/{$plantArg}"
 }
 
@@ -171,86 +164,101 @@ fun DruidNetApp(
             SnackbarHost(hostState = snackbarHostState)
         },
         modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    )
+        {
+            innerPadding -> 
 
-        NavHost(
-            navController = navController,
-            startDestination = WelcomeDestination.route,
-            modifier = Modifier
-                .padding(innerPadding)
-        ) {
-            composable(route = WelcomeDestination.route) {
-                WelcomeScreen(
-                    onNavigationButtonClick = {screen: Screen ->
-                        navController.navigate(screen.route)
-                    },
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize()
-                        .wrapContentSize(Alignment.Center)
-                )
-            }
-            composable(route = CatalogDestination.route) {
-                CatalogScreen(
-                    plantList = plantList,
-                    onClickPlantCard = { plant ->
-                        viewModel.setSelectedPlant(plant.plantId)
-                        coroutineScope.launch {
-                            viewModel.updatePlantUi(plant.plantId, plant.displayName)
-                            navController.navigate("${PlantSheetDestination.route}/${plant.plantId}")
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .wrapContentSize(Alignment.Center)
-                )
-            }
-            composable(route = PlantSheetDestination.routeWithArgs,
-                        arguments = listOf(navArgument(PlantSheetDestination.plantArg){
-                        type = NavType.IntType
-                        }),
-                        deepLinks = listOf(
-                            navDeepLink {
-                                uriPattern = "druidnet://druidnet/plant_sheet/{plantId}"
-                                action = android.content.Intent.ACTION_VIEW
+            NavHost(
+                navController = navController,
+                startDestination = WelcomeDestination.route,
+                modifier = Modifier
+                    .padding(innerPadding)
+            ) {
+                composable(route = WelcomeDestination.route) {
+                    WelcomeScreen(
+                        onNavigationButtonClick = { screen: Screen ->
+                            navController.navigate(screen.route)
+                        },
+                        navController = navController,
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center)
+                    )
+                }
+                composable(route = CatalogDestination.route) {
+                    CatalogScreen(
+                        plantList = plantList,
+                        onClickPlantCard = { plant ->
+//                        viewModel.setSelectedPlant(plant.plantId)
+                            coroutineScope.launch {
+                                viewModel.updatePlantUi(plant.plantId, plant.displayName)
+                                navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                             }
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center)
+                    )
+                }
+                composable(
+                    route = PlantSheetDestination.routeWithArgs,
+                    arguments = listOf(navArgument(PlantSheetDestination.plantArg) {
+                        type = NavType.StringType
+                    }),
+                    deepLinks = listOf(
+                        navDeepLink {
+                            uriPattern = "plant_sheet/{plantLatinName}"
+                        }
+                    )
+                ) {
+                    val plantLatinName: String? = it.arguments?.getString("plantLatinName")
+
+                    if (plantLatinName != null) {
+
+//                    if (displayName == "") {
+//                        LaunchedEffect(Unit) {
+//                            val displayName = viewModel.setDisplayName(plantLatinName)
+//                        }
+//                    }
+
+                        PlantSheetScreen(
+                            currentSection = druidNetUiState.currentSection,
+                            onChangeSection = { section -> { viewModel.changeSection(section) } },
+                            modifier = Modifier
+                                .fillMaxSize()
                         )
-            ){
-                val plantId: Int? = it.arguments?.getInt("plantId")
-                PlantSheetScreen(
-                        plant = druidNetUiState.plantUiState ?: viewModel.loadDefaultPlant(),
-                        currentSection = druidNetUiState.currentSection,
-                        onChangeSection = { section -> { viewModel.changeSection(section) } },
+                    } else {
+                        Text("Error: There's no plant reference in the route")
+                    }
+
+                }
+                composable(route = AboutDestination.route) {
+                    AboutScreen(
+                        onNavigationButtonClick = { screen: Screen ->
+                            navController.navigate(screen.route)
+                        },
+                        viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxSize()
                     )
+                }
+                composable(route = BibliographyDestination.route) {
+                    BibliographyScreen(
+                        bibliographyStr = bibliographyStr,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+                composable(route = CreditsDestination.route) {
+                    CreditsScreen(
+                        creditsText = viewModel.getCreditsText(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
 
             }
-            composable(route = AboutDestination.route) {
-                AboutScreen(
-                    onNavigationButtonClick = {screen: Screen ->
-                        navController.navigate(screen.route)
-                    },
-                    viewModel = viewModel,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
-            }
-            composable(route = BibliographyDestination.route) {
-                BibliographyScreen(
-                    bibliographyStr = bibliographyStr,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
-            }
-            composable(route = CreditsDestination.route) {
-                CreditsScreen(
-                    creditsText = viewModel.getCreditsText(),
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
-            }
-
         }
 
         // Run database check & update when the app starts
@@ -268,7 +276,6 @@ fun DruidNetApp(
                 onAcceptDisclaimer = { viewModel.unsetFirstLaunch() } )
         }
 
-    }
 }
 
 @Composable
@@ -315,7 +322,7 @@ fun DruidNetAppBar(
         if (currentScreen == WelcomeDestination) return {} // No top bar in Welcome screen
 
         val topBarTitle: String = when (currentScreen) {
-            PlantSheetDestination -> uiState.plantUiState!!.displayName
+            PlantSheetDestination -> "displayName"
             else -> stringResource(currentScreen.title)
         }
 
