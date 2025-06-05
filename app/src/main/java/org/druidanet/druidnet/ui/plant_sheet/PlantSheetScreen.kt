@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -57,8 +59,34 @@ enum class PlantSheetSection {
 
 val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 
+
 @Composable
 fun PlantSheetScreen(
+    currentSection: PlantSheetSection,
+    onChangeSection: (PlantSheetSection) -> () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory )
+) {
+    val plant = viewModel.uiState.collectAsState().value.plantUiState
+
+    if (plant != null)
+        PlantSheetBody(
+            plant = plant,
+            currentSection,
+            onChangeSection,
+            modifier
+        )
+    else
+        NoPlantFound()
+}
+
+@Composable
+fun NoPlantFound() {
+    Text("No plant found")
+}
+
+@Composable
+fun PlantSheetBody(
     plant: Plant,
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
@@ -411,7 +439,7 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 @Composable
 fun PlantSheetScreenPreview() {
     DruidNetTheme {
-        PlantSheetScreen(
+        PlantSheetBody(
             PlantsDataSource.loadPlants()[0],
             currentSection = PlantSheetSection.DESCRIPTION,
             onChangeSection = { { } },
