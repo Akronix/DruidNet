@@ -1,10 +1,7 @@
-import androidx.annotation.StringRes
-import org.druidanet.druidnet.R
-
 /**
  * Interface to describe the navigation destinations for the app
  */
-interface Screen {
+interface NavigationDestination {
     /**
      * Unique name to define the path for a composable
      */

@@ -1,16 +1,18 @@
 package org.druidanet.druidnet.ui.screens
 
-import Screen
+import NavigationDestination
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -25,19 +27,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.mikepenz.markdown.m3.Markdown
 import org.druidanet.druidnet.AboutDestination
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
-fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
-                  navController: NavController,
+fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                   modifier: Modifier = Modifier) {
 
     Box(
@@ -86,7 +88,7 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
             }
             Spacer(modifier = Modifier.height(48.dp))
 
-            Markdown("[Go to Product (via URI)](plant_sheet/Sambucus nigra)")
+            Markdown("[Go to Product (via URI)](plant_sheet/Sambucus nigra3)")
 
 //            Text("Próximamente:",
 //                color = Color.DarkGray)
@@ -102,26 +104,14 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun WelcomePreviewDark() {
-//    DruidNetTheme(darkTheme = true) {
-//        WelcomeScreen(
-//            onCatalogButtonClick = {},
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .wrapContentSize(Alignment.Center))
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun WelcomePreview() {
-//    DruidNetTheme(darkTheme = false) {
-//        WelcomeScreen(
-//            onNavigationButtonClick = { },
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .wrapContentSize(Alignment.Center))
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun WelcomePreview() {
+    DruidNetTheme(darkTheme = false) {
+        WelcomeScreen(
+            onNavigationButtonClick = { },
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center))
+    }
+}

@@ -1,6 +1,6 @@
 package org.druidanet.druidnet.ui.screens
 
-import Screen
+import NavigationDestination
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -61,7 +61,7 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.DEFAULT_CREDITS_TXT
 
 @Composable
-fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
+fun AboutScreen (onNavigationButtonClick: (NavigationDestination) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
