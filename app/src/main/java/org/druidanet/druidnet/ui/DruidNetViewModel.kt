@@ -44,7 +44,7 @@ import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
 import org.druidanet.druidnet.network.BackendScalarApi
-import org.druidanet.druidnet.ui.screens.PlantSheetSection
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
 import java.text.Collator
@@ -102,15 +102,6 @@ class DruidNetViewModel(
 
     /****** USER INTERACTION (UI) FUNCTIONS *****/
 
-    /**
-     * Set the current [selectPlant] to show information of
-     */
-    fun setSelectedPlant(selectPlant: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(selectedPlant = selectPlant)
-        }
-
-    }
 
     fun changeSection(newSection: PlantSheetSection) {
         if (newSection != uiState.value.currentSection)
@@ -179,6 +170,15 @@ class DruidNetViewModel(
 
     /****** DATABASE FUNCTIONS *****/
 
+//    fun updateDisplayName(plantLatinName: String) {
+//        _uiState.update { currentState ->
+//            currentState
+//                .copy(
+//                    displayName = plantLatinName
+//                )
+//        }
+//    }
+
     suspend fun updatePlantUi(selectPlant: Int, displayName: String) {
 
         val plantObj: Plant = this.getPlant(selectPlant)
@@ -188,7 +188,7 @@ class DruidNetViewModel(
         _uiState.update { currentState ->
             currentState
                 .copy(
-                    plantUiState = plantObj,
+//                    plantUiState = plantObj,
                     plantHasConfusions = plantObj.confusions.isNotEmpty()
                 )
         }
@@ -208,6 +208,7 @@ class DruidNetViewModel(
                             it.plantId,
                             it.displayName,
                             it.imagePath,
+                            it.latinName,
                             false
                         )
                     }
@@ -218,6 +219,7 @@ class DruidNetViewModel(
                                 it.plantId,
                                 it.displayName,
                                 it.imagePath,
+                                it.latinName,
                                 false
                             )
                         },
@@ -226,6 +228,7 @@ class DruidNetViewModel(
                                 it.plantId,
                                 it.displayName,
                                 it.imagePath,
+                                it.latinName,
                                 true
                             )
                         },
@@ -242,6 +245,7 @@ class DruidNetViewModel(
                         plant.plantId,
                         plant.displayName,
                         plant.imagePath,
+                        plant.latinName,
                         true
                     )
                 }
@@ -295,17 +299,12 @@ class DruidNetViewModel(
         return uiState.value.creditsTxt
     }
 
-    fun loadDefaultPlant(): Plant {
-        val defaultPlant = PlantsDataSource.loadPlants()[0]
-        _uiState.update { currentState ->
-            currentState
-                .copy(
-                    plantUiState = defaultPlant,
-                    plantHasConfusions = defaultPlant.confusions.isNotEmpty()
-                )
-        }
-        return defaultPlant
-        }
+//    suspend fun setDisplayName(plantLatinName: String): String {
+//        displayName = plantDao.getDisplayName(plantLatinName)
+//        updateDisplayName(displayName)
+//        return displayName
+//    }
+
 }
     /****** OTHERS - HELPER FUNCTIONS *****/
 

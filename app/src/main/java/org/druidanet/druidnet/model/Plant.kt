@@ -7,12 +7,15 @@ interface PlantBase {
 
     val imagePath: String
 
+    val latinName: String
+
 }
 
 open class PlantBasic(
     override val plantId: Int,
     override val displayName: String,
     override val imagePath: String,
+    override val latinName: String
 ) : PlantBase
 
 
@@ -20,14 +23,15 @@ data class PlantCard(
     override val plantId: Int,
     override val displayName: String,
     override val imagePath: String,
+    override val latinName: String,
     val isLatinName: Boolean
-) : PlantBasic(plantId, displayName, imagePath)
+) : PlantBasic(plantId, displayName, imagePath, latinName)
 
 
 data class Plant (
     override val plantId: Int,
 
-    val latinName: String,
+    override val latinName: String,
 
     val commonNames: Array<Name>,
     override val displayName: String = latinName,
@@ -50,7 +54,7 @@ data class Plant (
     override val imagePath: String,
 
     // otherImages
-): PlantBasic(plantId, displayName, imagePath)
+): PlantBasic(plantId, displayName, latinName, imagePath)
 
 data class Name (
     val name: String,
