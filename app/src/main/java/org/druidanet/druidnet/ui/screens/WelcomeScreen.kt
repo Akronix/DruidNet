@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,17 +25,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.net.toUri
+import androidx.navigation.NavController
 import org.druidanet.druidnet.AboutDestination
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
 fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
+                  navController: NavController,
                   modifier: Modifier = Modifier) {
 
     Box(
@@ -66,7 +65,8 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
         ) {
             Image(
                 painter = painterResource(R.drawable.druids),
-                contentDescription = "An image of a druid and a druidess",)
+                contentDescription = "An image of a druid and a druidess",
+            )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = stringResource(R.string.welcome),
@@ -84,6 +84,17 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
                     style = MaterialTheme.typography.labelMedium)
             }
             Spacer(modifier = Modifier.height(48.dp))
+
+            Button(onClick = {
+                // Internal navigation using the URI
+                // The NavController matches this URI to the navDeepLink pattern in ProductDetail
+                val productIdToNavigate = "Sambucus nigra"
+
+                navController.navigate("plant_sheet/$productIdToNavigate")
+            }) {
+                Text("Go to Product (via URI)")
+            }
+
 //            Text("Próximamente:",
 //                color = Color.DarkGray)
 //            Button(
@@ -109,15 +120,15 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
 //                .wrapContentSize(Alignment.Center))
 //    }
 //}
-
-@Preview(showBackground = true)
-@Composable
-fun WelcomePreview() {
-    DruidNetTheme(darkTheme = false) {
-        WelcomeScreen(
-            onNavigationButtonClick = { },
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center))
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun WelcomePreview() {
+//    DruidNetTheme(darkTheme = false) {
+//        WelcomeScreen(
+//            onNavigationButtonClick = { },
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .wrapContentSize(Alignment.Center))
+//    }
+//}
