@@ -98,7 +98,7 @@ fun CatalogPreview() {
     DruidNetTheme {
         CatalogScreen(
             plantList = PlantsDataSource.loadPlants()
-                .map { PlantCard(it.plantId, it.displayName, it.imagePath, false) },
+                .map { PlantCard(it.plantId, it.displayName, it.imagePath, it.latinName, false) },
             onClickPlantCard = { })
     }
 }
