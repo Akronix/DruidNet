@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import androidx.navigation.NavController
+import com.mikepenz.markdown.m3.Markdown
 import org.druidanet.druidnet.AboutDestination
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.R
@@ -85,15 +86,7 @@ fun WelcomeScreen(onNavigationButtonClick: (Screen) -> Unit,
             }
             Spacer(modifier = Modifier.height(48.dp))
 
-            Button(onClick = {
-                // Internal navigation using the URI
-                // The NavController matches this URI to the navDeepLink pattern in ProductDetail
-                val productIdToNavigate = "Sambucus nigra"
-
-                navController.navigate("plant_sheet/$productIdToNavigate")
-            }) {
-                Text("Go to Product (via URI)")
-            }
+            Markdown("[Go to Product (via URI)](plant_sheet/Sambucus nigra)")
 
 //            Text("Próximamente:",
 //                color = Color.DarkGray)

@@ -2,6 +2,7 @@ package org.druidanet.druidnet
 
 import Screen
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +34,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +62,8 @@ import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
+import androidx.core.net.toUri
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 
 
 object WelcomeDestination : Screen {
@@ -166,7 +172,7 @@ fun DruidNetApp(
         modifier = Modifier.fillMaxSize()
     )
         {
-            innerPadding -> 
+            innerPadding ->
 
             NavHost(
                 navController = navController,
@@ -175,16 +181,31 @@ fun DruidNetApp(
                     .padding(innerPadding)
             ) {
                 composable(route = WelcomeDestination.route) {
-                    WelcomeScreen(
-                        onNavigationButtonClick = { screen: Screen ->
-                            navController.navigate(screen.route)
-                        },
-                        navController = navController,
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
-                    )
+                    val defaultUriHandler = LocalUriHandler.current
+                    CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
+                        override fun openUri(uri: String) {
+                            if (uri.startsWith("druidnet://")) {
+                                println("TEST for url: $uri")
+                                navController.navigate(Uri.parse(uri))
+                            } else if (uri.startsWith("plant_sheet/")){
+                                println("TEST for url: $uri")
+                                navController.navigate(uri)
+                            } else {
+                                defaultUriHandler.openUri(uri)
+                            }
+                        }
+                    }) {
+                        WelcomeScreen(
+                            onNavigationButtonClick = { screen: Screen ->
+                                navController.navigate(screen.route)
+                            },
+                            navController = navController,
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .wrapContentSize(Alignment.Center)
+                        )
+                    }
                 }
                 composable(route = CatalogDestination.route) {
                     CatalogScreen(
@@ -208,7 +229,7 @@ fun DruidNetApp(
                     }),
                     deepLinks = listOf(
                         navDeepLink {
-                            uriPattern = "plant_sheet/{plantLatinName}"
+                            uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}"
                         }
                     )
                 ) {
@@ -222,12 +243,29 @@ fun DruidNetApp(
 //                        }
 //                    }
 
-                        PlantSheetScreen(
-                            currentSection = druidNetUiState.currentSection,
-                            onChangeSection = { section -> { viewModel.changeSection(section) } },
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
+                        val defaultUriHandler = LocalUriHandler.current
+                        CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
+                            override fun openUri(uri: String) {
+                                if (uri.startsWith("druidnet://")) {
+                                    println("TEST for url: $uri")
+                                    navController.navigate(uri.toUri())
+                                } else if (uri.startsWith("plant_sheet/")){
+                                    println("TEST for url: $uri")
+                                    navController.navigate(uri)
+                                } else {
+                                    defaultUriHandler.openUri(uri)
+                                }
+                            }
+                        }) {
+                            PlantSheetScreen(
+                                currentSection = druidNetUiState.currentSection,
+                                onChangeSection = { section -> { viewModel.changeSection(section) } },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            )
+                        }
+
+
                     } else {
                         Text("Error: There's no plant reference in the route")
                     }
