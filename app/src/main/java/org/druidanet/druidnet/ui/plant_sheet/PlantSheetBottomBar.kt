@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.ui.screens
+package org.druidanet.druidnet.ui.plant_sheet
 
 import Screen
 import android.annotation.SuppressLint

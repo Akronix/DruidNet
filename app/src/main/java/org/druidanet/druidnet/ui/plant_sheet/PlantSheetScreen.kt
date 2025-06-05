@@ -1,4 +1,4 @@
-package org.druidanet.druidnet.ui.screens
+package org.druidanet.druidnet.ui.plant_sheet
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
