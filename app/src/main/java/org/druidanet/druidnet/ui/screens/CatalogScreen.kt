@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -85,6 +87,7 @@ fun CatalogScreen(
     plantList: List<PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
     navigateBack: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -92,7 +95,10 @@ fun CatalogScreen(
             navigateUp = navigateBack,
             topBarTitle = stringResource(CatalogDestination.title),
             topBarIconPath = R.drawable.menu_book,
-        )
+        ),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) {
         Box(
             modifier = modifier
@@ -117,6 +123,7 @@ fun CatalogPreview() {
             plantList = PlantsDataSource.loadPlants()
                 .map { PlantCard(it.plantId, it.displayName, it.imagePath, it.latinName, false) },
             onClickPlantCard = { },
+            snackbarHostState = SnackbarHostState(),
             navigateBack = {},
         )
     }

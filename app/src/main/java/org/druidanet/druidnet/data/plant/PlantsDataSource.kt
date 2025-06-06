@@ -72,7 +72,7 @@ object PlantsDataSource {
                             Usage(
                                 UsageType.EDIBLE,
                                 "Bebidas Alcohólicas",
-                                "Con las flores se prepara el champán de Saúco."
+                                "Con las flores se prepara el champán de [Saúco](druidnet://druidanet.org/plant_sheet/Sambucus nigra)"
                             ),
                         )
                     )
