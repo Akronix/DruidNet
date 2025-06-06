@@ -2,6 +2,7 @@ package org.druidanet.druidnet
 
 import NavigationDestination
 import android.annotation.SuppressLint
+import androidx.compose.ui.graphics.Color
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -314,6 +315,7 @@ fun DruidNetAppBar(
     modifier: Modifier = Modifier,
     topBarTitle: String,
     topBarIconPath: Int? = null,
+    topBarColor: Color = MaterialTheme.colorScheme.primary
 ): @Composable () -> Unit {
 
         return {
@@ -336,6 +338,7 @@ fun DruidNetAppBar(
                             text = topBarTitle,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.displaySmall,
+                            color = topBarColor,
                             modifier = Modifier.padding(start = 6.dp)
                         )
                     }
