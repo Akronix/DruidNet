@@ -67,13 +67,14 @@ val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 fun PlantSheetScreen(
     plantLatinName: String,
     navigateBack: () -> Unit,
-    onChangeSection: (PlantSheetSection) -> () -> Unit,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory )
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
     val plant = plantSheetUiState.plantUiState
     val currentSection = plantSheetUiState.currentSection
+
+    val onChangeSection = { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
 
     if (plant != null) {
         Scaffold(
@@ -82,7 +83,7 @@ fun PlantSheetScreen(
                 topBarTitle = plant.displayName
             ),
             bottomBar = PlantSheetBottomBar(
-                onClickBottomNavItem = { section -> { sheetViewModel.changeSection(section) } },
+                onClickBottomNavItem = onChangeSection,
                 currentSection = plantSheetUiState.currentSection,
                 hasConfusions = plantSheetUiState.plantHasConfusions
             ),

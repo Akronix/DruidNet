@@ -102,14 +102,6 @@ class DruidNetViewModel(
 
     /****** USER INTERACTION (UI) FUNCTIONS *****/
 
-
-    fun changeSection(newSection: PlantSheetSection) {
-        if (newSection != uiState.value.currentSection)
-            _uiState.update { currentState ->
-                currentState.copy(currentSection = newSection)
-            }
-    }
-
     /****** NETWORK FUNCTIONS *****/
     fun checkAndUpdateDatabase(snackbarHost: SnackbarHostState) {
         viewModelScope.launch {
@@ -169,30 +161,6 @@ class DruidNetViewModel(
 
 
     /****** DATABASE FUNCTIONS *****/
-
-//    fun updateDisplayName(plantLatinName: String) {
-//        _uiState.update { currentState ->
-//            currentState
-//                .copy(
-//                    displayName = plantLatinName
-//                )
-//        }
-//    }
-
-    suspend fun updatePlantUi(selectPlant: Int, displayName: String) {
-
-        val plantObj: Plant = this.getPlant(selectPlant)
-            .filterNotNull()
-            .first()
-            .toPlant(displayName = displayName)
-        _uiState.update { currentState ->
-            currentState
-                .copy(
-//                    plantUiState = plantObj,
-                    plantHasConfusions = plantObj.confusions.isNotEmpty()
-                )
-        }
-    }
 
     // Get all plants from db
     fun getAllPlants(): Flow<List<PlantCard>> =
