@@ -52,7 +52,8 @@ class PlantSheetViewModel (
 
     /***** Local vars *****/
 
-    private val plantLatinName: String = checkNotNull(savedStatedHandle[PlantSheetDestination.plantArg])
+    private val plantArg: String = checkNotNull(savedStatedHandle[PlantSheetDestination.plantArg])
+    private val plantLatinName = plantArg.replace('_', ' ')
 
     private val preferencesState: StateFlow<PreferencesState> =
         userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
