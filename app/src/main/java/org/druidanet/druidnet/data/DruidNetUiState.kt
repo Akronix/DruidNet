@@ -7,10 +7,6 @@ import org.druidanet.druidnet.utils.DEFAULT_CREDITS_TXT
 
 data class DruidNetUiState(
 
-    val plantHasConfusions: Boolean = false,
-
-    val currentSection: PlantSheetSection = DEFAULT_SECTION,
-
     val firstLaunch: Boolean = true,
 
     val creditsTxt: String = DEFAULT_CREDITS_TXT,

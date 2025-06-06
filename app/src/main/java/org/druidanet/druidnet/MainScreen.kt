@@ -28,7 +28,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,11 +45,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
@@ -102,15 +99,15 @@ object PlantSheetDestination : NavigationDestination {
     val routeWithArgs = "$route/{$plantArg}"
 }
 
-val screensByRoute : Map<String, NavigationDestination> =
-    mapOf(
-        WelcomeDestination.route to WelcomeDestination,
-        CatalogDestination.route to CatalogDestination,
-        PlantSheetDestination.routeWithArgs to PlantSheetDestination,
-        AboutDestination.route to AboutDestination,
-        BibliographyDestination.route to BibliographyDestination,
-        CreditsDestination.route to CreditsDestination
-    )
+//val screensByRoute : Map<String, NavigationDestination> =
+//    mapOf(
+//        WelcomeDestination.route to WelcomeDestination,
+//        CatalogDestination.route to CatalogDestination,
+//        PlantSheetDestination.routeWithArgs to PlantSheetDestination,
+//        AboutDestination.route to AboutDestination,
+//        BibliographyDestination.route to BibliographyDestination,
+//        CreditsDestination.route to CreditsDestination
+//    )
 
 
 //enum class Screen(@StringRes val title: Int) {
@@ -127,9 +124,9 @@ fun DruidNetApp(
     viewModel: DruidNetViewModel = viewModel( factory = DruidNetViewModel.factory ),
     navController: NavHostController = rememberNavController()
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
 
-    val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
+//    val backStackEntry by navController.currentBackStackEntryAsState()
+//    val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
 
     val plantList by viewModel.getAllPlants().collectAsState(emptyList())
     val bibliography by viewModel.getBibliography().collectAsState(emptyList())
@@ -138,10 +135,6 @@ fun DruidNetApp(
                             .reduce { acc : String, ref: String -> "$acc\n$ref"} else ""
 
     val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
-
-    val druidNetUiState by viewModel.uiState.collectAsState()
-
-    val coroutineScope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -184,10 +177,7 @@ fun DruidNetApp(
                         plantList = plantList,
                         onClickPlantCard = { plant ->
 //                        viewModel.setSelectedPlant(plant.plantId)
-                            coroutineScope.launch {
-                                viewModel.updatePlantUi(plant.plantId, plant.displayName)
-                                navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
-                            }
+                            navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                         },
                         snackbarHostState = snackbarHostState,
                         navigateBack = { navController.navigateUp() },
@@ -228,7 +218,6 @@ fun DruidNetApp(
                             PlantSheetScreen(
                                 plantLatinName,
                                 { navController.navigateUp() },
-                                onChangeSection = { section -> { viewModel.changeSection(section) } },
                                 modifier = Modifier
                                     .fillMaxSize()
                             )
