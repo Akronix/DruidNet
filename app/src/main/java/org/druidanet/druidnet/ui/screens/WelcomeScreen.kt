@@ -115,17 +115,6 @@ fun WelcomeContent(onNavigationButtonClick: (NavigationDestination) -> Unit, mod
                 }
                 Spacer(modifier = Modifier.height(48.dp))
 
-                Markdown(
-                    "[Go to Product (via URI)](plant_sheet/Alchemilla vulgaris3)",
-                    colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
-                    typography = markdownTypography(
-                        link = MaterialTheme.typography. bodyLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            textDecoration = TextDecoration.Underline,
-                            )
-                    ))
-
-
 //            Text("Próximamente:",
 //                color = Color.DarkGray)
 //            Button(
