@@ -99,9 +99,9 @@ fun CatalogScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
-    ) {
+    ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = modifier.padding(innerPadding)
         ) {
             PlantsList(
                 plantsList = plantList,
