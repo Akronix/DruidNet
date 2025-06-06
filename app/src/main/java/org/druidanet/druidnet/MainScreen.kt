@@ -315,7 +315,7 @@ fun DruidNetAppBar(
     modifier: Modifier = Modifier,
     topBarTitle: String,
     topBarIconPath: Int? = null,
-    topBarColor: Color = MaterialTheme.colorScheme.primary
+    topBarColor: Color = Color.Unspecified
 ): @Composable () -> Unit {
 
         return {
