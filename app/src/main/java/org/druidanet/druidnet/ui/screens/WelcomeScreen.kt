@@ -116,7 +116,7 @@ fun WelcomeContent(onNavigationButtonClick: (NavigationDestination) -> Unit, mod
                 Spacer(modifier = Modifier.height(48.dp))
 
                 Markdown(
-                    "[Go to Product (via URI)](plant_sheet/Sambucus nigra3)",
+                    "[Go to Product (via URI)](plant_sheet/Alchemilla vulgaris)",
                     colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
                     typography = markdownTypography(
                         link = MaterialTheme.typography. bodyLarge.copy(

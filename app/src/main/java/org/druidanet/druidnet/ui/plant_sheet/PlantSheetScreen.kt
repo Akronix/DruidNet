@@ -101,7 +101,7 @@ fun PlantSheetScreen(
         Scaffold(
             topBar = DruidNetAppBar(
                 navigateUp = navigateBack,
-                topBarTitle = plantLatinName
+                topBarTitle = plantLatinName.replace('_',' ')
             ),
             modifier = Modifier.fillMaxSize()
         )
