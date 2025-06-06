@@ -116,7 +116,7 @@ fun WelcomeContent(onNavigationButtonClick: (NavigationDestination) -> Unit, mod
                 Spacer(modifier = Modifier.height(48.dp))
 
                 Markdown(
-                    "[Go to Product (via URI)](plant_sheet/Alchemilla vulgaris)",
+                    "[Go to Product (via URI)](plant_sheet/Alchemilla vulgaris3)",
                     colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
                     typography = markdownTypography(
                         link = MaterialTheme.typography. bodyLarge.copy(
@@ -144,7 +144,7 @@ fun WelcomeContent(onNavigationButtonClick: (NavigationDestination) -> Unit, mod
 @Preview(showBackground = true)
 @Composable
 fun WelcomePreview() {
-    DruidNetTheme(darkTheme = false) {
+    DruidNetTheme(darkTheme = true) {
         WelcomeContent(
             onNavigationButtonClick = { },
             modifier = Modifier

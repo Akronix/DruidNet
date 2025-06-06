@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -45,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.markdownPadding
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
@@ -101,20 +104,68 @@ fun PlantSheetScreen(
         Scaffold(
             topBar = DruidNetAppBar(
                 navigateUp = navigateBack,
-                topBarTitle = plantLatinName.replace('_',' ')
+                topBarTitle = plantLatinName.replace('_',' '),
+                topBarColor = MaterialTheme.colorScheme.error
             ),
             modifier = Modifier.fillMaxSize()
         )
         { innerPadding ->
-            NoPlantFound(modifier = modifier.padding(innerPadding))
+            NoPlantFound(
+                plantLatinName,
+                modifier = modifier.padding(innerPadding))
         }
     }
 }
 
 @Composable
-fun NoPlantFound(modifier : Modifier) {
-    Box( modifier) {
-        Text("No plant found")
+fun NoPlantFound(
+    plantLatinName: String,
+    modifier : Modifier) {
+    Box( modifier ) {
+        Column(modifier = Modifier
+            .align(Alignment.Center)
+            .padding(dimensionResource(R.dimen.padding_large))) {
+                Markdown("Todavía no tenemos _${plantLatinName}_ en nuestros registros.",
+                    modifier = Modifier,
+                    typography = markdownTypography(
+                        paragraph =
+                            MaterialTheme.typography.headlineSmall.copy(
+                            textAlign = TextAlign.Center)
+                    )
+                )
+
+                Image(painterResource(R.drawable.confused_druidess),
+                    "Una druidesa confundida observando una planta que desconoce.")
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(20.dp))
+                {
+                    Markdown("¿Te gustaría contribuir a que _${plantLatinName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com) \uD83D\uDD4A\uFE0F",
+                        modifier = Modifier,
+                        typography = markdownTypography(
+                            paragraph =
+                                MaterialTheme.typography.titleSmall
+                                    .copy(textAlign = TextAlign.Center,
+                                        fontSize = 18.sp),
+                            link = MaterialTheme.typography.titleSmall
+                                    .copy(textAlign = TextAlign.Center,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textDecoration = TextDecoration.Underline
+                                    ),
+                            text = MaterialTheme.typography.titleSmall
+                                    .copy(textAlign = TextAlign.Center)
+                        )
+                    )
+                }
+            }
+            Box(Modifier.fillMaxHeight())
+        }
     }
 }
 
@@ -476,14 +527,28 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
  */
+//@Preview(showBackground = true)
+//@Composable
+//fun PlantSheetScreenPreview() {
+//    DruidNetTheme {
+//        PlantSheetBody(
+//            PlantsDataSource.loadPlants()[0],
+//            currentSection = PlantSheetSection.USAGES,
+//            onChangeSection = { { } },
+//            modifier = Modifier.fillMaxSize()
+//        )
+//    }
+//}
+
+/**
+ * Composable that displays what the UI of the app looks like in light theme in the design tab.
+ */
 @Preview(showBackground = true)
 @Composable
-fun PlantSheetScreenPreview() {
-    DruidNetTheme {
-        PlantSheetBody(
-            PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.USAGES,
-            onChangeSection = { { } },
+fun NoPlantFoundPreview() {
+    DruidNetTheme(darkTheme = false) {
+        NoPlantFound(
+            "Digitalis purpurea",
             modifier = Modifier.fillMaxSize()
         )
     }

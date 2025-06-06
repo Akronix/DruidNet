@@ -6,4 +6,5 @@
     <dimen name="section_buttom_img">40dp</dimen>
     <dimen name="space_between_sections">5dp</dimen>
     <dimen name="text_icon_setting_margin">30dp</dimen>
+    <dimen name="padding_large">40.dp</dimen>
 </resources>
