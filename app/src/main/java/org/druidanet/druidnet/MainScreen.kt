@@ -18,8 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -54,14 +53,12 @@ import androidx.navigation.navDeepLink
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.ui.DruidNetViewModel
-import org.druidanet.druidnet.ui.plant_sheet.PlantSheetBottomBar
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
-import androidx.core.net.toUri
 
 
 object WelcomeDestination : NavigationDestination {
@@ -152,20 +149,9 @@ fun DruidNetApp(
 
     //canNavigateBack = navController.previousBackStackEntry != null,
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        modifier = Modifier.fillMaxSize()
-    )
-        {
-            innerPadding ->
-
             NavHost(
                 navController = navController,
                 startDestination = WelcomeDestination.route,
-                modifier = Modifier
-                    .padding(innerPadding)
             ) {
                 composable(route = WelcomeDestination.route) {
                     val defaultUriHandler = LocalUriHandler.current
@@ -186,8 +172,8 @@ fun DruidNetApp(
                             onNavigationButtonClick = { navigationDestination: NavigationDestination ->
                                 navController.navigate(navigationDestination.route)
                             },
+                            snackbarHostState,
                             modifier = Modifier
-                                .padding(innerPadding)
                                 .fillMaxSize()
                                 .wrapContentSize(Alignment.Center)
                         )
@@ -203,11 +189,11 @@ fun DruidNetApp(
                                 navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                             }
                         },
+                        snackbarHostState = snackbarHostState,
                         navigateBack = { navController.navigateUp() },
                         modifier = Modifier
                             .fillMaxSize()
                             .wrapContentSize(Alignment.Center)
-                            .padding(innerPadding)
                     )
                 }
                 composable(
@@ -245,7 +231,6 @@ fun DruidNetApp(
                                 onChangeSection = { section -> { viewModel.changeSection(section) } },
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(innerPadding)
                             )
                         }
 
@@ -256,6 +241,7 @@ fun DruidNetApp(
                 }
                 composable(route = AboutDestination.route) {
                     AboutScreen(
+                        navigateBack = { navController.navigateUp() },
                         onNavigationButtonClick = { navigationDestination: NavigationDestination ->
                             navController.navigate(navigationDestination.route)
                         },
@@ -266,6 +252,7 @@ fun DruidNetApp(
                 }
                 composable(route = BibliographyDestination.route) {
                     BibliographyScreen(
+                        navigateBack = { navController.navigateUp() },
                         bibliographyStr = bibliographyStr,
                         modifier = Modifier
                             .fillMaxSize()
@@ -273,6 +260,7 @@ fun DruidNetApp(
                 }
                 composable(route = CreditsDestination.route) {
                     CreditsScreen(
+                        navigateBack = { navController.navigateUp() },
                         creditsText = viewModel.getCreditsText(),
                         modifier = Modifier
                             .fillMaxSize()
@@ -280,7 +268,6 @@ fun DruidNetApp(
                 }
 
             }
-        }
 
         // Run database check & update when the app starts
         if (justStartedApp){

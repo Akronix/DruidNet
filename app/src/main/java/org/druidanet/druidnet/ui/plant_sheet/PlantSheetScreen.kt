@@ -1,14 +1,11 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +19,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,11 +43,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
-import org.druidanet.druidnet.PlantSheetDestination
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Confusion
@@ -80,35 +75,46 @@ fun PlantSheetScreen(
     val plant = plantSheetUiState.plantUiState
     val currentSection = plantSheetUiState.currentSection
 
-    Scaffold (
-        topBar = DruidNetAppBar(
-        navigateUp = navigateBack,
-        topBarTitle = plant?.displayName?: plantLatinName
-        ),
-        bottomBar = PlantSheetBottomBar(
-            onClickBottomNavItem = { section -> { sheetViewModel.changeSection(section) } },
-            currentSection = plantSheetUiState.currentSection,
-            hasConfusions = plantSheetUiState.plantHasConfusions
-        ),
-        modifier = Modifier.fillMaxSize())
-    {
-        innerPadding ->
-        if (plant != null)
+    if (plant != null) {
+        Scaffold(
+            topBar = DruidNetAppBar(
+                navigateUp = navigateBack,
+                topBarTitle = plant.displayName
+            ),
+            bottomBar = PlantSheetBottomBar(
+                onClickBottomNavItem = { section -> { sheetViewModel.changeSection(section) } },
+                currentSection = plantSheetUiState.currentSection,
+                hasConfusions = plantSheetUiState.plantHasConfusions
+            ),
+            modifier = Modifier.fillMaxSize()
+        )
+        { innerPadding ->
             PlantSheetBody(
                 plant = plant,
                 currentSection,
                 onChangeSection,
                 modifier = modifier.padding(innerPadding)
             )
-        else
-            NoPlantFound()
-
+        }
+    } else {
+        Scaffold(
+            topBar = DruidNetAppBar(
+                navigateUp = navigateBack,
+                topBarTitle = plantLatinName
+            ),
+            modifier = Modifier.fillMaxSize()
+        )
+        { innerPadding ->
+            NoPlantFound(modifier = modifier.padding(innerPadding))
+        }
     }
 }
 
 @Composable
-fun NoPlantFound() {
-    Text("No plant found")
+fun NoPlantFound(modifier : Modifier) {
+    Box( modifier) {
+        Text("No plant found")
+    }
 }
 
 @Composable
@@ -475,20 +481,9 @@ fun PlantSheetScreenPreview() {
     DruidNetTheme {
         PlantSheetBody(
             PlantsDataSource.loadPlants()[0],
-            currentSection = PlantSheetSection.DESCRIPTION,
+            currentSection = PlantSheetSection.USAGES,
             onChangeSection = { { } },
             modifier = Modifier.fillMaxSize()
         )
     }
 }
-
-/**
- * Composable that displays what the UI of the app looks like in dark theme in the design tab.
- */
-//@Preview
-//@Composable
-//fun CatalogDarkThemePreview() {
-//    DruidNetTheme(darkTheme = true) {
-//        CatalogScreen()
-//    }
-//}
