@@ -379,7 +379,15 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
                             style = MaterialTheme.typography.titleSmall
                     )
                     Markdown(usage.text,
-                        typography = markdownTypography(text = MaterialTheme.typography.bodyLarge))
+                        colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
+                        typography = markdownTypography(
+                            text = MaterialTheme.typography.bodyLarge,
+                            link = MaterialTheme.typography. bodyLarge. copy(
+                                fontWeight = FontWeight. Bold,
+                                textDecoration = TextDecoration. Underline
+                                )
+                        )
+                    )
                     Spacer(modifier = Modifier.padding(
                         dimensionResource(id = R.dimen.space_between_sections)
                     ))
