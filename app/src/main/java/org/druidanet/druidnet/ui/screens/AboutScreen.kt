@@ -373,6 +373,18 @@ fun BiblioPreview() {
                 null,
                 "https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-espanol-de-los-conocimientos-tradicionales/inventario_esp_conocimientos_tradicionales.html",
                 "Fase 1"
+            ).toMarkdownString() +
+            BibliographyEntity(
+                2,
+                "book",
+                "Cocinar con plantas silvestres: Reconocer, recolectar, utilizar",
+                "Bernard Bertrand",
+                "La Fertilidad de la Tierra Ediciones",
+                "2015",
+                "978-84-940582-9-5",
+                "2ª ed.",
+                "",
+                null
             ).toMarkdownString()
         )
     }

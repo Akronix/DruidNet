@@ -26,18 +26,18 @@ data class BibliographyEntity(
     fun toMarkdownString() : String  {
         if (type != "online") {
             return "_${title}_" +
-                    if (subtitle != null) ":  _${subtitle}_" else {""} +
+                    if (!subtitle.isNullOrEmpty()) ":  _${subtitle}_" else {""} +
                     ". " +
                     authors + ". " +
                     publisher + ". " +
                     date + ". " +
-                    if (edition != null) "$edition. " else {""} +
-                    if (url != null) "[Enlace a la web]($url). " else {""} +
-                    if (notes != null) "$notes." else {""}
+                    if (!edition.isNullOrEmpty()) "$edition. " else {""} +
+                    if (!url.isNullOrEmpty()) "[Enlace a la web]($url). " else {""} +
+                    if (!notes.isNullOrEmpty()) "$notes." else {""}
         } else {
             return "Portal web _${title}_: $url" +
-                    if (date != null) ". _Consultado por última vez: ${date}_" else {""} +
-                    if (notes != null) ". $notes." else {""}
+                    if (!date.isNullOrEmpty()) ". _Consultado por última vez: ${date}_" else {""} +
+                    if (!notes.isNullOrEmpty()) ". $notes." else {""}
         }
     }
 
