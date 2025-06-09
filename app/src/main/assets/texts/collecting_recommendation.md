@@ -1,4 +1,6 @@
-# Recomendaciones de recolección de plantas silvestres
+# Recomendaciones para la recolección de plantas silvestres
+
+![Una cesta repleta de diferentes flores silvestres recién recolectadas](../images/gatherer_basket.webp)
 
 ## ¿Cómo recolectar?
 A continuación, desarrollamos algunos consejos sobre cómo recolectar plantas silvestres. **No olvides que cualquier consumo que hagas de ellas, es bajo tu responsabilidad**.
