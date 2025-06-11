@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.R.attr
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,9 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,6 +57,11 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.font.FontWeight
+import android.R.attr.fontWeight
+
+
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -372,10 +376,19 @@ fun ConfusionTextBox(confusion: Confusion) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            Text(
-                text = confusion.latinName,
-                style = MaterialTheme.typography.titleMedium,
-                fontStyle = Italic,
+            Markdown(
+                content = confusion.latinName,
+                typography = markdownTypography(
+                    link = MaterialTheme.typography.titleMedium.copy(
+                        fontStyle = Italic,
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    paragraph = MaterialTheme.typography.titleMedium.copy(
+                        fontStyle = Italic,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                ),
                 modifier = Modifier.padding(bottom = 5.dp)
             )
             Markdown(
@@ -533,7 +546,7 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 //    DruidNetTheme {
 //        PlantSheetBody(
 //            PlantsDataSource.loadPlants()[0],
-//            currentSection = PlantSheetSection.USAGES,
+//            currentSection = PlantSheetSection.CONFUSIONS,
 //            onChangeSection = { { } },
 //            modifier = Modifier.fillMaxSize()
 //        )
@@ -543,13 +556,13 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
  */
-@Preview(showBackground = true)
-@Composable
-fun NoPlantFoundPreview() {
-    DruidNetTheme(darkTheme = false) {
-        NoPlantFound(
-            "Digitalis purpurea",
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun NoPlantFoundPreview() {
+//    DruidNetTheme(darkTheme = false) {
+//        NoPlantFound(
+//            "Digitalis purpurea",
+//            modifier = Modifier.fillMaxSize()
+//        )
+//    }
+//}
