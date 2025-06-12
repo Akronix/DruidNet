@@ -284,6 +284,7 @@ fun DruidNetApp(
             composable(route = RecommendationsDestination.route) {
                 RecomendationsScreen(
                     recommendationsTxt = viewModel.getRecommendationsText(),
+                    imageBitmap = viewModel.getRecommendationsImage(),
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
