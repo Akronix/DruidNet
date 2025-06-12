@@ -1,10 +1,5 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,27 +7,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +43,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,13 +61,6 @@ import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.assetsToBitmap
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.ui.tooling.preview.Preview
-import org.druidanet.druidnet.data.plant.PlantsDataSource
-import org.druidanet.druidnet.ui.theme.DruidNetTheme
-
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -91,58 +84,65 @@ fun PlantSheetScreen(
     val onChangeSection =
         { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
 
-    if (plant != null) {
-        Scaffold(
-            topBar = DruidNetAppBar(
-                navigateUp = navigateBack,
-                topBarTitle = plant.displayName
-            ),
-            bottomBar = PlantSheetBottomBar(
-                onClickBottomNavItem = onChangeSection,
-                currentSection = plantSheetUiState.currentSection,
-                hasConfusions = plantSheetUiState.plantHasConfusions
-            ),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(
-                        WindowInsetsSides.Horizontal,
-                    ),
-                )
-        ) {padding ->
-            PlantSheetBody(
-                plant = plant,
-                currentSection,
-                onChangeSection,
-                modifier = modifier.padding(padding)
-            )
-        }
+        if (plantSheetUiState.isBlank) {
+            BlankScreen()
+        } else if (plant != null) {
+            Scaffold(
+                topBar = DruidNetAppBar(
+                    navigateUp = navigateBack,
+                    topBarTitle = plant.displayName
+                ),
+                bottomBar = PlantSheetBottomBar(
+                    onClickBottomNavItem = onChangeSection,
+                    currentSection = plantSheetUiState.currentSection,
+                    hasConfusions = plantSheetUiState.plantHasConfusions
+                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Horizontal,
+                        ),
+                    )
 
-    } else {
-        Scaffold(
-            topBar = DruidNetAppBar(
-                navigateUp = navigateBack,
-                topBarTitle = plantLatinName.replace('_',' '),
-                topBarColor = MaterialTheme.colorScheme.error
-            ),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(
-                        WindowInsetsSides.Horizontal,
-                    ),
+            ) {padding ->
+                PlantSheetBody(
+                    plant = plant,
+                    currentSection,
+                    onChangeSection,
+                    modifier = modifier.padding(padding)
                 )
-        )
-        { padding ->
-            NoPlantFound(
-                plantLatinName,
-                modifier = modifier.padding(padding))
+            }
+
+        } else {
+            Scaffold(
+                topBar = DruidNetAppBar(
+                    navigateUp = navigateBack,
+                    topBarTitle = plantLatinName.replace('_',' '),
+                    topBarColor = MaterialTheme.colorScheme.error
+                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Horizontal,
+                        ),
+                    )
+            )
+            { padding ->
+                NoPlantFound(
+                    plantLatinName,
+                    modifier = modifier.padding(padding))
+            }
         }
-    }
+}
+
+@Composable
+fun BlankScreen() {
 }
 
 @Composable
