@@ -33,4 +33,6 @@
     <string name="title_screen_credits">Créditos</string>
     <string name="about_screen_faqs">Preguntas Frecuentes</string>
     <string name="about_screen_donate">Donaciones</string>
+    <string name="title_screen_recommendations">Recomendaciones</string>
+    <string name="greetings_recommendations_btn">Recomendaciones de recolección</string>
 </resources>
