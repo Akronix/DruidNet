@@ -78,6 +78,9 @@ class PlantSheetViewModel (
     // 1. A MutableStateFlow for the UI-driven state (currentSection)
     private val _currentSection = MutableStateFlow(DEFAULT_SECTION) // Initialize with a default
 
+    private val isPlantInDatabaseFlow: Flow<Boolean> =
+        plantsRepository.isPlantInDatabase(plantLatinName)
+
     // 2. The Flow from the repository
     private val plantDataFlow: Flow<PlantSheetUIState> = plantsRepository
         .getPlant(plantLatinName, language)
@@ -85,18 +88,25 @@ class PlantSheetViewModel (
             PlantSheetUIState(
                 plantUiState = it,
                 plantHasConfusions = it.confusions.isNotEmpty(),
-                displayName = it.displayName,
+                displayName = it.displayName
             )
         }
 
-    // 3. Combine both flows
+    val isPlantInDatabase: StateFlow<Boolean> = isPlantInDatabaseFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = true
+    )
+
+    // 3. Combine cuurent sectiond and plantData flows
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
     ) { plantSheetData, currentSection ->
         // When either flow emits a new value, this lambda is re-executed
         plantSheetData.copy(currentSection = currentSection) // Update the section in the combined state
-    }.stateIn(
+    }.
+    stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
         initialValue = PlantSheetUIState() // Ensure initialValue also has default section

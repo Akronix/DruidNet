@@ -7,7 +7,7 @@ import org.druidanet.druidnet.model.Plant
  */
 data class PlantSheetUIState(
 
-    val isBlank: Boolean = true,
+    val isLoading: Boolean = true,
 
     /**
      * Holds current plant ui state

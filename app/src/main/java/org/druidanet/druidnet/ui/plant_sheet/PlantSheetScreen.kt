@@ -84,9 +84,9 @@ fun PlantSheetScreen(
     val onChangeSection =
         { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
 
-        if (plantSheetUiState.isBlank) {
-            BlankScreen()
-        } else if (plant != null) {
+    val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
+
+        if (isPlantInDatabase && plant != null) {
             Scaffold(
                 topBar = DruidNetAppBar(
                     navigateUp = navigateBack,
@@ -116,7 +116,7 @@ fun PlantSheetScreen(
                 )
             }
 
-        } else {
+        } else if (!isPlantInDatabase) {
             Scaffold(
                 topBar = DruidNetAppBar(
                     navigateUp = navigateBack,
