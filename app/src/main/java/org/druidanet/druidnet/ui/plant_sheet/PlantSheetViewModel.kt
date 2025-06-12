@@ -73,13 +73,29 @@ class PlantSheetViewModel (
     private val language = preferencesState.value.displayLanguage
 
 
+    /* The following should be inside the UI state, but I couldn't let it working :( */
+    /* I tried combining flows but plantDataFlow doesn't output when the result is null,
+    * so that this flow would never return the value of isPlantInDatabase = false, therefore
+    * the UI wouldn't get advised to change */
+    private val isPlantInDatabaseFlow: Flow<Boolean> =
+        plantsRepository.isPlantInDatabase(plantLatinName)
+
+    val isPlantInDatabase: StateFlow<Boolean> = isPlantInDatabaseFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = true
+    )
+
     /***** UI state *****/
+
+    /* It could be interesting to change the whole implementation and move from using Flows
+       to using suspend and coroutines. May it has more sense, and then we could have a
+       Loading and Error state. But we would lose the Flow capabilities of course.
+       To do that transition, follow this example: https://github.com/android/compose-samples/blob/73b3a51e06a6520efb5b4931e71b771d257bf1dd/JetNews/app/src/main/java/com/example/jetnews/ui/home/HomeViewModel.kt#L150
+     */
 
     // 1. A MutableStateFlow for the UI-driven state (currentSection)
     private val _currentSection = MutableStateFlow(DEFAULT_SECTION) // Initialize with a default
-
-    private val isPlantInDatabaseFlow: Flow<Boolean> =
-        plantsRepository.isPlantInDatabase(plantLatinName)
 
     // 2. The Flow from the repository
     private val plantDataFlow: Flow<PlantSheetUIState> = plantsRepository
@@ -92,13 +108,7 @@ class PlantSheetViewModel (
             )
         }
 
-    val isPlantInDatabase: StateFlow<Boolean> = isPlantInDatabaseFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = true
-    )
-
-    // 3. Combine cuurent sectiond and plantData flows
+    // 3. Combine current section and plantData flows
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
