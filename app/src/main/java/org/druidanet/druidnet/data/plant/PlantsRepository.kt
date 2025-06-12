@@ -30,7 +30,6 @@ class PlantsRepository(
             .filterNotNull()
             .map {
                 val displayName = plantDao.getDisplayName(it.p.plantId, language).first()
-                println("DISPLAY NAME: $displayName")
                 it.toPlant(displayName = displayName)
             }
     }
