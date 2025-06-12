@@ -12,17 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
+import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
 fun RecomendationsScreen (
     recommendationsTxt: String,
-    imageBitmap: ImageBitmap,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -31,7 +32,7 @@ fun RecomendationsScreen (
         modifier = modifier.verticalScroll(state = scrollState)
     ) {
         Image(
-            bitmap = imageBitmap,
+            painter = painterResource(R.drawable.gatherer_basket),
             contentScale = ContentScale.FillWidth,
             contentDescription = "Una cesta repleta de diferentes flores silvestres recién recolectadas",
             modifier = Modifier
@@ -51,15 +52,15 @@ fun RecomendationsScreen (
         }
     }
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun RecomendationsScreenPreview() {
-//    DruidNetTheme(darkTheme = false) {
-//        RecomendationsScreen(
-//            "**Recomendaciones de recolección**\n" +
-//                    "## Recomendación 1\n" +
-//                    "Texto de recomendación"
-//        )
-//    }
-//}
+
+@Preview(showBackground = true)
+@Composable
+fun RecomendationsScreenPreview() {
+    DruidNetTheme(darkTheme = false) {
+        RecomendationsScreen(
+            "**Recomendaciones de recolección**\n" +
+                    "## Recomendación 1\n" +
+                    "Texto de recomendación"
+        )
+    }
+}
