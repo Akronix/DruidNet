@@ -1,17 +1,19 @@
-import androidx.annotation.StringRes
-import org.druidanet.druidnet.R
-
 /**
  * Interface to describe the navigation destinations for the app
  */
-interface Screen {
+abstract class NavigationDestination {
+
     /**
      * Unique name to define the path for a composable
      */
-    val route: String
+    abstract val route: String
 
     /**
      * String resource id to that contains title to be displayed for the screen.
      */
-    val title: Int
+    abstract val title: Int
+
+    open val hasTopBar: Boolean = true
+
+    open val topBarIconPath: Int? = null
 }

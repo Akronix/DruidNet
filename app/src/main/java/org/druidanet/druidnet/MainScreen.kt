@@ -1,7 +1,9 @@
 package org.druidanet.druidnet
 
-import Screen
+import NavigationDestination
 import android.annotation.SuppressLint
+import androidx.compose.ui.graphics.Color
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,21 +25,24 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -46,41 +51,40 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import kotlinx.coroutines.launch
-import org.druidanet.druidnet.data.DruidNetUiState
+import androidx.navigation.navDeepLink
+import kotlinx.serialization.Serializable
+import org.druidanet.druidnet.ui.DruidNetViewModel
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
-import org.druidanet.druidnet.ui.DruidNetViewModel
-import org.druidanet.druidnet.ui.screens.PlantSheetBottomBar
-import org.druidanet.druidnet.ui.screens.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 
-object WelcomeDestination : Screen {
+object WelcomeDestination : NavigationDestination() {
     override val route = "welcome"
     override val title = R.string.app_name
+    override val hasTopBar = false
 }
 
-object CatalogDestination : Screen {
+object CatalogDestination : NavigationDestination() {
     override val route = "catalog"
     override val title = R.string.title_screen_catalog
+    override val topBarIconPath = R.drawable.menu_book
 }
 
-object AboutDestination : Screen {
+object AboutDestination : NavigationDestination() {
     override val route = "about"
     override val title = R.string.title_screen_about
 }
 
-object BibliographyDestination : Screen {
+object BibliographyDestination : NavigationDestination() {
     override val route = "bibliography"
     override val title = R.string.title_screen_bibliography
 }
 
-object CreditsDestination : Screen {
+object CreditsDestination : NavigationDestination() {
     override val route = "credits"
     override val title = R.string.title_screen_credits
 }
@@ -93,14 +97,16 @@ object CreditsDestination : Screen {
 //    val routeWithArgs = "$route/{$plantId}"
 //}
 
-object PlantSheetDestination : Screen {
+@Serializable
+object PlantSheetDestination : NavigationDestination() {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
-    const val plantArg = "plantId"
+    const val plantArg = "plantLatinName"
     val routeWithArgs = "$route/{$plantArg}"
+    override val hasTopBar = false
 }
 
-val screensByRoute : Map<String, Screen> =
+val screensByRoute : Map<String, NavigationDestination> =
     mapOf(
         WelcomeDestination.route to WelcomeDestination,
         CatalogDestination.route to CatalogDestination,
@@ -109,7 +115,6 @@ val screensByRoute : Map<String, Screen> =
         BibliographyDestination.route to BibliographyDestination,
         CreditsDestination.route to CreditsDestination
     )
-
 
 //enum class Screen(@StringRes val title: Int) {
 //    Welcome(title = R.string.app_name),
@@ -125,9 +130,9 @@ fun DruidNetApp(
     viewModel: DruidNetViewModel = viewModel( factory = DruidNetViewModel.factory ),
     navController: NavHostController = rememberNavController()
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
 
-    val currentScreen : Screen = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
 
     val plantList by viewModel.getAllPlants().collectAsState(emptyList())
     val bibliography by viewModel.getBibliography().collectAsState(emptyList())
@@ -137,44 +142,61 @@ fun DruidNetApp(
 
     val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
 
-    val druidNetUiState by viewModel.uiState.collectAsState()
-
-    val coroutineScope = rememberCoroutineScope()
-
     val snackbarHostState = remember { SnackbarHostState() }
 
     var justStartedApp by remember { mutableStateOf(true)}
 
     //canNavigateBack = navController.previousBackStackEntry != null,
 
-    Scaffold(
-        topBar = DruidNetAppBar(
-            currentScreen = currentScreen,
+    val appMainTopBar: @Composable () -> Unit = if (currentNavigationDestination.hasTopBar) {
+        DruidNetAppBar(
+            topBarTitle = stringResource(currentNavigationDestination.title),
             navigateUp = { navController.navigateUp() },
-            uiState = druidNetUiState
-        ),
-        bottomBar = PlantSheetBottomBar(
-            currentScreen = currentScreen,
-            onClickBottomNavItem = { section -> { viewModel.changeSection(section) } },
-            currentSection = druidNetUiState.currentSection,
-            hasConfusions = druidNetUiState.plantHasConfusions
-        ),
+            topBarIconPath = currentNavigationDestination.topBarIconPath,
+        )} else { {} }
+
+    Scaffold(
+        topBar = appMainTopBar,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-
         NavHost(
             navController = navController,
             startDestination = WelcomeDestination.route,
-            modifier = Modifier
-                .padding(innerPadding)
         ) {
             composable(route = WelcomeDestination.route) {
-                WelcomeScreen(
-                    onNavigationButtonClick = {screen: Screen ->
-                        navController.navigate(screen.route)
+                val defaultUriHandler = LocalUriHandler.current
+                CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
+                    override fun openUri(uri: String) {
+                        if (uri.startsWith("druidnet://")) {
+                            println("TEST for url: $uri")
+                            navController.navigate(Uri.parse(uri))
+                        } else if (uri.startsWith("plant_sheet/")) {
+                            println("TEST for url: $uri")
+                            navController.navigate(uri)
+                        } else {
+                            defaultUriHandler.openUri(uri)
+                        }
+                    }
+                }) {
+                    WelcomeScreen(
+                        onNavigationButtonClick = { navigationDestination: NavigationDestination ->
+                            navController.navigate(navigationDestination.route)
+                        },
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center)
+                    )
+                }
+            }
+            composable(route = CatalogDestination.route) {
+                CatalogScreen(
+                    plantList = plantList,
+                    onClickPlantCard = { plant ->
+                        navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                     },
                     modifier = Modifier
                         .padding(innerPadding)
@@ -182,42 +204,57 @@ fun DruidNetApp(
                         .wrapContentSize(Alignment.Center)
                 )
             }
-            composable(route = CatalogDestination.route) {
-                CatalogScreen(
-                    plantList = plantList,
-                    onClickPlantCard = { plant ->
-                        viewModel.setSelectedPlant(plant.plantId)
-                        coroutineScope.launch {
-                            viewModel.updatePlantUi(plant.plantId, plant.displayName)
-                            navController.navigate("${PlantSheetDestination.route}/${plant.plantId}")
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .wrapContentSize(Alignment.Center)
+            composable(
+                route = PlantSheetDestination.routeWithArgs,
+                arguments = listOf(navArgument(PlantSheetDestination.plantArg) {
+                    type = NavType.StringType
+                }),
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}"
+                    }
                 )
-            }
-            composable(route = PlantSheetDestination.routeWithArgs,
-                        arguments = listOf(navArgument(PlantSheetDestination.plantArg){
-                        type = NavType.IntType
-                        })
-            ){
+            ) {
+                val plantLatinName: String? = it.arguments?.getString("plantLatinName")
 
-                PlantSheetScreen(
-                    plant = druidNetUiState.plantUiState!!,
-                    currentSection = druidNetUiState.currentSection,
-                    onChangeSection = { section -> { viewModel.changeSection(section) } },
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
+                if (plantLatinName != null) {
+
+                    val defaultUriHandler = LocalUriHandler.current
+                    CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
+                        override fun openUri(uri: String) {
+                            if (uri.startsWith("druidnet://")) {
+                                println("TEST for url: $uri")
+                                navController.navigate(uri.toUri())
+                            } else if (uri.startsWith("plant_sheet/")) {
+                                println("TEST for url: $uri")
+                                navController.navigate(uri)
+                            } else {
+                                defaultUriHandler.openUri(uri)
+                            }
+                        }
+                    }) {
+                        PlantSheetScreen(
+                            plantLatinName,
+                            { navController.navigateUp() },
+                            innerPadding,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
+                    }
+
+                } else {
+                    Text("Error: There's no plant reference in the route")
+                }
+
             }
             composable(route = AboutDestination.route) {
                 AboutScreen(
-                    onNavigationButtonClick = {screen: Screen ->
-                        navController.navigate(screen.route)
+                    onNavigationButtonClick = { navigationDestination: NavigationDestination ->
+                        navController.navigate(navigationDestination.route)
                     },
                     viewModel = viewModel,
                     modifier = Modifier
+                        .padding(innerPadding)
                         .fillMaxSize()
                 )
             }
@@ -225,6 +262,7 @@ fun DruidNetApp(
                 BibliographyScreen(
                     bibliographyStr = bibliographyStr,
                     modifier = Modifier
+                        .padding(innerPadding)
                         .fillMaxSize()
                 )
             }
@@ -232,6 +270,7 @@ fun DruidNetApp(
                 CreditsScreen(
                     creditsText = viewModel.getCreditsText(),
                     modifier = Modifier
+                        .padding(innerPadding)
                         .fillMaxSize()
                 )
             }
@@ -239,7 +278,7 @@ fun DruidNetApp(
         }
 
         // Run database check & update when the app starts
-        if (justStartedApp){
+        if (justStartedApp) {
             LaunchedEffect(Unit) {
                 justStartedApp = false
                 viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
@@ -250,9 +289,8 @@ fun DruidNetApp(
         if (firstLaunch) {
             Disclaimer(
                 onDismissDisclaimer = { },
-                onAcceptDisclaimer = { viewModel.unsetFirstLaunch() } )
+                onAcceptDisclaimer = { viewModel.unsetFirstLaunch() })
         }
-
     }
 }
 
@@ -291,20 +329,12 @@ fun Disclaimer(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DruidNetAppBar(
-    currentScreen: Screen,
+    topBarTitle: String,
     navigateUp: () -> Unit,
-    uiState: DruidNetUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    topBarIconPath: Int? = null,
+    topBarColor: Color = Color.Unspecified
 ): @Composable () -> Unit {
-
-        if (currentScreen == WelcomeDestination) return {} // No top bar in Welcome screen
-
-        val topBarTitle: String = when (currentScreen) {
-            PlantSheetDestination -> uiState.plantUiState!!.displayName
-            else -> stringResource(currentScreen.title)
-        }
-
-        val topBarIconPath: Int? = if (currentScreen == CatalogDestination) R.drawable.menu_book else null
 
         return {
             CenterAlignedTopAppBar(
@@ -326,6 +356,7 @@ fun DruidNetAppBar(
                             text = topBarTitle,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.displaySmall,
+                            color = topBarColor,
                             modifier = Modifier.padding(start = 6.dp)
                         )
                     }

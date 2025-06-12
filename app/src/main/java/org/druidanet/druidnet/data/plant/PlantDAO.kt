@@ -16,7 +16,7 @@ import org.druidanet.druidnet.model.PlantBasic
 @Dao
 interface PlantDAO {
 
-    @Query("SELECT DISTINCT common_name as displayName, plantId, image_path as imagePath " +
+    @Query("SELECT DISTINCT common_name as displayName, plantId, image_path as imagePath, latin_name as latinName " +
             "FROM PlantView " +
             "WHERE language = :language " +
             "ORDER BY displayName " +
@@ -24,16 +24,16 @@ interface PlantDAO {
     fun getPlantCatalogData(language: LanguageEnum): Flow<List<PlantBasic>>
 
 
-    @Query("SELECT DISTINCT latin_name as displayName, plantId, image_path as imagePath" +
+    @Query("SELECT DISTINCT latin_name as displayName, plantId, image_path as imagePath, latin_name as latinName" +
             " FROM PlantView" +
             " ORDER BY latin_name")
     fun getPlantCatalogLatin(): Flow<List<PlantBasic>>
 
 
-    @Query("SELECT plantId, latin_name as displayName, image_path as imagePath" +
+    @Query("SELECT plantId, latin_name as displayName, image_path as imagePath, latin_name as latinName" +
             " FROM PlantView " +
             " EXCEPT" +
-            " SELECT plantId, latin_name as displayName, image_path as imagePath " +
+            " SELECT plantId, latin_name as displayName, image_path as imagePath, latin_name as latinName " +
             " FROM PlantView" +
             " WHERE language = :language" +
             " ORDER BY displayName")
@@ -54,6 +54,10 @@ interface PlantDAO {
     @Query("SELECT * FROM Plant WHERE plantId = :plantId")
     @Transaction
     fun getPlant(plantId: Int): Flow<PlantData>
+
+    @Query("SELECT * FROM Plant WHERE latin_name = :plantLatinName")
+    @Transaction
+    fun getPlant(plantLatinName: String): Flow<PlantData?>
 
     /*** INSERT DATA ***/
 

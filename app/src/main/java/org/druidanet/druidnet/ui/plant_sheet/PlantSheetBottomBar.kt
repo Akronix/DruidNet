@@ -1,6 +1,5 @@
-package org.druidanet.druidnet.ui.screens
+package org.druidanet.druidnet.ui.plant_sheet
 
-import Screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -22,7 +21,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import org.druidanet.druidnet.PlantSheetDestination
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -30,12 +28,10 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 @SuppressLint("ComposableNaming")
 @Composable
 fun PlantSheetBottomBar(
-    currentScreen: Screen,
     onClickBottomNavItem: (PlantSheetSection) -> () -> Unit,
     currentSection: PlantSheetSection,
     hasConfusions: Boolean
 ) : @Composable () -> Unit {
-    if (currentScreen == PlantSheetDestination)
         return {
             BottomAppBar(
                 actions = {
@@ -67,8 +63,6 @@ fun PlantSheetBottomBar(
                 }
             )
         }
-    else
-        return {}
 }
 
 @Composable
@@ -145,15 +139,14 @@ fun PlantSheetBottomBarPreview() {
     DruidNetTheme {
         Scaffold(
             bottomBar = PlantSheetBottomBar(
-                PlantSheetDestination,
-                onClickBottomNavItem = { _ -> {  } },
-                currentSection = PlantSheetSection.DESCRIPTION,
+                onClickBottomNavItem = { _ -> { } },
+                currentSection = PlantSheetSection.USAGES,
                 hasConfusions = samplePlant.confusions.isNotEmpty()
             ),
         ) {
-            PlantSheetScreen(
+            PlantSheetBody(
                 plant = samplePlant,
-                currentSection = PlantSheetSection.DESCRIPTION,
+                currentSection = PlantSheetSection.USAGES,
                 onChangeSection = { { } },
                 modifier = Modifier.padding(it)
             )

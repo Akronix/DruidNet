@@ -1,6 +1,6 @@
 package org.druidanet.druidnet.ui.screens
 
-import Screen
+import NavigationDestination
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -27,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -53,6 +54,7 @@ import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.BibliographyDestination
 import org.druidanet.druidnet.CreditsDestination
+import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.LanguageEnum
@@ -61,77 +63,84 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.DEFAULT_CREDITS_TXT
 
 @Composable
-fun AboutScreen (onNavigationButtonClick: (Screen) -> Unit, viewModel: DruidNetViewModel, modifier: Modifier = Modifier) {
+fun AboutScreen (
+    onNavigationButtonClick: (NavigationDestination) -> Unit,
+     viewModel: DruidNetViewModel,
+     modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier
-    ) {
+    Box(modifier = modifier)
+        {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
 
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .padding(10.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
+                AboutSectionHeader("Ajustes")
 
-            AboutSectionHeader("Ajustes")
+                AboutItem(
+                    action = { showDialog = true },
+                    stringResource(R.string.title_screen_language),
+                    imageResource = R.drawable.language
+                )
 
-            AboutItem(
-                action = { showDialog = true },
-                stringResource(R.string.title_screen_language),
-                imageResource = R.drawable.language
-            )
+                AboutSectionHeader("Acerca de " + stringResource(R.string.app_name))
 
-            AboutSectionHeader("Acerca de " + stringResource(R.string.app_name))
+                AboutItem(
+                    { onNavigationButtonClick(BibliographyDestination) },
+                    stringResource(R.string.title_screen_bibliography),
+                    imageResource = R.drawable.library_books,
+                    additionalText = null
+                )
 
-            AboutItem(
-                { onNavigationButtonClick( BibliographyDestination ) },
-                stringResource(R.string.title_screen_bibliography),
-                imageResource = R.drawable.library_books,
-                additionalText = null
-            )
+                AboutItem(
+                    { openURIAction(context, "https://druidnet.es/preguntas-frecuentes/") },
+                    stringResource(R.string.about_screen_faqs),
+                    imageResource = R.drawable.help,
+                    additionalText = null
+                )
 
-            AboutItem(
-                { openURIAction(context, "https://druidnet.es/preguntas-frecuentes/") },
-                stringResource(R.string.about_screen_faqs),
-                imageResource = R.drawable.help,
-                additionalText = null
-            )
+                AboutItem(
+                    { onNavigationButtonClick(CreditsDestination) },
+                    stringResource(R.string.title_screen_credits),
+                    imageVector = Icons.Default.Star,
+                    additionalText = null
+                )
 
-            AboutItem(
-                { onNavigationButtonClick( CreditsDestination ) },
-                stringResource(R.string.title_screen_credits),
-                imageVector = Icons.Default.Star,
-                additionalText = null
-            )
+                AboutItem(
+                    {
+                        openURIAction(
+                            context,
+                            "https://opencollective.com/druidnet#category-CONTRIBUTE"
+                        )
+                    },
+                    stringResource(R.string.about_screen_donate),
+                    imageResource = R.drawable.donate,
+                    additionalText = null
+                )
 
-            AboutItem(
-                { openURIAction(context, "https://opencollective.com/druidnet#category-CONTRIBUTE") },
-                stringResource(R.string.about_screen_donate),
-                imageResource = R.drawable.donate,
-                additionalText = null
-            )
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(horizontal = 50.dp)
+                )
 
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = Color.Gray,
-                modifier = Modifier.padding(horizontal = 50.dp)
-            )
+                AboutItem(
+                    { sendEmailAction(context) },
+                    "Contacta",
+                    additionalText = "¿Alguna sugerencia? ¿Quieres colaborar?",
+                    imageVector = Icons.Default.Email
+                )
+            }
 
-            AboutItem(
-                { sendEmailAction(context) },
-                "Contacta",
-                additionalText = "¿Alguna sugerencia? ¿Quieres colaborar?",
-                imageVector = Icons.Default.Email )
+            if (showDialog) {
+                SwitchLanguageDialog(viewModel, { showDialog = false })
+            }
         }
-
-        if (showDialog) {
-            SwitchLanguageDialog(viewModel, {showDialog = false })
-        }
-    }
 }
 
 @Composable
@@ -295,11 +304,17 @@ fun sendEmailAction(context: Context) {
 }
 
 @Composable
-fun CreditsScreen ( creditsText: String, modifier: Modifier = Modifier) {
-        Column (modifier = modifier.fillMaxHeight() // Take up the full available height
-            .verticalScroll(state = ScrollState(0)),
-                 verticalArrangement = Arrangement.SpaceBetween,){
-            Markdown(creditsText,
+fun CreditsScreen (
+    creditsText: String,
+    modifier: Modifier = Modifier) {
+        Column(
+            modifier = modifier
+                .fillMaxHeight() // Take up the full available height
+                .verticalScroll(state = ScrollState(0)),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Markdown(
+                creditsText,
                 typography = markdownTypography(
                     h1 = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
                     paragraph = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp)
@@ -331,12 +346,18 @@ fun CreditsScreen ( creditsText: String, modifier: Modifier = Modifier) {
                     .padding(vertical = 10.dp, horizontal = 30.dp)
             )
         }
-    }
+}
 
 @Composable
-fun BibliographyScreen (bibliographyStr: String, modifier: Modifier = Modifier) {
+fun BibliographyScreen (
+    bibliographyStr: String,
+    modifier: Modifier = Modifier) {
 
-    Box( modifier.verticalScroll(state = ScrollState(0)) ) {
+    Box(
+        modifier = modifier
+            .verticalScroll(state = ScrollState(0))
+    )
+    {
 
         SelectionContainer {
 
@@ -347,13 +368,14 @@ fun BibliographyScreen (bibliographyStr: String, modifier: Modifier = Modifier) 
                     link = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Normal,
                         textDecoration = TextDecoration.Underline
-                    )),
+                    )
+                ),
                 modifier = Modifier
                     .padding(vertical = 10.dp, horizontal = 30.dp)
             )
         }
-
     }
+
 }
 
 
@@ -406,9 +428,9 @@ fun CreditsPreview() {
 //    DruidNetTheme(darkTheme = true) {
 //        AboutScreen(
 //            { },
+//            { },
 //            null,
-//            modifier = Modifier
-//                .fillMaxSize()
+//            Modifier
 //        )
 //    }
 //}

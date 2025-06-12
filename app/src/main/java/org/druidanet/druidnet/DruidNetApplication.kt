@@ -23,7 +23,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 class DruidNetApplication: Application() {
     val database: AppDatabase by lazy { AppDatabase.getDatabase(this) }
     val userPreferencesRepository by lazy { UserPreferencesRepository(dataStore) }
-    val plantsRepository by lazy { PlantsRepository(PlantsRemoteDataSource()) }
+    val plantsRepository by lazy { PlantsRepository(PlantsRemoteDataSource(), plantDao = database.plantDao()) }
     val biblioRepository by lazy { BibliographyRepository() }
     val imagesRepository by lazy {
         ImagesRepository(

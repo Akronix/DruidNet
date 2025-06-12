@@ -34,6 +34,7 @@ import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
+import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
@@ -43,7 +44,7 @@ import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
 import org.druidanet.druidnet.network.BackendScalarApi
-import org.druidanet.druidnet.ui.screens.PlantSheetSection
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
 import java.text.Collator
@@ -100,23 +101,6 @@ class DruidNetViewModel(
     }
 
     /****** USER INTERACTION (UI) FUNCTIONS *****/
-
-    /**
-     * Set the current [selectPlant] to show information of
-     */
-    fun setSelectedPlant(selectPlant: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(selectedPlant = selectPlant)
-        }
-
-    }
-
-    fun changeSection(newSection: PlantSheetSection) {
-        if (newSection != uiState.value.currentSection)
-            _uiState.update { currentState ->
-                currentState.copy(currentSection = newSection)
-            }
-    }
 
     /****** NETWORK FUNCTIONS *****/
     fun checkAndUpdateDatabase(snackbarHost: SnackbarHostState) {
@@ -178,21 +162,6 @@ class DruidNetViewModel(
 
     /****** DATABASE FUNCTIONS *****/
 
-    suspend fun updatePlantUi(selectPlant: Int, displayName: String) {
-
-        val plantObj: Plant = this.getPlant(selectPlant)
-            .filterNotNull()
-            .first()
-            .toPlant(displayName = displayName)
-        _uiState.update { currentState ->
-            currentState
-                .copy(
-                    plantUiState = plantObj,
-                    plantHasConfusions = plantObj.confusions.isNotEmpty()
-                )
-        }
-    }
-
     // Get all plants from db
     fun getAllPlants(): Flow<List<PlantCard>> =
         if (LANGUAGE_APP != LanguageEnum.LATIN) {
@@ -207,6 +176,7 @@ class DruidNetViewModel(
                             it.plantId,
                             it.displayName,
                             it.imagePath,
+                            it.latinName,
                             false
                         )
                     }
@@ -217,6 +187,7 @@ class DruidNetViewModel(
                                 it.plantId,
                                 it.displayName,
                                 it.imagePath,
+                                it.latinName,
                                 false
                             )
                         },
@@ -225,6 +196,7 @@ class DruidNetViewModel(
                                 it.plantId,
                                 it.displayName,
                                 it.imagePath,
+                                it.latinName,
                                 true
                             )
                         },
@@ -241,6 +213,7 @@ class DruidNetViewModel(
                         plant.plantId,
                         plant.displayName,
                         plant.imagePath,
+                        plant.latinName,
                         true
                     )
                 }
@@ -293,6 +266,13 @@ class DruidNetViewModel(
         }
         return uiState.value.creditsTxt
     }
+
+//    suspend fun setDisplayName(plantLatinName: String): String {
+//        displayName = plantDao.getDisplayName(plantLatinName)
+//        updateDisplayName(displayName)
+//        return displayName
+//    }
+
 }
     /****** OTHERS - HELPER FUNCTIONS *****/
 
