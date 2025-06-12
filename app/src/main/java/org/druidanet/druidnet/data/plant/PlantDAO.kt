@@ -57,7 +57,7 @@ interface PlantDAO {
 
     @Query("SELECT * FROM Plant WHERE latin_name = :plantLatinName")
     @Transaction
-    fun getPlant(plantLatinName: String): Flow<PlantData>
+    fun getPlant(plantLatinName: String): Flow<PlantData?>
 
     /*** INSERT DATA ***/
 
