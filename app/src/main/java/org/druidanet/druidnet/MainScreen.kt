@@ -196,7 +196,6 @@ fun DruidNetApp(
                 CatalogScreen(
                     plantList = plantList,
                     onClickPlantCard = { plant ->
-//                        viewModel.setSelectedPlant(plant.plantId)
                         navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                     },
                     modifier = Modifier

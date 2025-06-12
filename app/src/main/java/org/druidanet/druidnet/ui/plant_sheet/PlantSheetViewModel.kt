@@ -8,6 +8,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -78,19 +79,20 @@ class PlantSheetViewModel (
     private val _currentSection = MutableStateFlow(DEFAULT_SECTION) // Initialize with a default
 
     // 2. The Flow from the repository
-    private val plantDataFlow: Flow<PlantSheetUIState> = plantsRepository.getPlant(plantLatinName, language)
+    private val plantDataFlow: Flow<PlantSheetUIState> = plantsRepository
+        .getPlant(plantLatinName, language)
         .map {
             PlantSheetUIState(
                 plantUiState = it,
                 plantHasConfusions = it.confusions.isNotEmpty(),
-                displayName = it.displayName
+                displayName = it.displayName,
             )
         }
 
     // 3. Combine both flows
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
-        _currentSection // The flow that controls the current section
+        _currentSection, // The flow that controls the current section,
     ) { plantSheetData, currentSection ->
         // When either flow emits a new value, this lambda is re-executed
         plantSheetData.copy(currentSection = currentSection) // Update the section in the combined state
