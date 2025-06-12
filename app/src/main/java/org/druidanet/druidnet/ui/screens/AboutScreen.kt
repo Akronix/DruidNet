@@ -63,28 +63,7 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.DEFAULT_CREDITS_TXT
 
 @Composable
-fun AboutLayout (navigateBack: () -> Unit,
-                    topBarTitle: String,
-                    modifier: Modifier = Modifier,
-                    content: @Composable () -> Unit) {
-    Scaffold(
-        topBar = DruidNetAppBar(
-            navigateUp = navigateBack,
-            topBarTitle = topBarTitle,
-        ),
-    ) {
-            innerPadding ->
-        Box(
-            modifier = modifier.padding(innerPadding)
-        ) {
-            content()
-            }
-        }
-}
-
-@Composable
 fun AboutScreen (
-    navigateBack: () -> Unit,
     onNavigationButtonClick: (NavigationDestination) -> Unit,
      viewModel: DruidNetViewModel,
      modifier: Modifier = Modifier) {
@@ -92,10 +71,7 @@ fun AboutScreen (
 
     var showDialog by remember { mutableStateOf(false) }
 
-    AboutLayout(
-            navigateBack = navigateBack,
-            topBarTitle = stringResource(R.string.title_screen_about),
-            modifier = modifier)
+    Box(modifier = modifier)
         {
             Column(
                 horizontalAlignment = Alignment.Start,
@@ -329,17 +305,11 @@ fun sendEmailAction(context: Context) {
 
 @Composable
 fun CreditsScreen (
-    navigateBack: () -> Unit,
     creditsText: String,
     modifier: Modifier = Modifier) {
-    AboutLayout(
-        navigateBack = navigateBack,
-        topBarTitle = stringResource(R.string.title_screen_credits),
-        modifier = modifier
-    )
-    {
         Column(
-            modifier = modifier.fillMaxHeight() // Take up the full available height
+            modifier = modifier
+                .fillMaxHeight() // Take up the full available height
                 .verticalScroll(state = ScrollState(0)),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -376,19 +346,16 @@ fun CreditsScreen (
                     .padding(vertical = 10.dp, horizontal = 30.dp)
             )
         }
-    }
 }
 
 @Composable
 fun BibliographyScreen (
-    navigateBack: () -> Unit,
     bibliographyStr: String,
     modifier: Modifier = Modifier) {
 
-    AboutLayout(
-        navigateBack = navigateBack,
-        topBarTitle = stringResource(R.string.title_screen_bibliography),
-        modifier = modifier.verticalScroll(state = ScrollState(0))
+    Box(
+        modifier = modifier
+            .verticalScroll(state = ScrollState(0))
     )
     {
 
@@ -417,7 +384,6 @@ fun BibliographyScreen (
 fun BiblioPreview() {
     DruidNetTheme(darkTheme = false) {
         BibliographyScreen(
-            { },
             BibliographyEntity(
                 1,
                 "incollection",
@@ -451,7 +417,6 @@ fun BiblioPreview() {
 fun CreditsPreview() {
     DruidNetTheme(darkTheme = false) {
         CreditsScreen(
-            {},
             DEFAULT_CREDITS_TXT
         )
     }

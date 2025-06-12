@@ -20,25 +20,17 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.mikepenz.markdown.m3.Markdown
-import com.mikepenz.markdown.m3.markdownColor
-import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.AboutDestination
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.R
@@ -46,24 +38,7 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
 fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
-                  snackbarHostState: SnackbarHostState,
-                  modifier: Modifier = Modifier) {
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
-        WelcomeContent(
-            onNavigationButtonClick = onNavigationButtonClick,
-            modifier = modifier.padding(innerPadding)
-        )
-    }
-        
-}
-
-@Composable
-fun WelcomeContent(onNavigationButtonClick: (NavigationDestination) -> Unit, modifier: Modifier) {
+                   modifier: Modifier) {
     Box(
         modifier = modifier
     ) {
@@ -134,7 +109,7 @@ fun WelcomeContent(onNavigationButtonClick: (NavigationDestination) -> Unit, mod
 @Composable
 fun WelcomePreview() {
     DruidNetTheme(darkTheme = true) {
-        WelcomeContent(
+        WelcomeScreen(
             onNavigationButtonClick = { },
             modifier = Modifier
                 .fillMaxSize()

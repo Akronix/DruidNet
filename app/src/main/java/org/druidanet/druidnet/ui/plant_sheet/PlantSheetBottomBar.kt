@@ -21,7 +21,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import org.druidanet.druidnet.PlantSheetDestination
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -140,14 +139,14 @@ fun PlantSheetBottomBarPreview() {
     DruidNetTheme {
         Scaffold(
             bottomBar = PlantSheetBottomBar(
-                onClickBottomNavItem = { _ -> {  } },
-                currentSection = PlantSheetSection.DESCRIPTION,
+                onClickBottomNavItem = { _ -> { } },
+                currentSection = PlantSheetSection.USAGES,
                 hasConfusions = samplePlant.confusions.isNotEmpty()
             ),
         ) {
             PlantSheetBody(
                 plant = samplePlant,
-                currentSection = PlantSheetSection.DESCRIPTION,
+                currentSection = PlantSheetSection.USAGES,
                 onChangeSection = { { } },
                 modifier = Modifier.padding(it)
             )
