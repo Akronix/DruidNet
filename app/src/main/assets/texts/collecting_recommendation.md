@@ -1,8 +1,4 @@
-# Recomendaciones para la recolección de plantas silvestres
-
-![Una cesta repleta de diferentes flores silvestres recién recolectadas](../images/gatherer_basket.webp)
-
-## ¿Cómo recolectar?
+## Cómo recolectar plantas silvestres
 A continuación, desarrollamos algunos consejos sobre cómo recolectar plantas silvestres. **No olvides que cualquier consumo que hagas de ellas, es bajo tu responsabilidad**.
 
 1. Antes de consumir cualquier planta, **debes poder identificarla de manera fehaciente**. Es importante observarla a lo largo de todo su ciclo de vida, puesto que las plantas pueden variar mucho desde su juventud hasta su época adulta. No ingerir ni usar ninguna planta que no se conozca.
@@ -11,7 +7,7 @@ A continuación, desarrollamos algunos consejos sobre cómo recolectar plantas s
 4. También es importante tener en cuanto el posible grado de **toxicidad** que pueda tener una planta, en qué órganos está y fijarse que no se confunda con otras plantas peligrosas. En una misma planta, algunas partes pueden ser comestibles y otras tóxicas. Como con las plantas cultivadas, recolectaremos las partes de las plantas silvestres que estén sanas, con buen aspecto, jóvenes y tiernas a la vez.
 5. Por último, tenemos que **asegurarnos que la naturaleza podrá regenerarse** y que no hacemos una recolecta excesiva. Es importante informarte de que el lugar donde vas a recolectar no es un espacio protegido y de si existen algunas **restricciones** concernientes a las especies que estás recolectando.
 
-## ¿Cuándo recolectar?
+## Cuándo recolectar plantas silvestres
 Una regla general para recolectar las diferentes partes de las plantas es:
 * Hojas: antes de que las plantas comiencen a florecer. La mayoría de  las hojas cambian de sabor y textura una vez que la planta ha florecido.
 * Flores: cuando están recién abiertas en un día soleado, lo que  implica más néctar, más fragancia y más sabor.
@@ -25,7 +21,7 @@ El tiempo seco, por lo general, funciona mejor, especialmente cuando
 recolectamos hierbas para secar.
 
 
-## ¿Por qué recolectar?
+## Por qué recolectar plantas silvestres
 La recolección de plantas silvestres es, sin lugar a dudas, una de las actividades más **ancestrales** del ser humano.
 Aún así, en nuestra sociedad actual hemos perdido mucho de ese conocimiento, y también mucha de la habilidad en su reconocimiento y hábito en fijarnos cómo cambia el entorno natural.
 No obstante, estos conocimientos, habilidades y hábitos pueden ser _re-adquiridas_ mediante su entrenamiento y estudio.

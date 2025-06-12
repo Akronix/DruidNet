@@ -121,7 +121,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
 @Preview(showBackground = true)
 @Composable
 fun WelcomePreview() {
-    DruidNetTheme(darkTheme = true) {
+    DruidNetTheme(darkTheme = false) {
         WelcomeScreen(
             onNavigationButtonClick = { },
             modifier = Modifier

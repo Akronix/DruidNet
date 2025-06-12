@@ -1,8 +1,11 @@
 package org.druidanet.druidnet.ui
 
 import android.content.res.AssetManager
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -17,14 +20,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.DruidNetUiState
@@ -36,7 +37,6 @@ import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
-import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
@@ -46,9 +46,7 @@ import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
 import org.druidanet.druidnet.network.BackendScalarApi
-import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
-import java.io.File
 import java.io.IOException
 import java.text.Collator
 import java.util.Locale
@@ -274,6 +272,13 @@ class DruidNetViewModel(
 
     fun getRecommendationsText(): String {
         return assets.open("texts/collecting_recommendation.md").bufferedReader().use { it.readText() }
+    }
+
+    fun getRecommendationsImage(): ImageBitmap {
+        val inputStream = assets.open("images/gatherer_basket.webp")
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        inputStream.close()
+        return bitmap.asImageBitmap()
     }
 
 //    suspend fun setDisplayName(plantLatinName: String): String {
