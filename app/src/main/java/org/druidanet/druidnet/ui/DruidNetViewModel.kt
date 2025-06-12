@@ -275,7 +275,7 @@ class DruidNetViewModel(
     }
 
     fun getRecommendationsImage(): ImageBitmap {
-        val inputStream = assets.open("images/gatherer_basket.webp")
+        val inputStream = assets.open("drawable/gatherer_basket.webp")
         val bitmap = BitmapFactory.decodeStream(inputStream)
         inputStream.close()
         return bitmap.asImageBitmap()

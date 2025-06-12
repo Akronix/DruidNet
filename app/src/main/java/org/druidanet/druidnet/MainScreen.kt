@@ -174,20 +174,6 @@ fun DruidNetApp(
             startDestination = WelcomeDestination.route,
         ) {
             composable(route = WelcomeDestination.route) {
-                val defaultUriHandler = LocalUriHandler.current
-                CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
-                    override fun openUri(uri: String) {
-                        if (uri.startsWith("druidnet://")) {
-                            println("TEST for url: $uri")
-                            navController.navigate(Uri.parse(uri))
-                        } else if (uri.startsWith("plant_sheet/")) {
-                            println("TEST for url: $uri")
-                            navController.navigate(uri)
-                        } else {
-                            defaultUriHandler.openUri(uri)
-                        }
-                    }
-                }) {
                     WelcomeScreen(
                         onNavigationButtonClick = { navigationDestination: NavigationDestination ->
                             navController.navigate(navigationDestination.route)
@@ -197,7 +183,6 @@ fun DruidNetApp(
                             .fillMaxSize()
                             .wrapContentSize(Alignment.Center)
                     )
-                }
             }
             composable(route = CatalogDestination.route) {
                 CatalogScreen(
@@ -284,7 +269,6 @@ fun DruidNetApp(
             composable(route = RecommendationsDestination.route) {
                 RecomendationsScreen(
                     recommendationsTxt = viewModel.getRecommendationsText(),
-                    imageBitmap = viewModel.getRecommendationsImage(),
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()

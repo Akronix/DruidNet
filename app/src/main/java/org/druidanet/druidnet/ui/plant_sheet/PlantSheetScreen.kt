@@ -86,59 +86,59 @@ fun PlantSheetScreen(
 
     val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
 
-        if (isPlantInDatabase && plant != null) {
-            Scaffold(
-                topBar = DruidNetAppBar(
-                    navigateUp = navigateBack,
-                    topBarTitle = plant.displayName
-                ),
-                bottomBar = PlantSheetBottomBar(
-                    onClickBottomNavItem = onChangeSection,
-                    currentSection = plantSheetUiState.currentSection,
-                    hasConfusions = plantSheetUiState.plantHasConfusions
-                ),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal,
-                        ),
-                    )
-
-            ) {padding ->
-                PlantSheetBody(
-                    plant = plant,
-                    currentSection,
-                    onChangeSection,
-                    modifier = modifier.padding(padding)
+    if (isPlantInDatabase && plant != null) {
+        Scaffold(
+            topBar = DruidNetAppBar(
+                navigateUp = navigateBack,
+                topBarTitle = plant.displayName
+            ),
+            bottomBar = PlantSheetBottomBar(
+                onClickBottomNavItem = onChangeSection,
+                currentSection = plantSheetUiState.currentSection,
+                hasConfusions = plantSheetUiState.plantHasConfusions
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal,
+                    ),
                 )
-            }
 
-        } else if (!isPlantInDatabase) {
-            Scaffold(
-                topBar = DruidNetAppBar(
-                    navigateUp = navigateBack,
-                    topBarTitle = plantLatinName.replace('_',' '),
-                    topBarColor = MaterialTheme.colorScheme.error
-                ),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal,
-                        ),
-                    )
+        ) {padding ->
+            PlantSheetBody(
+                plant = plant,
+                currentSection,
+                onChangeSection,
+                modifier = modifier.padding(padding)
             )
-            { padding ->
-                NoPlantFound(
-                    plantLatinName,
-                    modifier = modifier.padding(padding))
-            }
         }
+
+    } else if (!isPlantInDatabase) {
+        Scaffold(
+            topBar = DruidNetAppBar(
+                navigateUp = navigateBack,
+                topBarTitle = plantLatinName.replace('_',' '),
+                topBarColor = MaterialTheme.colorScheme.error
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal,
+                    ),
+                )
+        )
+        { padding ->
+            NoPlantFound(
+                plantLatinName,
+                modifier = modifier.padding(padding))
+        }
+    }
 }
 
 @Composable
