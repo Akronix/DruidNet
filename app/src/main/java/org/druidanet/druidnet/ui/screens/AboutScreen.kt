@@ -352,7 +352,6 @@ fun CreditsScreen (
 fun BibliographyScreen (
     bibliographyStr: String,
     modifier: Modifier = Modifier) {
-
     Box(
         modifier = modifier
             .verticalScroll(state = ScrollState(0))

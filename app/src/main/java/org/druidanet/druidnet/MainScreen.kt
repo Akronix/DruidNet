@@ -60,6 +60,7 @@ import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
+import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 
 
 object WelcomeDestination : NavigationDestination() {
@@ -89,6 +90,11 @@ object CreditsDestination : NavigationDestination() {
     override val title = R.string.title_screen_credits
 }
 
+object RecommendationsDestination : NavigationDestination() {
+    override val route = "recommendations"
+    override val title = R.string.title_screen_recommendations
+}
+
 // We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
 //@Serializable
 //data class PlantSheetDestination(val plantId: Int = 0) : Screen {
@@ -113,7 +119,8 @@ val screensByRoute : Map<String, NavigationDestination> =
         PlantSheetDestination.routeWithArgs to PlantSheetDestination,
         AboutDestination.route to AboutDestination,
         BibliographyDestination.route to BibliographyDestination,
-        CreditsDestination.route to CreditsDestination
+        CreditsDestination.route to CreditsDestination,
+        RecommendationsDestination.route to RecommendationsDestination
     )
 
 //enum class Screen(@StringRes val title: Int) {
@@ -269,6 +276,14 @@ fun DruidNetApp(
             composable(route = CreditsDestination.route) {
                 CreditsScreen(
                     creditsText = viewModel.getCreditsText(),
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                )
+            }
+            composable(route = RecommendationsDestination.route) {
+                RecomendationsScreen(
+                    recommendationsTxt = viewModel.getRecommendationsText(),
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()

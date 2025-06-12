@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui
 
+import android.content.res.AssetManager
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.DruidNetUiState
@@ -46,6 +48,7 @@ import org.druidanet.druidnet.network.BackendApi
 import org.druidanet.druidnet.network.BackendScalarApi
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.utils.mergeOrderedLists
+import java.io.File
 import java.io.IOException
 import java.text.Collator
 import java.util.Locale
@@ -57,7 +60,8 @@ class DruidNetViewModel(
     private val plantsRepository: PlantsRepository,
     private val biblioRepository: BibliographyRepository,
     private val imagesRepository: ImagesRepository,
-    private val roomDatabase: RoomDatabase
+    private val roomDatabase: RoomDatabase,
+    private val assets: AssetManager
 ) : ViewModel() {
 
     /****** STATE VARIABLES *****/
@@ -94,7 +98,8 @@ class DruidNetViewModel(
                     application.plantsRepository,
                     application.biblioRepository,
                     application.imagesRepository,
-                    application.database
+                    application.database,
+                    application.assets
                 )
             }
         }
@@ -265,6 +270,10 @@ class DruidNetViewModel(
             }
         }
         return uiState.value.creditsTxt
+    }
+
+    fun getRecommendationsText(): String {
+        return assets.open("texts/collecting_recommendation.md").bufferedReader().use { it.readText() }
     }
 
 //    suspend fun setDisplayName(plantLatinName: String): String {

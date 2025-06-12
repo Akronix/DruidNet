@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import androidx.compose.ui.zIndex
 import org.druidanet.druidnet.AboutDestination
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.RecommendationsDestination
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
@@ -89,6 +92,16 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     )
                 }
                 Spacer(modifier = Modifier.height(48.dp))
+                Button(
+                    onClick = { onNavigationButtonClick(RecommendationsDestination) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp))
+                }
 
 //            Text("Próximamente:",
 //                color = Color.DarkGray)
