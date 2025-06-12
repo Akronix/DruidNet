@@ -86,28 +86,15 @@ fun PlantsList(
 fun CatalogScreen(
     plantList: List<PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
-    navigateBack: () -> Unit,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = DruidNetAppBar(
-            navigateUp = navigateBack,
-            topBarTitle = stringResource(CatalogDestination.title),
-            topBarIconPath = R.drawable.menu_book,
-        ),
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = modifier.padding(innerPadding)
-        ) {
-            PlantsList(
-                plantsList = plantList,
-                onClickPlantCard = onClickPlantCard
-            )
-        }
+    Box(
+        modifier = modifier
+    ) {
+        PlantsList(
+            plantsList = plantList,
+            onClickPlantCard = onClickPlantCard
+        )
     }
 
 }
@@ -123,8 +110,6 @@ fun CatalogPreview() {
             plantList = PlantsDataSource.loadPlants()
                 .map { PlantCard(it.plantId, it.displayName, it.imagePath, it.latinName, false) },
             onClickPlantCard = { },
-            snackbarHostState = SnackbarHostState(),
-            navigateBack = {},
         )
     }
 }

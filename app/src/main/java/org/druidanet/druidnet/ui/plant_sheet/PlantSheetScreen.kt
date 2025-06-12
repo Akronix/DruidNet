@@ -1,27 +1,35 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
-import android.R.attr
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,28 +47,26 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
-import com.mikepenz.markdown.model.markdownPadding
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
-import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.font.FontWeight
-import android.R.attr.fontWeight
-
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.tooling.preview.Preview
+import org.druidanet.druidnet.data.plant.PlantsDataSource
+import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 
 enum class PlantSheetSection {
@@ -74,14 +80,16 @@ val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 fun PlantSheetScreen(
     plantLatinName: String,
     navigateBack: () -> Unit,
+    innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    sheetViewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory )
+    sheetViewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory),
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
     val plant = plantSheetUiState.plantUiState
     val currentSection = plantSheetUiState.currentSection
 
-    val onChangeSection = { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
+    val onChangeSection =
+        { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
 
     if (plant != null) {
         Scaffold(
@@ -94,16 +102,24 @@ fun PlantSheetScreen(
                 currentSection = plantSheetUiState.currentSection,
                 hasConfusions = plantSheetUiState.plantHasConfusions
             ),
-            modifier = Modifier.fillMaxSize()
-        )
-        { innerPadding ->
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal,
+                    ),
+                )
+        ) {padding ->
             PlantSheetBody(
                 plant = plant,
                 currentSection,
                 onChangeSection,
-                modifier = modifier.padding(innerPadding)
+                modifier = modifier.padding(padding)
             )
         }
+
     } else {
         Scaffold(
             topBar = DruidNetAppBar(
@@ -111,12 +127,20 @@ fun PlantSheetScreen(
                 topBarTitle = plantLatinName.replace('_',' '),
                 topBarColor = MaterialTheme.colorScheme.error
             ),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal,
+                    ),
+                )
         )
-        { innerPadding ->
+        { padding ->
             NoPlantFound(
                 plantLatinName,
-                modifier = modifier.padding(innerPadding))
+                modifier = modifier.padding(padding))
         }
     }
 }
@@ -129,17 +153,17 @@ fun NoPlantFound(
         Column(modifier = Modifier
             .align(Alignment.Center)
             .padding(dimensionResource(R.dimen.padding_large))) {
-                Markdown("Todavía no tenemos _${plantLatinName}_ en nuestros registros.",
-                    modifier = Modifier,
-                    typography = markdownTypography(
-                        paragraph =
-                            MaterialTheme.typography.headlineSmall.copy(
+            Markdown("Todavía no tenemos _${plantLatinName}_ en nuestros registros.",
+                modifier = Modifier,
+                typography = markdownTypography(
+                    paragraph =
+                        MaterialTheme.typography.headlineSmall.copy(
                             textAlign = TextAlign.Center)
-                    )
                 )
+            )
 
-                Image(painterResource(R.drawable.confused_druidess),
-                    "Una druidesa confundida observando una planta que desconoce.")
+            Image(painterResource(R.drawable.confused_druidess),
+                "Una druidesa confundida observando una planta que desconoce.")
             Surface(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(10.dp),
@@ -157,13 +181,13 @@ fun NoPlantFound(
                                     .copy(textAlign = TextAlign.Center,
                                         fontSize = 18.sp),
                             link = MaterialTheme.typography.titleSmall
-                                    .copy(textAlign = TextAlign.Center,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textDecoration = TextDecoration.Underline
-                                    ),
+                                .copy(textAlign = TextAlign.Center,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textDecoration = TextDecoration.Underline
+                                ),
                             text = MaterialTheme.typography.titleSmall
-                                    .copy(textAlign = TextAlign.Center)
+                                .copy(textAlign = TextAlign.Center)
                         )
                     )
                 }
@@ -180,7 +204,7 @@ fun PlantSheetBody(
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    
+
     SelectionContainer {
 
         when (currentSection) {
@@ -252,16 +276,16 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
 
             Text(
                 buildAnnotatedString {
-                        withStyle(style = SpanStyle( fontWeight = FontWeight.Bold )) {
-                            append(stringResource(R.string.datasheet_common_names))
-                        }
-                        append(" ")
-                        append(plant.commonNames.joinToString(
-                            transform = {name -> "${name.name} (${name.language.abbr})"}
-                        ))
-                        append(".")
-                    },
-                    style = MaterialTheme.typography.bodyLarge
+                    withStyle(style = SpanStyle( fontWeight = FontWeight.Bold )) {
+                        append(stringResource(R.string.datasheet_common_names))
+                    }
+                    append(" ")
+                    append(plant.commonNames.joinToString(
+                        transform = {name -> "${name.name} (${name.language.abbr})"}
+                    ))
+                    append(".")
+                },
+                style = MaterialTheme.typography.bodyLarge
             )
 
             Spacer(modifier = Modifier.padding(
@@ -325,7 +349,7 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
             Row (
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable(onClick = onClickShowUsages)
-                                    .padding(bottom = 10.dp)
+                    .padding(bottom = 10.dp)
 
             )
             {
@@ -348,11 +372,11 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
 @Composable
 fun PlantSheetConfusions(plant: Plant, modifier: Modifier) {
     Column ( modifier =
-            modifier.padding(
-                top = 20.dp,
-                start = 10.dp,
-                end = 10.dp,
-                bottom = 0.dp)
+        modifier.padding(
+            top = 20.dp,
+            start = 10.dp,
+            end = 10.dp,
+            bottom = 0.dp)
     ) {
         Text("Posibles confusiones...",
             style = MaterialTheme.typography.titleLarge)
@@ -411,8 +435,8 @@ fun ConfusionTextBox(confusion: Confusion) {
                         Markdown(
                             content = confusion.captionText,
                             typography = markdownTypography(paragraph =
-                            MaterialTheme.typography.bodyMedium
-                                .copy(textAlign = TextAlign.Justify)
+                                MaterialTheme.typography.bodyMedium
+                                    .copy(textAlign = TextAlign.Justify)
                             )
                         )
                 }
@@ -427,11 +451,11 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
     val usagesTypes = plant.usages.keys
 
     Column( modifier =
-            modifier.padding(
-                top = 20.dp,
-                start = 10.dp,
-                end = 10.dp,
-                bottom = 0.dp)
+        modifier.padding(
+            top = 20.dp,
+            start = 10.dp,
+            end = 10.dp,
+            bottom = 0.dp)
     ) {
 
         if (plant.toxic && plant.toxic_text != null) {
@@ -442,26 +466,26 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
             Text(stringResource(type.displayText),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 5.dp)
-                )
+            )
 
             plant.usages[type]?.forEach {
-                usage: Usage ->
-                    Text("~ " + usage.subType + " ~",
-                            style = MaterialTheme.typography.titleSmall
-                    )
-                    Markdown(usage.text,
-                        colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
-                        typography = markdownTypography(
-                            text = MaterialTheme.typography.bodyLarge,
-                            link = MaterialTheme.typography. bodyLarge. copy(
-                                fontWeight = FontWeight. Bold,
-                                textDecoration = TextDecoration. Underline
-                                )
+                    usage: Usage ->
+                Text("~ " + usage.subType + " ~",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Markdown(usage.text,
+                    colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
+                    typography = markdownTypography(
+                        text = MaterialTheme.typography.bodyLarge,
+                        link = MaterialTheme.typography. bodyLarge. copy(
+                            fontWeight = FontWeight. Bold,
+                            textDecoration = TextDecoration. Underline
                         )
                     )
-                    Spacer(modifier = Modifier.padding(
-                        dimensionResource(id = R.dimen.space_between_sections)
-                    ))
+                )
+                Spacer(modifier = Modifier.padding(
+                    dimensionResource(id = R.dimen.space_between_sections)
+                ))
             }
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
@@ -498,13 +522,13 @@ fun ToxicTextBox(toxicText: String) {
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.align(Alignment.CenterVertically)
-                    )
+                )
             }
             Markdown(
                 content = toxicText,
                 typography = markdownTypography(paragraph =
                     MaterialTheme.typography.bodyMedium
-                    .copy(textAlign = TextAlign.Center)
+                        .copy(textAlign = TextAlign.Center)
                 )
             )
         }
@@ -546,7 +570,7 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 //    DruidNetTheme {
 //        PlantSheetBody(
 //            PlantsDataSource.loadPlants()[0],
-//            currentSection = PlantSheetSection.CONFUSIONS,
+//            currentSection = PlantSheetSection.USAGES,
 //            onChangeSection = { { } },
 //            modifier = Modifier.fillMaxSize()
 //        )
