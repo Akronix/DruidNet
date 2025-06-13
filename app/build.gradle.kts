@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
     id("androidx.room")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -84,9 +85,7 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -137,7 +136,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime:${rootProject.extra["compose_version"]}")
 
     // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.datastore.preferences)
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -148,7 +147,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     // Telephoto lib
-    implementation("me.saket.telephoto:zoomable:0.13.0")
+    implementation(libs.zoomable)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
