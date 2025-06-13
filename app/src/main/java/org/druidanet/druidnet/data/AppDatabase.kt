@@ -42,7 +42,7 @@ abstract class AppDatabase: RoomDatabase() {
                     "druid_database"
                 )
                     // Wipes and rebuilds instead of migrating if no Migration object.
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                     // prepopulate the database after onCreate was called
                     .createFromAsset("databases/druid_database.db")
                     // prepopulate the database after onCreate was called
