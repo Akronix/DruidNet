@@ -30,8 +30,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -78,7 +78,9 @@ fun PlantSheetScreen(
     sheetViewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory),
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
-    val plant = plantSheetUiState.plantUiState
+    val plant = remember (plantSheetUiState.plantUiState?.plantId) {
+        plantSheetUiState.plantUiState
+    }
     val currentSection = plantSheetUiState.currentSection
 
     val onChangeSection =
@@ -139,10 +141,6 @@ fun PlantSheetScreen(
                 modifier = modifier.padding(padding))
         }
     }
-}
-
-@Composable
-fun BlankScreen() {
 }
 
 @Composable
@@ -479,7 +477,8 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
                         text = MaterialTheme.typography.bodyLarge,
                         link = MaterialTheme.typography. bodyLarge. copy(
                             fontWeight = FontWeight. Bold,
-                            textDecoration = TextDecoration. Underline
+                            textDecoration = TextDecoration.Underline,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     )
                 )
