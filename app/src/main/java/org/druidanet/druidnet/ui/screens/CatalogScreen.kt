@@ -68,7 +68,9 @@ fun PlantsList(
     onClickPlantCard: (PlantCard) -> Unit,
     modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
-        items(plantsList) { plant ->
+        items(plantsList,
+            key = {it.plantId}
+        ) { plant ->
             PlantCard(
                 plant = plant,
                 onClickPlantCard = onClickPlantCard,

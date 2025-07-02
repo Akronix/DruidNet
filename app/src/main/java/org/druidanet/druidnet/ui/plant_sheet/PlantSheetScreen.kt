@@ -31,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
@@ -76,7 +78,9 @@ fun PlantSheetScreen(
     sheetViewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory),
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
-    val plant = plantSheetUiState.plantUiState
+    val plant = remember (plantSheetUiState.plantUiState?.plantId) {
+        plantSheetUiState.plantUiState
+    }
     val currentSection = plantSheetUiState.currentSection
 
     val onChangeSection =
@@ -137,10 +141,6 @@ fun PlantSheetScreen(
                 modifier = modifier.padding(padding))
         }
     }
-}
-
-@Composable
-fun BlankScreen() {
 }
 
 @Composable
@@ -472,6 +472,7 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
                     style = MaterialTheme.typography.titleSmall
                 )
                 Markdown(usage.text,
+                    colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
                     typography = markdownTypography(
                         text = MaterialTheme.typography.bodyLarge,
                         link = MaterialTheme.typography. bodyLarge. copy(

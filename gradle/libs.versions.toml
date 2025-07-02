@@ -10,26 +10,26 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2025.06.00"
+composeBom = "2025.06.01"
 appcompat = "1.7.1"
 material = "1.12.0"
 activity = "1.10.1"
-multiplatformMarkdownRenderer = "0.35.0"
-multiplatformMarkdownRendererAndroid = "0.35.0"
-multiplatformMarkdownRendererM3 = "0.35.0"
+multiplatformMarkdownRenderer = "0.27.0"
+multiplatformMarkdownRendererAndroid = "0.27.0"
+multiplatformMarkdownRendererM3 = "0.27.0"
 navigationCompose = "2.9.0"
 media3Common = "1.7.1"
 datastoreCoreAndroid = "1.1.7"
-roomKtx = "2.7.1"
-roomRuntime = "2.7.1"
-uiTooling = "1.8.2"
+roomKtx = "2.7.2"
+roomRuntime = "2.7.2"
+uiTooling = "1.8.3"
 zoomable = "0.16.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
-androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtx" }
+#androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -49,8 +49,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3Common" }
-androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+#androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3Common" }
+#androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-android = { module = "com.mikepenz:multiplatform-markdown-renderer-android", version.ref = "multiplatformMarkdownRendererAndroid" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRendererM3" }
