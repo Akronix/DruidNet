@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.DruidNetApplication
+import org.druidanet.druidnet.data.DocumentsRepository
 import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
@@ -58,6 +59,7 @@ class DruidNetViewModel(
     private val plantsRepository: PlantsRepository,
     private val biblioRepository: BibliographyRepository,
     private val imagesRepository: ImagesRepository,
+    private val documentsRepository: DocumentsRepository,
     private val roomDatabase: RoomDatabase,
     private val assets: AssetManager
 ) : ViewModel() {
@@ -96,6 +98,7 @@ class DruidNetViewModel(
                     application.plantsRepository,
                     application.biblioRepository,
                     application.imagesRepository,
+                    application.documentsRepository,
                     application.database,
                     application.assets
                 )
@@ -132,6 +135,9 @@ class DruidNetViewModel(
                     Log.i("DruidNet", "Downloading images:\n $imageList")
                     imagesRepository.fetchImages(imageList)
 
+                    // 3. Download credits.md
+                    documentsRepository.downloadCreditsMd()
+
                     // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
                     roomDatabase.withTransaction {
@@ -150,6 +156,32 @@ class DruidNetViewModel(
                 } else {
                     Log.i("DruidNet", "La base de datos está al día.")
                 }
+
+                if (res.versionRecommendations > userPreferencesRepository.getRecommendationsVersion.first()) {
+                    Log.i("DruidNet", "Downloading recommendations...")
+                    snackbarHost.showSnackbar("Actualizando texto de recomendaciones...")
+                    if (documentsRepository.downloadRecommendationsMd()) {
+                        userPreferencesRepository.updateVersion(
+                            "recommendations",
+                            res.versionRecommendations)
+                        Log.i("DruidNet", "Recommendations updated!")
+                    }
+
+                }
+                if (res.versionGlossary > userPreferencesRepository.getGlossaryVersion.first()) {
+                    Log.i("DruidNet", "Downloading glossary...")
+                    snackbarHost.showSnackbar("Actualizando glosario...")
+                    if (documentsRepository.downloadGlossaryMd()) {
+                        userPreferencesRepository.updateVersion(
+                            "glossary",
+                            res.versionGlossary
+                        )
+                        Log.i("DruidNet", "Glossary updated!")
+                    }
+
+                }
+
+
             } catch (e: SerializationException) {
                 Log.e("DruidNet", "Serialization Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")
@@ -255,35 +287,21 @@ class DruidNetViewModel(
 
     fun getDisplayNameLanguage(): LanguageEnum = LANGUAGE_APP /* It should use userPreferencesRepository.getDisplayNameLanguagePreference ??
                                                                     but then we have to query this value using a flow coroutine */
-    fun getCreditsText(): String {
-        viewModelScope.launch {
-            try {
-                val res = BackendScalarApi.retrofitService.getCreditsMd()
-                _uiState.update { currentState ->
-                    currentState.copy(creditsTxt = res)
-                }
+    fun getCreditsText(): String =
+        documentsRepository.getCreditsMd()
 
-            } catch (e: Exception) {
-                Log.e("DruidNet", "Error: ${e.message}", e)
-            }
-        }
-        return uiState.value.creditsTxt
-    }
+    fun getRecommendationsText(): String =
+        documentsRepository.getRecommendationsMd()
 
-    fun getRecommendationsText(): String {
-        return assets.open("texts/collecting_recommendation.md").bufferedReader().use { it.readText() }
-    }
+    fun getGlossaryText(): String =
+        documentsRepository.getGlossaryMd()
 
-    fun getGlossaryText(): String {
-        return assets.open("texts/glossary.md").bufferedReader().use { it.readText() }
-    }
-
-    fun getRecommendationsImage(): ImageBitmap {
-        val inputStream = assets.open("drawable/gatherer_basket.webp")
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        inputStream.close()
-        return bitmap.asImageBitmap()
-    }
+//    fun getAssetsImage(): ImageBitmap {
+//        val inputStream = assets.open("drawable/gatherer_basket.webp")
+//        val bitmap = BitmapFactory.decodeStream(inputStream)
+//        inputStream.close()
+//        return bitmap.asImageBitmap()
+//    }
 
 //    suspend fun setDisplayName(plantLatinName: String): String {
 //        displayName = plantDao.getDisplayName(plantLatinName)

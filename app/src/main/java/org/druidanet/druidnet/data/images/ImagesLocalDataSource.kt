@@ -18,7 +18,6 @@ class ImagesLocalDataSource(
         var input: InputStream? = null
         try {
             input = body.byteStream()
-            //val file = File(getCacheDir(), "cacheFileAppeal.srl")
             val fos = FileOutputStream("$localStorageDir/$imgName")
             fos.use { targetOutputStream ->
                 input.copyTo(targetOutputStream)
