@@ -34,6 +34,8 @@ class UserPreferencesRepository (
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val DISPLAY_NAME_LANGUAGE = stringPreferencesKey("display_name_language")
         val DATABASE_VERSION = longPreferencesKey ("database_version")
+        val GLOSSARY_VERSION = longPreferencesKey ("glossary_version")
+        val RECOMMENDATIONS_VERSION = longPreferencesKey ("recommendations_version")
         const val TAG = "UserPreferencesRepo"
     }
 
@@ -128,10 +130,46 @@ class UserPreferencesRepository (
             preferences[DATABASE_VERSION]?:0 // Inital value to 0
         }
 
+    val getGlossaryVersion: Flow<Long> = dataStore.data
+        .catch {
+            if (it is IOException) {
+                Log.e(TAG, "Error reading preferences.", it)
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }
+        .map { preferences ->
+            preferences[GLOSSARY_VERSION]?:0 // Inital value to 0
+        }
 
-    suspend fun updateDatabaseVersion(dbVersion: Long) {
+
+    val getRecommendationsVersion: Flow<Long> = dataStore.data
+        .catch {
+            if (it is IOException) {
+                Log.e(TAG, "Error reading preferences.", it)
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }
+        .map { preferences ->
+            preferences[RECOMMENDATIONS_VERSION]?:0 // Inital value to 0
+        }
+
+
+    suspend fun updateDatabaseVersion(newVersion: Long) = updateVersion("database", newVersion)
+
+    suspend fun updateVersion(versionPreference: String, newVersion: Long) {
+        val versionKey = when (versionPreference) {
+            "database" -> DATABASE_VERSION
+            "glossary" -> GLOSSARY_VERSION
+            "recommendations" -> RECOMMENDATIONS_VERSION
+            else -> DATABASE_VERSION
+        }
+
         dataStore.edit { preferences ->
-            preferences[DATABASE_VERSION] = dbVersion
+            preferences[versionKey] = newVersion
         }
     }
 

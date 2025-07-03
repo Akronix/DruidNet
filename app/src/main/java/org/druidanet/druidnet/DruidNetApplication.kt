@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import org.druidanet.druidnet.data.AppDatabase
+import org.druidanet.druidnet.data.DocumentsRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.data.UserPreferencesRepository
@@ -32,6 +33,12 @@ class DruidNetApplication: Application() {
                 this.applicationContext.assets ,
                 this.applicationContext.getDir("images", Context.MODE_PRIVATE).absolutePath
             )
+        )
+    }
+    val documentsRepository by lazy {
+        DocumentsRepository(
+            localStorageDir = this.applicationContext.getDir("documents", MODE_PRIVATE).absolutePath,
+            assetsMgr = this.applicationContext.assets
         )
     }
 

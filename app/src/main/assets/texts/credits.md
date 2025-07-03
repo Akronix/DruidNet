@@ -1,7 +1,3 @@
-package org.druidanet.druidnet.utils
-
-const val DEFAULT_CREDITS_TXT =
-"""
 # Lider del proyecto y desarrollador
 **Abel Serrano Juste**
 
@@ -27,5 +23,3 @@ const val DEFAULT_CREDITS_TXT =
 **Stefania Kasouni** (_Pantallas de fichas de plantas_)
 
 <br/>
-            
-"""

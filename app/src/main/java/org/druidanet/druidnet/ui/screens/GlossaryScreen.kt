@@ -43,6 +43,7 @@ fun GlossaryScreen (
                 typography = markdownTypography(
                     h1 = MaterialTheme.typography.headlineLarge,
                     h2 = MaterialTheme.typography.headlineMedium,
+                    h3 = MaterialTheme.typography.headlineSmall,
                     paragraph = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp)
                 ),
                 modifier = Modifier
