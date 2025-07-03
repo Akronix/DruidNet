@@ -9,10 +9,10 @@ A continuación, desarrollamos algunos consejos sobre cómo recolectar plantas s
 
 ## Cuándo recolectar plantas silvestres
 Una regla general para recolectar las diferentes partes de las plantas es:
-* Hojas: antes de que las plantas comiencen a florecer. La mayoría de  las hojas cambian de sabor y textura una vez que la planta ha florecido.
-* Flores: cuando están recién abiertas en un día soleado, lo que  implica más néctar, más fragancia y más sabor.
-* Frutos: cuando están maduros.
-* Raíces: en invierno, cuando la parte superior de la planta ha muerto y todos los nutrientes han vuelto a las raíces. Finales del otoño y principios de la primavera también suelen ser buenas épocas para recolectar raíces, tubérculos, rizomas o bulbos.
+- **Hojas**: antes de que las plantas comiencen a florecer. La mayoría de  las hojas cambian de sabor y textura una vez que la planta ha florecido.
+- **Flores**: cuando están recién abiertas en un día soleado, lo que  implica más néctar, más fragancia y más sabor.
+- **Frutos**: cuando están maduros.
+- **Raíces**: en invierno, cuando la parte superior de la planta ha muerto y todos los nutrientes han vuelto a las raíces. Finales del otoño y principios de la primavera también suelen ser buenas épocas para recolectar raíces, tubérculos, rizomas o bulbos.
 
 El clima cálido aumenta los aceites esenciales en las hierbas silvestres
 aromáticas, por lo que tendrán más sabor en un día soleado.
