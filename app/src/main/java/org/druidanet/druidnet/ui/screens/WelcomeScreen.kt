@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import org.druidanet.druidnet.AboutDestination
 import org.druidanet.druidnet.CatalogDestination
+import org.druidanet.druidnet.GlossaryDestination
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.RecommendationsDestination
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -66,6 +67,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(40.dp)
                     .verticalScroll(rememberScrollState())
             ) {
@@ -91,7 +93,10 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Bottom buttons
+
                 Button(
                     onClick = { onNavigationButtonClick(RecommendationsDestination) },
                     colors = ButtonDefaults.buttonColors(
@@ -99,9 +104,24 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
+                    Text(
+                        "\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = { onNavigationButtonClick(GlossaryDestination) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
                         style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp))
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
 
 //            Text("Próximamente:",
 //                color = Color.DarkGray)

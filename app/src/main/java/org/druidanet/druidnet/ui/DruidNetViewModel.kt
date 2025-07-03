@@ -274,6 +274,10 @@ class DruidNetViewModel(
         return assets.open("texts/collecting_recommendation.md").bufferedReader().use { it.readText() }
     }
 
+    fun getGlossaryText(): String {
+        return assets.open("texts/glossary.md").bufferedReader().use { it.readText() }
+    }
+
     fun getRecommendationsImage(): ImageBitmap {
         val inputStream = assets.open("drawable/gatherer_basket.webp")
         val bitmap = BitmapFactory.decodeStream(inputStream)

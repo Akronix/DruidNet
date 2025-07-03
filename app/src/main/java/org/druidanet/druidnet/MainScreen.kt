@@ -3,7 +3,6 @@ package org.druidanet.druidnet
 import NavigationDestination
 import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -60,6 +59,7 @@ import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
+import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 
 
@@ -95,6 +95,12 @@ object RecommendationsDestination : NavigationDestination() {
     override val title = R.string.title_screen_recommendations
 }
 
+object GlossaryDestination : NavigationDestination() {
+    override val route = "glossary"
+    override val title = R.string.title_screen_glossary
+    override val topBarIconPath = R.drawable.dictionary
+}
+
 // We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
 //@Serializable
 //data class PlantSheetDestination(val plantId: Int = 0) : Screen {
@@ -120,7 +126,8 @@ val screensByRoute : Map<String, NavigationDestination> =
         AboutDestination.route to AboutDestination,
         BibliographyDestination.route to BibliographyDestination,
         CreditsDestination.route to CreditsDestination,
-        RecommendationsDestination.route to RecommendationsDestination
+        RecommendationsDestination.route to RecommendationsDestination,
+        GlossaryDestination.route to GlossaryDestination
     )
 
 //enum class Screen(@StringRes val title: Int) {
@@ -269,6 +276,14 @@ fun DruidNetApp(
             composable(route = RecommendationsDestination.route) {
                 RecomendationsScreen(
                     recommendationsTxt = viewModel.getRecommendationsText(),
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                )
+            }
+            composable(route = GlossaryDestination.route) {
+                GlossaryScreen(
+                    glossaryTxt = viewModel.getGlossaryText(),
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
