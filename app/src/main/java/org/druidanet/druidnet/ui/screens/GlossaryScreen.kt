@@ -1,6 +1,7 @@
 package org.druidanet.druidnet.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,10 +24,9 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 @Composable
 fun GlossaryScreen (
     glossaryTxt: String,
+    scrollState: ScrollState,
     modifier: Modifier = Modifier
 ) {
-    val scrollState = rememberScrollState()
-
     Column(
         modifier = modifier.verticalScroll(state = scrollState)
     ) {
@@ -60,7 +60,8 @@ fun GlossaryScreenPreview() {
         GlossaryScreen(
             "**Recomendaciones de recolección**\n" +
                     "## Recomendación 1\n" +
-                    "Texto de recomendación"
+                    "Texto de recomendación",
+            scrollState = ScrollState(0)
         )
     }
 }
