@@ -4,11 +4,13 @@ import NavigationDestination
 import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
@@ -30,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -160,6 +163,14 @@ fun DruidNetApp(
 
     var justStartedApp by remember { mutableStateOf(true)}
 
+    val scrollStateCatalog = rememberSaveable(saver = LazyListState.Saver) {
+        LazyListState(0, 0)
+    }
+
+    val scrollStateGlossary = rememberSaveable(saver = ScrollState.Saver) {
+        ScrollState(initial = 0) // Initialize a new ScrollState
+    }
+
     //canNavigateBack = navController.previousBackStackEntry != null,
 
     val appMainTopBar: @Composable () -> Unit = if (currentNavigationDestination.hasTopBar) {
@@ -197,6 +208,7 @@ fun DruidNetApp(
                     onClickPlantCard = { plant ->
                         navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                     },
+                    listState = scrollStateCatalog,
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
@@ -284,6 +296,7 @@ fun DruidNetApp(
             composable(route = GlossaryDestination.route) {
                 GlossaryScreen(
                     glossaryTxt = viewModel.getGlossaryText(),
+                    scrollStateGlossary,
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
