@@ -67,8 +67,7 @@ data class NameEntity (
     foreignKeys = arrayOf(ForeignKey(entity = PlantEntity::class,
                                     parentColumns = arrayOf("plantId"),
                                     childColumns = arrayOf("plantId"),
-                                    onDelete = ForeignKey.CASCADE)),
-            indices = [Index(value = ["latin_name"], unique = true)])
+                                    onDelete = ForeignKey.CASCADE)))
 data class ConfusionEntity(
     @PrimaryKey(autoGenerate = true) val confusionId: Int = 1,
     @ColumnInfo(index = true) val plantId: Int,
