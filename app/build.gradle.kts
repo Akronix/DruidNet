@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "org.druidanet.druidnet"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 16
         versionName = "1.3.1"
 
@@ -109,7 +109,7 @@ dependencies {
 //    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
 
     // Serializable
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     // Retrofit
     implementation(libs.retrofit)
