@@ -1,6 +1,7 @@
 package org.druidanet.druidnet
 
 import NavigationDestination
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Row
@@ -68,6 +69,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -176,7 +178,8 @@ fun DruidNetApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
 
-    val plantList by viewModel.getAllPlants().collectAsState(emptyList())
+    val allPlants by viewModel.getAllPlants().collectAsState(emptyList())
+    val mapPlantCards = allPlants.associateBy { it.plantId }
     val bibliography by viewModel.getBibliography().collectAsState(emptyList())
     val bibliographyStr = if (bibliography.isNotEmpty())
                 bibliography.map { "* " + it.toMarkdownString() }
@@ -197,7 +200,9 @@ fun DruidNetApp(
     }
 
     var isSearchBar by rememberSaveable { mutableStateOf(false)}
-    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    val queryName by viewModel.catalogSearchQuery.collectAsStateWithLifecycle()
+    Log.i("D","query: $queryName")
 
     //canNavigateBack = navController.previousBackStackEntry != null,
 
@@ -215,10 +220,10 @@ fun DruidNetApp(
             } else {
                 {
                     SearchToolbar(
-                        searchQuery = "",
-                        onSearchQueryChanged = {},
+                        searchQuery = queryName,
+                        onSearchQueryChanged = viewModel::onSearchQueryChanged,
                         onSearchTriggered = {  },
-                        onBackClick = { isSearchBar = false },
+                        onBackClick = { isSearchBar = false; viewModel.onSearchQueryChanged("") },
                         modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
                     )
                 }
@@ -262,11 +267,13 @@ fun DruidNetApp(
             }
             composable(route = CatalogDestination.route) {
                 CatalogScreen(
-                    plantList = plantList,
+                    allPlants = allPlants,
+                    mapPlantCards = mapPlantCards,
                     onClickPlantCard = { plant ->
                         navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                     },
                     listState = scrollStateCatalog,
+                    viewModel = viewModel,
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
@@ -494,9 +501,9 @@ private fun SearchToolbar(
                 )
             }
             SearchTextField(
+                searchQuery = searchQuery,
                 onSearchQueryChanged = onSearchQueryChanged,
                 onSearchTriggered = onSearchTriggered,
-                searchQuery = searchQuery,
             )
         }
 }
@@ -572,7 +579,7 @@ private fun SearchTextField(
         ),
         keyboardActions = KeyboardActions(
             onSearch = {
-                if (searchQuery.isBlank()) return@KeyboardActions
+//                if (searchQuery.isBlank()) return@KeyboardActions
                 onSearchExplicitlyTriggered()
             },
         ),

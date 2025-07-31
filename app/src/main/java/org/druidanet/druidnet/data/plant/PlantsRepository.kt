@@ -3,12 +3,15 @@ package org.druidanet.druidnet.data.plant
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.network.PlantDataDTO
 import org.druidanet.druidnet.ui.toPlant
 
@@ -24,7 +27,6 @@ class PlantsRepository(
             .map { it != null }
     }
 
-
     fun getPlant(plantLatinName: String, language: LanguageEnum) : Flow<Plant> {
         return plantDao.getPlant(plantLatinName)
             .filterNotNull()
@@ -32,6 +34,11 @@ class PlantsRepository(
                 val displayName = plantDao.getDisplayName(it.p.plantId, language).first()
                 it.toPlant(displayName = displayName)
             }
+    }
+
+    fun searchPlantsByName(name: String, mapPlantCardsById: Map<Int, PlantCard>) : Flow<List<PlantCard>> {
+        val plantsMatchingName : Flow<List<Int>> = plantDao.getPlantsWithName(name)
+        return plantsMatchingName.map { plantIds -> plantIds.map { plantId -> mapPlantCardsById[plantId]!! } }
     }
 
 }
