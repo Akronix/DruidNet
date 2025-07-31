@@ -1,3 +1,5 @@
+import androidx.compose.ui.graphics.vector.ImageVector
+
 /**
  * Interface to describe the navigation destinations for the app
  */

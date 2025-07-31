@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +43,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.dimensionResource
@@ -179,11 +182,23 @@ fun DruidNetApp(
     //canNavigateBack = navController.previousBackStackEntry != null,
 
     val appMainTopBar: @Composable () -> Unit = if (currentNavigationDestination.hasTopBar) {
-        DruidNetAppBar(
-            topBarTitle = stringResource(currentNavigationDestination.title),
-            navigateUp = { navController.navigateUp() },
-            topBarIconPath = currentNavigationDestination.topBarIconPath,
-        )} else { {} }
+        if (currentNavigationDestination.route == "catalog") {
+            DruidNetAppBar(
+                topBarTitle = stringResource(currentNavigationDestination.title),
+                navigateUp = { navController.navigateUp() },
+                topBarIconPath = currentNavigationDestination.topBarIconPath,
+                actionIcon = Icons.Rounded.Search,
+                actionIconContentDescription = stringResource(R.string.appbar_search_button),
+                onActionClick = showSearchToolbar()
+            )
+        } else {
+            DruidNetAppBar(
+                topBarTitle = stringResource(currentNavigationDestination.title),
+                navigateUp = { navController.navigateUp() },
+                topBarIconPath = currentNavigationDestination.topBarIconPath
+            )
+        }
+    } else { {} }
 
     Scaffold(
         topBar = appMainTopBar,
@@ -333,6 +348,10 @@ fun DruidNetApp(
     }
 }
 
+fun showSearchToolbar(): () -> Unit {
+    return {}
+}
+
 @Composable
 fun Disclaimer(
     onDismissDisclaimer: () -> Unit,
@@ -372,7 +391,10 @@ fun DruidNetAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     topBarIconPath: Int? = null,
-    topBarColor: Color = Color.Unspecified
+    topBarColor: Color = Color.Unspecified,
+    onActionClick: () -> Unit = {},
+    actionIconContentDescription: String? = null,
+    actionIcon: ImageVector? = null
 ): @Composable () -> Unit {
 
         return {
@@ -406,6 +428,17 @@ fun DruidNetAppBar(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_button)
                         )
+                    }
+                },
+                actions = {
+                    if (actionIcon != null && actionIconContentDescription != null) {
+                        IconButton(onClick = onActionClick) {
+                            Icon(
+                                imageVector = actionIcon,
+                                contentDescription = actionIconContentDescription,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
                     }
                 },
                 modifier = modifier
