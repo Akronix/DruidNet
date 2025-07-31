@@ -18,6 +18,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -25,8 +27,11 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.PlantCard
+import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 
@@ -88,11 +93,17 @@ fun PlantsList(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CatalogScreen(
-    plantList: List<PlantCard>,
+    allPlants: List<PlantCard>,
+    mapPlantCards: Map<Int,PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
     listState: LazyListState,
+    viewModel: DruidNetViewModel,
     modifier: Modifier = Modifier
 ) {
+    val queryName by viewModel.catalogSearchQuery.collectAsStateWithLifecycle()
+    val plantList:List<PlantCard> by viewModel.getPlantsFilteredByName(queryName, mapPlantCards).collectAsState(allPlants)
+
+    // TO REPLACE BY SCAFFOLD HERE
     Box(
         modifier = modifier
     ) {
@@ -108,18 +119,18 @@ fun CatalogScreen(
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
  */
-@Preview(showBackground = true)
-@Composable
-fun CatalogPreview() {
-    DruidNetTheme {
-        CatalogScreen(
-            plantList = PlantsDataSource.loadPlants()
-                .map { PlantCard(it.plantId, it.displayName, it.imagePath, it.latinName, false) },
-            onClickPlantCard = { },
-            listState = LazyListState(0, 0)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun CatalogPreview() {
+//    DruidNetTheme {
+//        CatalogScreen(
+//            plantList = PlantsDataSource.loadPlants()
+//                .map { PlantCard(it.plantId, it.displayName, it.imagePath, it.latinName, false) },
+//            onClickPlantCard = { },
+//            listState = LazyListState(0, 0)
+//        )
+//    }
+//}
 
 /**
  * Composable that displays what the UI of the app looks like in dark theme in the design tab.
