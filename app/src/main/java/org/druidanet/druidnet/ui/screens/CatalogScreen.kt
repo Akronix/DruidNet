@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.screens
 
+import android.R.style.Theme
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -200,12 +201,11 @@ private fun SearchToolbar(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth()
-            .background(color = Color.White),
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.background),
     ) {
-        IconButton(onClick = { onBackClick() },
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White)
-        ) {
+        IconButton(onClick = { onBackClick() }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(
