@@ -1,9 +1,9 @@
 package org.druidanet.druidnet.ui.screens
 
-import android.R.style.Theme
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -31,7 +31,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -63,6 +62,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.m3.Markdown
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
@@ -131,7 +132,6 @@ fun PlantsList(
 @Composable
 fun CatalogScreen(
     allPlants: List<PlantCard>,
-    mapPlantCards: Map<Int, PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
     listState: LazyListState,
     viewModel: DruidNetViewModel,
@@ -143,7 +143,7 @@ fun CatalogScreen(
 
     var searchQuery by remember { mutableStateOf("")}
 
-    val plantList:List<PlantCard> by viewModel.getPlantsFilteredByName(searchQuery, mapPlantCards).collectAsState(allPlants)
+    val plantList : List<PlantCard> by viewModel.getPlantsFilteredByName(searchQuery).collectAsState(allPlants)
 
     var isSearchBar by remember { mutableStateOf(false)}
 
@@ -162,7 +162,7 @@ fun CatalogScreen(
                 SearchToolbar(
                     searchQuery = searchQuery,
                     onSearchQueryChanged = {searchQuery = it},
-                    onSearchTriggered = {  },
+                    onSearchTriggered = { searchQuery = it.trim() },
                     onBackClick = { isSearchBar = false; searchQuery = "" },
                     modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
                 )
@@ -181,13 +181,25 @@ fun CatalogScreen(
                 ),
             )
 
-    ) {
-        PlantsList(
-            plantsList = plantList,
-            onClickPlantCard = onClickPlantCard,
-            listState = listState,
-            modifier = Modifier.padding(it)
-        )
+    ) {paddingValues ->
+        if (plantList.isNotEmpty()) {
+            PlantsList(
+                plantsList = plantList,
+                onClickPlantCard = onClickPlantCard,
+                listState = listState,
+                modifier = Modifier.padding(paddingValues)
+            )
+        } else {
+            NoPlantsScreen(modifier = modifier.padding(paddingValues))
+        }
+    }
+}
+
+@Composable
+fun NoPlantsScreen(modifier: Modifier) {
+    Box( modifier ) {
+        Text("Aún no tenemos ninguna planta que coincida con tu búsqueda.\n\n" +
+                "¿Echas algo de menos? [Envíanos un mensaje](mailto:druidnetbeta@gmail.com)")
     }
 }
 

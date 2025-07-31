@@ -36,10 +36,15 @@ class PlantsRepository(
             }
     }
 
-    //TODO: Review code: map and !! operator (cancels null check)
-    fun searchPlantsByName(name: String, mapPlantCardsById: Map<Int, PlantCard>) : Flow<List<PlantCard>> {
+    fun searchPlantsByName(name: String, originalListPlants: Flow<List<PlantCard>>) : Flow<List<PlantCard>> {
         val plantsMatchingName : Flow<List<Int>> = plantDao.getPlantsWithName(name)
-        return plantsMatchingName.map { plantIds -> plantIds.map { plantId -> mapPlantCardsById[plantId]!! }.sortedBy { it.displayName } }
+        return plantsMatchingName.combine( originalListPlants, { plantIds, plants ->
+            plants.filter {
+                plant -> plant.plantId in plantIds
+            }
+        }
+        )
+
     }
 
 }

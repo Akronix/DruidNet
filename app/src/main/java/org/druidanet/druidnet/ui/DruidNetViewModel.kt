@@ -83,7 +83,7 @@ class DruidNetViewModel(
             )
 
     var LANGUAGE_APP = preferencesState.value.displayLanguage
-    val allPlantsFlow = getAllPlants()//.map { list -> list.sortedBy { it.plantId } }
+    val allPlantsFlow = getAllPlants()
 
     /****** VIEW MODEL CONSTRUCTOR *****/
 
@@ -196,10 +196,10 @@ class DruidNetViewModel(
 
     /****** DATABASE FUNCTIONS *****/
 
-    fun getPlantsFilteredByName(queryName: String, plants: Map<Int,PlantCard>) : Flow<List<PlantCard>> {
+    fun getPlantsFilteredByName(queryName: String) : Flow<List<PlantCard>> {
         return if (queryName.isNotEmpty()) plantsRepository.searchPlantsByName(
             name = queryName,
-            mapPlantCardsById = plants
+            originalListPlants = allPlantsFlow
         ) else
             allPlantsFlow
     }
