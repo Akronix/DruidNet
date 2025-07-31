@@ -38,4 +38,7 @@
     <string name="title_screen_glossary">Glosario</string>
     <string name="greetings_glosarry_btn">Glosario de preparados</string>
     <string name="appbar_search_button">Buscar</string>
+    <string name="feature_search_title">Buscar por nombre</string>
+    <string name="feature_search_clear_search_text_content_desc">Limpiar búsqueda</string>
+    <string name="feature_search_textfield">Buscar por nombre</string>
 </resources>
