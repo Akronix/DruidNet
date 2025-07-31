@@ -69,7 +69,6 @@ fun PlantsList(
 ) {
     LazyColumn(
         state = listState,
-        contentPadding = WindowInsets.systemBars.asPaddingValues(),
         modifier = modifier) {
         items(plantsList,
             key = {it.plantId}
