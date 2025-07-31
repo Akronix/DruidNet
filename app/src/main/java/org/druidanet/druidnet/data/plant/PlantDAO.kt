@@ -60,7 +60,7 @@ interface PlantDAO {
     fun getPlant(plantLatinName: String): Flow<PlantData?>
 
     @Query("SELECT DISTINCT plantId FROM Name WHERE common_name LIKE :name || '%' OR common_name LIKE '% ' || :name || '%'")
-//    @Query("SELECT DISTINCT plantId FROM NameView WHERE name_ai LIKE :name" + '%')
+//TODO: @Query("SELECT DISTINCT plantId FROM NameView WHERE name_ai LIKE :name" + '%')
     fun getPlantsWithName(name: String): Flow<List<Int>>
 
     /*** INSERT DATA ***/

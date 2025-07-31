@@ -159,7 +159,6 @@ fun DruidNetApp(
     val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
 
     val allPlants by viewModel.getAllPlants().collectAsState(emptyList())
-    val mapPlantCards = allPlants.associateBy { it.plantId }
     val bibliography by viewModel.getBibliography().collectAsState(emptyList())
     val bibliographyStr = if (bibliography.isNotEmpty())
                 bibliography.map { "* " + it.toMarkdownString() }
@@ -219,7 +218,6 @@ fun DruidNetApp(
             composable(route = CatalogDestination.route) {
                 CatalogScreen(
                     allPlants = allPlants,
-                    mapPlantCards = mapPlantCards,
                     onClickPlantCard = { plant ->
                         navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                     },
