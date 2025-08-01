@@ -3,6 +3,7 @@ package org.druidanet.druidnet.ui.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,12 +11,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -44,7 +47,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -62,6 +64,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.DraggableScrollbar
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberDraggableScroller
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.Markdown
 import org.druidanet.druidnet.CatalogDestination
@@ -71,6 +76,7 @@ import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
+import androidx.compose.ui.Alignment
 
 @Composable
 fun PlantCard(plant: PlantCard, onClickPlantCard: (PlantCard) -> Unit, modifier: Modifier) {
@@ -109,20 +115,41 @@ fun PlantsList(
     listState: LazyListState,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        state = listState,
-        modifier = modifier) {
-        items(plantsList,
-            key = {it.plantId}
-        ) { plant ->
-            PlantCard(
-                plant = plant,
-                onClickPlantCard = onClickPlantCard,
-                modifier = Modifier.padding(8.dp)
-            )
+    Box(modifier = modifier) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                plantsList,
+                key = { it.plantId }
+            ) { plant ->
+                PlantCard(
+                    plant = plant,
+                    onClickPlantCard = onClickPlantCard,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+            }
 
         }
 
+        /* ScrollBar addition: */
+        val scrollbarState = listState.scrollbarState(
+            itemsAvailable = plantsList.size,
+        )
+        listState.DraggableScrollbar(
+            modifier = Modifier
+                .fillMaxHeight()
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .padding(horizontal = 2.dp)
+                .align(Alignment.CenterEnd),
+            state = scrollbarState,
+            orientation = Orientation.Vertical,
+            onThumbMoved = listState.rememberDraggableScroller(
+                itemsAvailable = plantsList.size,
+            ),
+        )
     }
 
 }
