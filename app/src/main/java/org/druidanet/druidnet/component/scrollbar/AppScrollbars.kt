@@ -66,6 +66,11 @@ import kotlinx.coroutines.delay
 private const val SCROLLBAR_INACTIVE_TO_DORMANT_TIME_IN_MS = 2_000L
 
 /**
+ * The size of the scrollbar thumb
+ */
+private const val THUMB_SIZE = 5
+
+/**
  * A [Scrollbar] that allows for fast scrolling of content by dragging its thumb.
  * Its thumb disappears when the scrolling container is dormant.
  * @param modifier a [Modifier] for the [Scrollbar]
@@ -136,8 +141,8 @@ private fun ScrollableState.DraggableScrollbarThumb(
         modifier = Modifier
             .run {
                 when (orientation) {
-                    Vertical -> width(12.dp).fillMaxHeight()
-                    Horizontal -> height(12.dp).fillMaxWidth()
+                    Vertical -> width(THUMB_SIZE.dp).fillMaxHeight()
+                    Horizontal -> height(THUMB_SIZE.dp).fillMaxWidth()
                 }
             }
             .scrollThumb(this, interactionSource),
@@ -227,8 +232,8 @@ private fun scrollbarThumbColor(
 
     val color = animateColorAsState(
         targetValue = when (state) {
-            Active -> MaterialTheme.colorScheme.onSurface.copy(0.5f)
-            Inactive -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+            Active -> MaterialTheme.colorScheme.onPrimaryContainer.copy(0.5f)
+            Inactive -> MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)
             Dormant -> Color.Transparent
         },
         animationSpec = SpringSpec(
