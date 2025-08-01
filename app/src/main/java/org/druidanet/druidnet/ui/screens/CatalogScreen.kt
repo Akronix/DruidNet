@@ -131,7 +131,6 @@ fun PlantsList(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CatalogScreen(
-    allPlants: List<PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
     listState: LazyListState,
     viewModel: DruidNetViewModel,
@@ -143,7 +142,7 @@ fun CatalogScreen(
 
     var searchQuery by remember { mutableStateOf("")}
 
-    val plantList : List<PlantCard> by viewModel.getPlantsFilteredByName(searchQuery).collectAsState(allPlants)
+    val plantList : List<PlantCard> by viewModel.getPlantsFilteredByName(searchQuery).collectAsState(emptyList())
 
     var isSearchBar by remember { mutableStateOf(false)}
 

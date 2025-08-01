@@ -65,8 +65,10 @@ class DruidNetViewModel(
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
 
+    /*
     private val _searchText = MutableStateFlow("")
     val catalogSearchQuery = _searchText.asStateFlow()
+    */
 
     private val preferencesState: StateFlow<PreferencesState> =
         userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
@@ -83,7 +85,7 @@ class DruidNetViewModel(
             )
 
     var LANGUAGE_APP = preferencesState.value.displayLanguage
-    val allPlantsFlow = getAllPlants()
+    var allPlantsFlow = getAllPlants(LANGUAGE_APP)
 
     /****** VIEW MODEL CONSTRUCTOR *****/
 
@@ -206,12 +208,12 @@ class DruidNetViewModel(
 
 
     // Get all plants from db
-    // TODO: move to PlantRepository the getAllPlants function
-    fun getAllPlants(): Flow<List<PlantCard>> =
-        if (LANGUAGE_APP != LanguageEnum.LATIN) {
+    // TODO: move getAllPlants function to PlantRepository
+    fun getAllPlants(language: LanguageEnum): Flow<List<PlantCard>> =
+        if (language != LanguageEnum.LATIN) {
             combine(
-                plantDao.getPlantCatalogData(LANGUAGE_APP),
-                plantDao.getPlantCatalogLatinNotInLanguage(LANGUAGE_APP)
+                plantDao.getPlantCatalogData(language),
+                plantDao.getPlantCatalogLatinNotInLanguage(language)
             )
             { plantsInLanguage, plantsInLatin ->
                 if (plantsInLatin.isEmpty())
@@ -290,6 +292,7 @@ class DruidNetViewModel(
         viewModelScope.launch {
             userPreferencesRepository.updateDisplayNameLanguagePreference(language)
             LANGUAGE_APP = language
+            allPlantsFlow = getAllPlants(language)
         }
 
     }
@@ -305,10 +308,12 @@ class DruidNetViewModel(
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
 
+    /*
     fun onSearchQueryChanged(query: String) {
         _searchText.value = query
         Log.i( "D", query)
     }
+    */
 
 //    fun getAssetsImage(): ImageBitmap {
 //        val inputStream = assets.open("drawable/gatherer_basket.webp")
