@@ -47,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -58,6 +59,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,7 +69,6 @@ import androidx.compose.ui.unit.dp
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.DraggableScrollbar
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberDraggableScroller
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
-import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.Markdown
 import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.DruidNetAppBar
@@ -76,7 +77,6 @@ import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
-import androidx.compose.ui.Alignment
 
 @Composable
 fun PlantCard(plant: PlantCard, onClickPlantCard: (PlantCard) -> Unit, modifier: Modifier) {
@@ -223,9 +223,18 @@ fun CatalogScreen(
 
 @Composable
 fun NoPlantsScreen(modifier: Modifier) {
-    Box( modifier ) {
-        Text("Aún no tenemos ninguna planta que coincida con tu búsqueda.\n\n" +
-                "¿Echas algo de menos? [Envíanos un mensaje](mailto:druidnetbeta@gmail.com)")
+    Box( modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp),
+        contentAlignment = Alignment.Center ) {
+        Column(modifier = Modifier
+            .align(Alignment.Center)
+            .padding(dimensionResource(R.dimen.padding_large))) {
+            Markdown(
+                "Aún no tenemos ninguna planta que coincida con tu búsqueda.\n\n" +
+                        "¿Echas algo de menos? [Envíanos un mensaje](mailto:druidnetbeta@gmail.com)"
+            )
+        }
     }
 }
 
@@ -356,6 +365,13 @@ private fun SearchToolbarPreview() {
     }
 }
 
+@Preview(showBackground = false, name = "No Plants Found - Dark Theme")
+@Composable
+fun NoPlantsScreenPreviewDark() {
+    DruidNetTheme(darkTheme = true) { // Apply your theme in dark mode
+        NoPlantsScreen(Modifier)
+    }
+}
 
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
