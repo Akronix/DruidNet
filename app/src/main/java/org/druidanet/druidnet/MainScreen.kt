@@ -180,11 +180,12 @@ fun DruidNetApp(
     //canNavigateBack = navController.previousBackStackEntry != null,
 
     val appMainTopBar: @Composable () -> Unit = if (currentNavigationDestination.hasTopBar) {
-        DruidNetAppBar(
+        {DruidNetAppBar(
             topBarTitle = stringResource(currentNavigationDestination.title),
             navigateUp = { navController.navigateUp() },
             topBarIconPath = currentNavigationDestination.topBarIconPath,
-        )} else { {} }
+        )}
+    } else { {} }
 
     Scaffold(
         topBar = appMainTopBar,
@@ -377,9 +378,8 @@ fun DruidNetAppBar(
     onActionClick: () -> Unit = {},
     actionIconContentDescription: String? = null,
     actionIcon: ImageVector? = null
-): @Composable () -> Unit {
+): Unit {
 
-        return {
             CenterAlignedTopAppBar(
                 title = {
                     Row(
@@ -425,5 +425,4 @@ fun DruidNetAppBar(
                 },
                 modifier = modifier
             )
-        }
     }

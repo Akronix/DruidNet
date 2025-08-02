@@ -90,10 +90,10 @@ fun PlantSheetScreen(
 
     if (isPlantInDatabase && plant != null) {
         Scaffold(
-            topBar = DruidNetAppBar(
+            topBar = {DruidNetAppBar(
                 navigateUp = navigateBack,
                 topBarTitle = plant.displayName
-            ),
+            )},
             bottomBar = PlantSheetBottomBar(
                 onClickBottomNavItem = onChangeSection,
                 currentSection = plantSheetUiState.currentSection,
@@ -120,11 +120,11 @@ fun PlantSheetScreen(
 
     } else if (!isPlantInDatabase) {
         Scaffold(
-            topBar = DruidNetAppBar(
+            topBar = {DruidNetAppBar(
                 navigateUp = navigateBack,
                 topBarTitle = plantLatinName.replace('_',' '),
                 topBarColor = MaterialTheme.colorScheme.error
-            ),
+            )},
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
