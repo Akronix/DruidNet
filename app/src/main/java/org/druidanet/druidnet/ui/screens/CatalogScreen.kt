@@ -1,6 +1,8 @@
 package org.druidanet.druidnet.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -174,25 +176,30 @@ fun CatalogScreen(
     var isSearchBar by remember { mutableStateOf(false)}
 
     val catalogTopBar =
-        if (!isSearchBar) {
-            DruidNetAppBar(
-                topBarTitle = stringResource(CatalogDestination.title),
-                navigateUp = navigateBack,
-                topBarIconPath = CatalogDestination.topBarIconPath,
-                actionIcon = Icons.Default.Search,
-                actionIconContentDescription = stringResource(R.string.appbar_search_button),
-                onActionClick = { isSearchBar = true }
-            )
-        } else {
-            {
-                SearchToolbar(
-                    searchQuery = searchQuery,
-                    onSearchQueryChanged = {searchQuery = it},
-                    onSearchTriggered = { searchQuery = it.trim() },
-                    onBackClick = { isSearchBar = false; searchQuery = "" },
-                    modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
-                )
-            }
+        @Composable {
+            Crossfade(
+                modifier = Modifier.animateContentSize(),
+                targetState = isSearchBar,
+                label = "Search"
+            ) { targetSearchState ->
+                if (!targetSearchState) {
+                    DruidNetAppBar(
+                        topBarTitle = stringResource(CatalogDestination.title),
+                        navigateUp = navigateBack,
+                        topBarIconPath = CatalogDestination.topBarIconPath,
+                        actionIcon = Icons.Default.Search,
+                        actionIconContentDescription = stringResource(R.string.appbar_search_button),
+                        onActionClick = { isSearchBar = true }
+                    )
+                } else {
+                    SearchToolbar(
+                        searchQuery = searchQuery,
+                        onSearchQueryChanged = { searchQuery = it },
+                        onSearchTriggered = { searchQuery = it.trim() },
+                        onBackClick = { isSearchBar = false; searchQuery = "" },
+                        modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
+                    )
+                } }
         }
 
     Scaffold(
