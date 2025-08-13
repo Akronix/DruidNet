@@ -1,7 +1,6 @@
 package org.druidanet.druidnet.data.plant
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -44,7 +43,7 @@ interface PlantDAO {
             " FROM PlantView" +
             " WHERE language = :language" +
             " AND plantId=:plantId")
-    fun getDisplayName(plantId: Int, language: LanguageEnum): Flow<String>
+    fun getDisplayName(plantId: Int, language: LanguageEnum): Flow<String?>
 
     @Query("SELECT latin_name" +
             " FROM PlantView" +
