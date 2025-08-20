@@ -9,19 +9,21 @@ import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.data.plant.ConfusionEntity
 import org.druidanet.druidnet.data.plant.NameEntity
+import org.druidanet.druidnet.data.plant.NameView
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantEntity
 import org.druidanet.druidnet.data.plant.PlantView
 import org.druidanet.druidnet.data.plant.UsageEntity
 
 @Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class, BibliographyEntity::class],
-          views = [PlantView::class],
-          version = 5,
+          views = [PlantView::class, NameView::class],
+          version = 6,
           exportSchema = true,
           autoMigrations = [
               AutoMigration (from = 1, to = 2),
               AutoMigration (from = 2, to = 3),
-              AutoMigration (from = 4, to = 5)
+              AutoMigration (from = 4, to = 5),
+              AutoMigration (from = 5, to = 6)
           ]
         )
 abstract class AppDatabase: RoomDatabase() {
