@@ -1,14 +1,17 @@
 package org.druidanet.druidnet
 
 import NavigationDestination
-import android.annotation.SuppressLint
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
@@ -36,6 +39,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.dimensionResource
@@ -61,9 +66,9 @@ import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
-import org.druidanet.druidnet.ui.screens.WelcomeScreen
 import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
+import org.druidanet.druidnet.ui.screens.WelcomeScreen
 
 
 object WelcomeDestination : NavigationDestination() {
@@ -76,6 +81,7 @@ object CatalogDestination : NavigationDestination() {
     override val route = "catalog"
     override val title = R.string.title_screen_catalog
     override val topBarIconPath = R.drawable.menu_book
+    override val hasTopBar = false
 }
 
 object AboutDestination : NavigationDestination() {
@@ -142,6 +148,7 @@ val screensByRoute : Map<String, NavigationDestination> =
 //    Credits(title = R.string.title_screen_credits),
 //}
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DruidNetApp(
     viewModel: DruidNetViewModel = viewModel( factory = DruidNetViewModel.factory ),
@@ -151,7 +158,6 @@ fun DruidNetApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
 
-    val plantList by viewModel.getAllPlants().collectAsState(emptyList())
     val bibliography by viewModel.getBibliography().collectAsState(emptyList())
     val bibliographyStr = if (bibliography.isNotEmpty())
                 bibliography.map { "* " + it.toMarkdownString() }
@@ -174,16 +180,23 @@ fun DruidNetApp(
     //canNavigateBack = navController.previousBackStackEntry != null,
 
     val appMainTopBar: @Composable () -> Unit = if (currentNavigationDestination.hasTopBar) {
-        DruidNetAppBar(
+        {DruidNetAppBar(
             topBarTitle = stringResource(currentNavigationDestination.title),
             navigateUp = { navController.navigateUp() },
             topBarIconPath = currentNavigationDestination.topBarIconPath,
-        )} else { {} }
+        )}
+    } else { {} }
 
     Scaffold(
         topBar = appMainTopBar,
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.windowInsetsPadding(
+                    WindowInsets.safeDrawing.exclude(
+                        WindowInsets.ime,
+                    ),
+                ),)
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -204,13 +217,14 @@ fun DruidNetApp(
             }
             composable(route = CatalogDestination.route) {
                 CatalogScreen(
-                    plantList = plantList,
                     onClickPlantCard = { plant ->
                         navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                     },
                     listState = scrollStateCatalog,
+                    viewModel = viewModel,
+                    navigateBack = { navController.navigateUp() },
+                    innerPadding,
                     modifier = Modifier
-                        .padding(innerPadding)
                         .fillMaxSize()
                         .wrapContentSize(Alignment.Center)
                 )
@@ -246,7 +260,7 @@ fun DruidNetApp(
                     }) {
                         PlantSheetScreen(
                             plantLatinName,
-                            { navController.navigateUp() },
+                            navigateBack = { navController.navigateUp() },
                             innerPadding,
                             modifier = Modifier
                                 .fillMaxSize()
@@ -353,7 +367,6 @@ fun Disclaimer(
     )
 }
 
-@SuppressLint("ComposableNaming")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DruidNetAppBar(
@@ -361,10 +374,12 @@ fun DruidNetAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     topBarIconPath: Int? = null,
-    topBarColor: Color = Color.Unspecified
-): @Composable () -> Unit {
+    topBarColor: Color = Color.Unspecified,
+    onActionClick: () -> Unit = {},
+    actionIconContentDescription: String? = null,
+    actionIcon: ImageVector? = null
+): Unit {
 
-        return {
             CenterAlignedTopAppBar(
                 title = {
                     Row(
@@ -397,8 +412,17 @@ fun DruidNetAppBar(
                         )
                     }
                 },
+                actions = {
+                    if (actionIcon != null && actionIconContentDescription != null) {
+                        IconButton(onClick = onActionClick) {
+                            Icon(
+                                imageVector = actionIcon,
+                                contentDescription = actionIconContentDescription,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+                },
                 modifier = modifier
             )
-        }
     }
-

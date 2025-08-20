@@ -115,6 +115,53 @@ data class PlantView(
     val image_path: String,
 )
 
+
+@DatabaseView(
+    // First SELECT: Processes common_name from Name table
+    "SELECT " +
+            "n.plantId, " +
+            "CAST(" + // Explicitly CAST the entire REPLACE block to TEXT
+            // --- A block --- (Innermost processing for 'a' on the result of E block)
+            "REPLACE(" +
+            "  REPLACE(" +
+            // --- E block --- (Innermost processing for 'e' on the result of I block)
+            "    REPLACE(" +
+            "      REPLACE(" +
+            // --- I block --- (Innermost processing for 'i' on the result of O block)
+            "        REPLACE(" +
+            "          REPLACE(" +
+            // --- O block --- (Innermost processing for 'o' on the result of U block)
+            "            REPLACE(" +
+            "              REPLACE(" +
+            // --- U block --- (Innermost processing for 'u' on the base LOWER(common_name))
+            "                REPLACE(" +
+            "                  REPLACE(LOWER(n.common_name), 'ú', 'u'), " +
+            "                'ü', 'u'), " + // End U block
+            "              'ó', 'o'), " +
+            "            'ò', 'o'), " +     // End O block
+            "          'í', 'i'), " +
+            "        'ï', 'i'), " +         // End I block
+            "      'é', 'e'), " +
+            "    'è', 'e'), " +             // End E block
+            "  'á', 'a'), " +
+            "'à', 'a')" +                 // End A block
+            " AS TEXT) AS name_searchable " + // End CAST for the first SELECT part
+            "FROM Name n " +
+
+            "UNION ALL " +
+
+            // Second SELECT: Takes latin_name from Plant table
+            "SELECT " +
+            "p.plantId, " +
+            "p.latin_name AS name_searchable " +
+            "FROM Plant p"
+)
+data class NameView(
+    val plantId: Int,
+    @ColumnInfo(name = "name_searchable")
+    val nameSearchable: String
+)
+
 data class PlantData(
     @Embedded val p: PlantEntity,
 
@@ -137,3 +184,5 @@ data class PlantData(
     val usages: List<UsageEntity>
 
 )
+
+

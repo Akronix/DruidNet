@@ -1,11 +1,8 @@
 package org.druidanet.druidnet.ui
 
 import android.content.res.AssetManager
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -23,7 +20,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
@@ -46,9 +42,9 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.network.BackendApi
-import org.druidanet.druidnet.network.BackendScalarApi
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
+import java.net.UnknownHostException
 import java.text.Collator
 import java.util.Locale
 
@@ -69,6 +65,11 @@ class DruidNetViewModel(
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
 
+    /*
+    private val _searchText = MutableStateFlow("")
+    val catalogSearchQuery = _searchText.asStateFlow()
+    */
+
     private val preferencesState: StateFlow<PreferencesState> =
         userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
             PreferencesState(displayLanguage = displayLanguage)
@@ -84,6 +85,7 @@ class DruidNetViewModel(
             )
 
     var LANGUAGE_APP = preferencesState.value.displayLanguage
+    var allPlantsFlow = getAllPlants(LANGUAGE_APP)
 
     /****** VIEW MODEL CONSTRUCTOR *****/
 
@@ -100,7 +102,7 @@ class DruidNetViewModel(
                     application.imagesRepository,
                     application.documentsRepository,
                     application.database,
-                    application.assets
+                    application.assets,
                 )
             }
         }
@@ -185,7 +187,7 @@ class DruidNetViewModel(
             } catch (e: SerializationException) {
                 Log.e("DruidNet", "Serialization Error: ${e.message}", e)
                 snackbarHost.showSnackbar("Error procesando los datos de descarga")
-            } catch (e: java.net.UnknownHostException) {
+            } catch (e: UnknownHostException) {
                 Log.e("DruidNet", "No internet connection.", e)
             } catch (e: IOException) {
                 Log.e("DruidNet", "IO Error: ${e.message}", e)
@@ -194,15 +196,24 @@ class DruidNetViewModel(
         }
     }
 
-
     /****** DATABASE FUNCTIONS *****/
 
+    fun getPlantsFilteredByName(queryName: String) : Flow<List<PlantCard>> {
+        return if (queryName.isNotEmpty()) plantsRepository.searchPlantsByName(
+            name = queryName,
+            originalListPlants = allPlantsFlow
+        ) else
+            allPlantsFlow
+    }
+
+
     // Get all plants from db
-    fun getAllPlants(): Flow<List<PlantCard>> =
-        if (LANGUAGE_APP != LanguageEnum.LATIN) {
+    // TODO: move getAllPlants function to PlantRepository
+    fun getAllPlants(language: LanguageEnum): Flow<List<PlantCard>> =
+        if (language != LanguageEnum.LATIN) {
             combine(
-                plantDao.getPlantCatalogData(LANGUAGE_APP),
-                plantDao.getPlantCatalogLatinNotInLanguage(LANGUAGE_APP)
+                plantDao.getPlantCatalogData(language),
+                plantDao.getPlantCatalogLatinNotInLanguage(language)
             )
             { plantsInLanguage, plantsInLatin ->
                 if (plantsInLatin.isEmpty())
@@ -281,6 +292,7 @@ class DruidNetViewModel(
         viewModelScope.launch {
             userPreferencesRepository.updateDisplayNameLanguagePreference(language)
             LANGUAGE_APP = language
+            allPlantsFlow = getAllPlants(language)
         }
 
     }
@@ -295,6 +307,13 @@ class DruidNetViewModel(
 
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
+
+    /*
+    fun onSearchQueryChanged(query: String) {
+        _searchText.value = query
+        Log.i( "D", query)
+    }
+    */
 
 //    fun getAssetsImage(): ImageBitmap {
 //        val inputStream = assets.open("drawable/gatherer_basket.webp")
