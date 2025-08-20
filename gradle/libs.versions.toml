@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.1"
+agp = "8.12.1"
 datastorePreferences = "1.1.7"
 retrofit = "2.11.0"
 coreSplashscreen = "1.2.0-beta02"
