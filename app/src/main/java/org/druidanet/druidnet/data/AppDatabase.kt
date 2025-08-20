@@ -44,8 +44,8 @@ abstract class AppDatabase: RoomDatabase() {
                     AppDatabase::class.java,
                     "druid_database"
                 )
-                    // Wipes and rebuilds instead of migrating if no Migration object.
-                    .fallbackToDestructiveMigration(true)
+                    .fallbackToDestructiveMigration(false)
+                    .fallbackToDestructiveMigrationOnDowngrade(true)
                     // prepopulate the database after onCreate was called
                     .createFromAsset("databases/druid_database.db")
                     // prepopulate the database after onCreate was called
