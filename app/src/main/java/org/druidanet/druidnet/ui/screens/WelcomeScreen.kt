@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui.screens
 
-import NavigationDestination
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,11 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import org.druidanet.druidnet.AboutDestination
-import org.druidanet.druidnet.CatalogDestination
-import org.druidanet.druidnet.GlossaryDestination
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.RecommendationsDestination
+import org.druidanet.druidnet.navigation.AboutDestination
+import org.druidanet.druidnet.navigation.CatalogDestination
+import org.druidanet.druidnet.navigation.GlossaryDestination
+import org.druidanet.druidnet.navigation.NavigationDestination
+import org.druidanet.druidnet.navigation.RecommendationsDestination
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable

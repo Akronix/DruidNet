@@ -8,25 +8,20 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import org.druidanet.druidnet.DruidNetApplication
-import org.druidanet.druidnet.PlantSheetDestination
-import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
+import org.druidanet.druidnet.navigation.PlantSheetDestination
 
 private const val TIMEOUT_MILLIS = 5_000L
 

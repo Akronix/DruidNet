@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui.screens
 
-import NavigationDestination
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -51,11 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
-import org.druidanet.druidnet.BibliographyDestination
-import org.druidanet.druidnet.CreditsDestination
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.LanguageEnum
+import org.druidanet.druidnet.navigation.BibliographyDestination
+import org.druidanet.druidnet.navigation.CreditsDestination
+import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
