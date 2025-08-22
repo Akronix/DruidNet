@@ -72,10 +72,10 @@ import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollba
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberDraggableScroller
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
 import com.mikepenz.markdown.m3.Markdown
-import org.druidanet.druidnet.CatalogDestination
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.model.PlantCard
+import org.druidanet.druidnet.navigation.CatalogDestination
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap

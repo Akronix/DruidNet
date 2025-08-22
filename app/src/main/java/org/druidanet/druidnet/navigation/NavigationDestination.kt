@@ -1,4 +1,4 @@
-import androidx.compose.ui.graphics.vector.ImageVector
+package org.druidanet.druidnet.navigation
 
 /**
  * Interface to describe the navigation destinations for the app
