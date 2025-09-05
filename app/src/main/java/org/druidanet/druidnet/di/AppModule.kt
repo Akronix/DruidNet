@@ -1,6 +1,7 @@
 package org.druidanet.druidnet.di
 
 import android.content.Context
+import android.content.res.AssetManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -30,5 +31,11 @@ object AppModule {
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return context.dataStore // Uses the extension property defined above
+    }
+
+    @Provides
+    @Singleton
+    fun provideAssetManager(@ApplicationContext context: Context): AssetManager {
+        return context.assets
     }
 }

@@ -1,16 +1,17 @@
 package org.druidanet.druidnet.ui
 
-import android.content.res.AssetManager
+// import androidx.lifecycle.ViewModelProvider // REMOVED
+// import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY // REMOVED
+// import androidx.lifecycle.viewmodel.initializer // REMOVED
+// import androidx.lifecycle.viewmodel.viewModelFactory // REMOVED
+// import androidx.room.RoomDatabase // REMOVED (or change to AppDatabase if it's the specific type needed elsewhere)
+// import org.druidanet.druidnet.DruidNetApplication // REMOVED
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.room.RoomDatabase
 import androidx.room.withTransaction
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
-import org.druidanet.druidnet.DruidNetApplication
+import org.druidanet.druidnet.data.AppDatabase
 import org.druidanet.druidnet.data.DocumentsRepository
 import org.druidanet.druidnet.data.DruidNetUiState
 import org.druidanet.druidnet.data.PreferencesState
@@ -41,14 +42,16 @@ import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
-import org.druidanet.druidnet.network.BackendApi
+import org.druidanet.druidnet.network.BackendApiService
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import java.io.IOException
 import java.net.UnknownHostException
 import java.text.Collator
 import java.util.Locale
+import javax.inject.Inject
 
-class DruidNetViewModel(
+@HiltViewModel // ADDED
+class DruidNetViewModel @Inject constructor( // ADDED @Inject
     private val plantDao: PlantDAO,
     private val biblioDao: BibliographyDAO,
     private val userPreferencesRepository: UserPreferencesRepository,
@@ -56,8 +59,8 @@ class DruidNetViewModel(
     private val biblioRepository: BibliographyRepository,
     private val imagesRepository: ImagesRepository,
     private val documentsRepository: DocumentsRepository,
-    private val roomDatabase: RoomDatabase,
-    private val assets: AssetManager
+    private val appDatabase: AppDatabase, // CHANGED from roomDatabase: RoomDatabase
+    private val backendApiService: BackendApiService // ADDED
 ) : ViewModel() {
 
     /****** STATE VARIABLES *****/
@@ -87,27 +90,6 @@ class DruidNetViewModel(
     var LANGUAGE_APP = preferencesState.value.displayLanguage
     var allPlantsFlow = getAllPlants(LANGUAGE_APP)
 
-    /****** VIEW MODEL CONSTRUCTOR *****/
-
-    companion object {
-        val factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as DruidNetApplication)
-                DruidNetViewModel(
-                    application.database.plantDao(),
-                    application.database.biblioDao(),
-                    application.userPreferencesRepository,
-                    application.plantsRepository,
-                    application.biblioRepository,
-                    application.imagesRepository,
-                    application.documentsRepository,
-                    application.database,
-                    application.assets,
-                )
-            }
-        }
-    }
-
     /****** USER INTERACTION (UI) FUNCTIONS *****/
 
     /****** NETWORK FUNCTIONS *****/
@@ -116,7 +98,8 @@ class DruidNetViewModel(
             try {
                 /* TO RETHINK ALL THIS CODE */
                 val currentDBVersion: Long = userPreferencesRepository.getDatabaseVersion.first()
-                val res = BackendApi.retrofitService.getLastUpdate()
+                // Use injected backendApiService instead of BackendApi.retrofitService
+                val res = backendApiService.getLastUpdate()
                 Log.i(
                     "DruidNet",
                     "Checking new versions of the database...Last update: ${res.versionDB}. Current version: $currentDBVersion"
@@ -142,7 +125,7 @@ class DruidNetViewModel(
 
                     // (The next two steps, ideally, would be done in one atomic transaction)
 //                 withContext(Dispatchers.IO) {
-                    roomDatabase.withTransaction {
+                    appDatabase.withTransaction { // MODIFIED: Use injected appDatabase
 
                         //  3. Delete all data in localdb
                         clearDB()
@@ -155,6 +138,7 @@ class DruidNetViewModel(
                     }
                     userPreferencesRepository.updateDatabaseVersion(res.versionDB)
                     snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
+                    Log.i("DruidNet", "Database updated!")
                 } else {
                     Log.i("DruidNet", "La base de datos está al día.")
                 }
@@ -275,7 +259,7 @@ class DruidNetViewModel(
     fun getBibliography(): Flow<List<BibliographyEntity>> =
         biblioDao.getAllBibliographyEntries()
 
-    fun clearDB() = roomDatabase.clearAllTables()
+    fun clearDB() = appDatabase.clearAllTables() // If AppDatabase doesn't have this, adjust to appDatabase.runInTransaction { plantDao.clear(); biblioDao.clear(); ... }
 
 
     /****** USER PREFERENCES FUNCTIONS *****/

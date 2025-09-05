@@ -107,6 +107,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // WorkManager dependency
     implementation("androidx.work:work-runtime-ktx:2.10.0")

@@ -44,7 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -58,7 +58,7 @@ import org.druidanet.druidnet.ui.DruidNetViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DruidNetApp(
-    viewModel: DruidNetViewModel = viewModel( factory = DruidNetViewModel.factory ),
+    viewModel: DruidNetViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
 
@@ -174,7 +174,7 @@ fun DruidNetAppBar(
     onActionClick: () -> Unit = {},
     actionIconContentDescription: String? = null,
     actionIcon: ImageVector? = null
-): Unit {
+) {
 
             CenterAlignedTopAppBar(
                 title = {

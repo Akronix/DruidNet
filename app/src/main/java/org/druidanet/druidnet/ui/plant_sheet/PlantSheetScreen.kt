@@ -49,7 +49,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
@@ -75,7 +75,7 @@ fun PlantSheetScreen(
     navigateBack: () -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    sheetViewModel: PlantSheetViewModel = viewModel(factory = PlantSheetViewModel.factory),
+    sheetViewModel: PlantSheetViewModel = hiltViewModel(),
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
     val plant = remember (plantSheetUiState.plantUiState?.plantId) {

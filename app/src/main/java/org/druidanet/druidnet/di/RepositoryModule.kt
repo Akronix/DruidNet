@@ -2,6 +2,7 @@ package org.druidanet.druidnet.di
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.content.res.AssetManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import dagger.Module
@@ -9,14 +10,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import org.druidanet.druidnet.data.DocumentsRepository
 import org.druidanet.druidnet.data.UserPreferencesRepository
-import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyRepository
-import org.druidanet.druidnet.data.images.ImagesRepository
-import org.druidanet.druidnet.data.plant.PlantDAO
-import org.druidanet.druidnet.data.DocumentsRepository // Corrected package based on recent files
 import org.druidanet.druidnet.data.images.ImagesLocalDataSource
 import org.druidanet.druidnet.data.images.ImagesRemoteDataSource
+import org.druidanet.druidnet.data.images.ImagesRepository
+import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.network.BackendApiService
@@ -38,13 +38,14 @@ object RepositoryModule {
     @Singleton
     fun provideDocumentsRepository(
         @ApplicationContext context: Context,
-        @RetrofitScalar backendScalarApiService: BackendScalarApiService,
+        assetsManager: AssetManager,
+        backendScalarApiService: BackendScalarApiService,
     ): DocumentsRepository {
         // Assuming DocumentsRepository constructor takes BackendApiService and PlantDAO
         return DocumentsRepository(
             backendScalarApiService,
             localStorageDir = context.getDir("documents", MODE_PRIVATE).absolutePath,
-            assetsMgr = context.assets
+            assetsMgr = assetsManager
         )
     }
 
@@ -52,12 +53,13 @@ object RepositoryModule {
     @Singleton
     fun provideImagesRepository(
         @ApplicationContext context: Context,
-        @RetrofitScalar backendScalarApiService: BackendScalarApiService,
+        assetsManager: AssetManager,
+        backendScalarApiService: BackendScalarApiService,
     ): ImagesRepository {
         // Assuming ImagesRepository constructor takes Context, BackendScalarApiService, and PlantDAO
         return ImagesRepository(ImagesRemoteDataSource(backendScalarApiService), ImagesLocalDataSource(
-            context.assets ,
-            context.getDir("images", Context.MODE_PRIVATE).absolutePath
+            assetsManager,
+            context.getDir("images", MODE_PRIVATE).absolutePath
         ))
     }
 
@@ -65,7 +67,7 @@ object RepositoryModule {
     @Singleton
     fun providePlantsRepository(
         plantDAO: PlantDAO,
-        @RetrofitAPI backendApiService: BackendApiService,
+        backendApiService: BackendApiService,
     ): PlantsRepository {
         // Assuming ImagesRepository constructor takes Context, BackendScalarApiService, and PlantDAO
         return PlantsRepository(PlantsRemoteDataSource(backendApiService), plantDao = plantDAO)
@@ -74,7 +76,7 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideBibliographyRepository(
-        @RetrofitAPI backendApiService: BackendApiService
+       backendApiService: BackendApiService
     ): BibliographyRepository {
         // Assuming BibliographyRepository constructor takes BackendApiService and BibliographyDAO
         return BibliographyRepository(backendApiService)
