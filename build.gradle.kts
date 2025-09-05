@@ -15,4 +15,3 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     id("com.google.dagger.hilt.android") version "2.57.1" apply false
 }
-val ndkVersion by extra("28.0.12916984")

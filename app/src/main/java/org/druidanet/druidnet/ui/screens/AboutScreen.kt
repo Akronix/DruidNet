@@ -58,6 +58,7 @@ import org.druidanet.druidnet.navigation.CreditsDestination
 import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
+import androidx.core.net.toUri
 
 @Composable
 fun AboutScreen (
@@ -255,7 +256,7 @@ fun AboutItem(
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
-        Row(verticalAlignment = Alignment.CenterVertically,)
+        Row(verticalAlignment = Alignment.CenterVertically)
         {
             if (imageVector != null)
                 Icon(
@@ -285,7 +286,7 @@ fun AboutItem(
 fun openURIAction(context: Context, uri: String) {
 
     val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(uri)
+        data = uri.toUri()
     }
     context.startActivity(intent)
 }
@@ -293,7 +294,7 @@ fun openURIAction(context: Context, uri: String) {
 fun sendEmailAction(context: Context) {
 
     val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:")
+    data = "mailto:".toUri()
         putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
         putExtra(Intent.EXTRA_SUBJECT, "DruidNetApp: ")
     }
