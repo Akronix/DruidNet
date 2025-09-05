@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("androidx.room")
     alias(libs.plugins.compose.compiler)
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -100,6 +101,12 @@ android {
 
 
 dependencies {
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // WorkManager dependency
     implementation("androidx.work:work-runtime-ktx:2.10.0")

@@ -13,5 +13,6 @@ plugins {
     id("com.google.devtools.ksp") version "2.1.21-2.0.2" apply false
     id("androidx.room") version "2.7.1" apply false
     alias(libs.plugins.compose.compiler) apply false
+    id("com.google.dagger.hilt.android") version "2.56.2" apply false
 }
 val ndkVersion by extra("28.0.12916984")

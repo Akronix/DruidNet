@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.HiltAndroidApp
 import org.druidanet.druidnet.data.AppDatabase
 import org.druidanet.druidnet.data.DocumentsRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyRepository
@@ -21,6 +22,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_PREFERENCES_NAME
 )
 
+@HiltAndroidApp
 class DruidNetApplication: Application() {
     val database: AppDatabase by lazy { AppDatabase.getDatabase(this) }
     val userPreferencesRepository by lazy { UserPreferencesRepository(dataStore) }
