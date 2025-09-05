@@ -38,9 +38,11 @@ object RepositoryModule {
     @Singleton
     fun provideDocumentsRepository(
         @ApplicationContext context: Context,
+        @RetrofitScalar backendScalarApiService: BackendScalarApiService,
     ): DocumentsRepository {
         // Assuming DocumentsRepository constructor takes BackendApiService and PlantDAO
         return DocumentsRepository(
+            backendScalarApiService,
             localStorageDir = context.getDir("documents", MODE_PRIVATE).absolutePath,
             assetsMgr = context.assets
         )
@@ -50,10 +52,10 @@ object RepositoryModule {
     @Singleton
     fun provideImagesRepository(
         @ApplicationContext context: Context,
-        backendScalarApiService: BackendScalarApiService,
+        @RetrofitScalar backendScalarApiService: BackendScalarApiService,
     ): ImagesRepository {
         // Assuming ImagesRepository constructor takes Context, BackendScalarApiService, and PlantDAO
-        return ImagesRepository(ImagesRemoteDataSource(), ImagesLocalDataSource(
+        return ImagesRepository(ImagesRemoteDataSource(backendScalarApiService), ImagesLocalDataSource(
             context.assets ,
             context.getDir("images", Context.MODE_PRIVATE).absolutePath
         ))
@@ -62,18 +64,20 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providePlantsRepository(
-        plantDAO: PlantDAO
+        plantDAO: PlantDAO,
+        @RetrofitAPI backendApiService: BackendApiService,
     ): PlantsRepository {
         // Assuming ImagesRepository constructor takes Context, BackendScalarApiService, and PlantDAO
-        return PlantsRepository(PlantsRemoteDataSource(), plantDao = plantDAO)
+        return PlantsRepository(PlantsRemoteDataSource(backendApiService), plantDao = plantDAO)
     }
 
     @Provides
     @Singleton
     fun provideBibliographyRepository(
+        @RetrofitAPI backendApiService: BackendApiService
     ): BibliographyRepository {
         // Assuming BibliographyRepository constructor takes BackendApiService and BibliographyDAO
-        return BibliographyRepository()
+        return BibliographyRepository(backendApiService)
     }
 }
 

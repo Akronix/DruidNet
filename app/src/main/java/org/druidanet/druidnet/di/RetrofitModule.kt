@@ -13,7 +13,14 @@ import org.druidanet.druidnet.network.BackendScalarApiService
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Named
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+annotation class RetrofitScalar
+
+@Qualifier
+annotation class RetrofitAPI
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -30,7 +37,8 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    @Named("JsonRetrofit")
+    @Named("RetrofitAPI")
+    @RetrofitAPI
     fun provideJsonRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val contentType = "application/json".toMediaType()
         val json = Json { ignoreUnknownKeys = true } // Matching your BackendApiService setup
@@ -49,7 +57,8 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    @Named("ScalarRetrofit")
+    @Named("RetrofitScalar")
+    @RetrofitScalar
     fun provideScalarRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)

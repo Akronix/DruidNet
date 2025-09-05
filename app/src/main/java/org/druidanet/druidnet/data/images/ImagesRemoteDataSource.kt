@@ -1,7 +1,8 @@
 package org.druidanet.druidnet.data.images
 
-import org.druidanet.druidnet.network.BackendApi
+import org.druidanet.druidnet.network.BackendScalarApiService
+import javax.inject.Inject
 
-class ImagesRemoteDataSource {
-    suspend fun downloadImage(imgSrc: String) = BackendApi.retrofitService.downloadImage(imgSrc).body()
+class ImagesRemoteDataSource @Inject constructor(private val backendScalarApiService: BackendScalarApiService) {
+    suspend fun downloadImage(imgSrc: String) = backendScalarApiService.downloadImage(imgSrc).body()
 }

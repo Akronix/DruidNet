@@ -35,10 +35,6 @@ interface BackendApiService {
     @GET("database/allplants")
     suspend fun downloadPlantData() : PlantDataDTO
 
-    @Streaming
-    @GET("images/{imgSrc}")
-    suspend fun downloadImage(@Path("imgSrc") imgSrc: String ): Response<ResponseBody>
-
 }
 
 object BackendApi {
@@ -60,6 +56,10 @@ interface BackendScalarApiService {
     @Streaming
     @GET
     suspend fun downloadFile(@Url fileUrl: String): Response<ResponseBody>
+
+    @Streaming
+    @GET("images/{imgSrc}")
+    suspend fun downloadImage(@Path("imgSrc") imgSrc: String ): Response<ResponseBody>
 
 }
 

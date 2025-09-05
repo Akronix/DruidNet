@@ -1,15 +1,16 @@
 package org.druidanet.druidnet.data
 
 import android.content.res.AssetManager
-import android.content.res.loader.AssetsProvider
 import android.util.Log
 import okhttp3.ResponseBody
-import org.druidanet.druidnet.network.BackendScalarApi
+import org.druidanet.druidnet.network.BackendScalarApiService
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import javax.inject.Inject
 
-class DocumentsRepository(
+class DocumentsRepository @Inject constructor(
+    private val backendScalarApiService: BackendScalarApiService,
     private val localStorageDir: String,
     private val assetsMgr: AssetManager
     ) {
@@ -19,7 +20,7 @@ class DocumentsRepository(
     suspend fun downloadGlossaryMd() = downloadFile("glossary.md")
 
     private suspend fun downloadFile(fileName: String) : Boolean {
-        val responseBody = BackendScalarApi.retrofitService.downloadFile(fileName).body()
+        val responseBody = backendScalarApiService.downloadFile(fileName).body()
         return saveFile(responseBody, fileName) != ""
     }
 
