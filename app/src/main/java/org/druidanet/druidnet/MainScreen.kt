@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -48,6 +49,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import org.druidanet.druidnet.navigation.DruidNetNavHost
 import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.navigation.WelcomeDestination
@@ -74,6 +76,7 @@ fun DruidNetApp(
     val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage by viewModel.snackbarMessage.collectAsState()
 
     var justStartedApp by remember { mutableStateOf(true)}
 
@@ -102,7 +105,8 @@ fun DruidNetApp(
                     WindowInsets.safeDrawing.exclude(
                         WindowInsets.ime,
                     ),
-                ),)
+                ),
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -120,6 +124,20 @@ fun DruidNetApp(
             LaunchedEffect(Unit) {
                 justStartedApp = false
                 viewModel.checkAndUpdateDatabase()
+            }
+        }
+
+        // Show Snackbar when a message is available
+        LaunchedEffect(snackbarMessage) {
+            snackbarMessage?.let { message ->
+                launch {
+                    snackbarHostState.showSnackbar(
+                        message = message,
+                        duration = SnackbarDuration.Short
+                    )
+                    // After the snackbar is shown and dismissed, clear the message.
+                    viewModel.onSnackbarMessageShown()
+                }
             }
         }
 

@@ -6,6 +6,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -21,6 +22,10 @@ import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.network.BackendApiService
 import java.io.IOException
 import java.net.UnknownHostException
+
+const val KEY_PLANTS_DB_UPDATED = "KEY_PLANTS_DB_UPDATED"
+const val KEY_RECOMMENDATIONS_UPDATED = "KEY_RECOMMENDATIONS_UPDATED"
+const val KEY_GLOSSARY_UPDATED = "KEY_GLOSSARY_UPDATED"
 
 @HiltWorker
 class DatabaseUpdateWorker @AssistedInject constructor(
@@ -38,6 +43,10 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
+        var plantsDbUpdated = false
+        var recommendationsUpdated = false
+        var glossaryUpdated = false
+
         return try {
             Log.i("DruidNetWorker", "DatabaseUpdateWorker started.")
             val currentDBVersion: Long = userPreferencesRepository.getDatabaseVersion.first()
@@ -68,7 +77,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                 // 4. Update database in a transaction
                 appDatabase.withTransaction {
                     Log.i("DruidNetWorker", "Starting database transaction: clearing old data and populating new data.")
-                    appDatabase.clearAllTables() // Assuming this method exists and clears all relevant tables
+                    appDatabase.clearAllTables()
                     Log.i("DruidNetWorker", "Cleared all tables from database.")
 
                     plantDao.populatePlants(plantData.plants)
@@ -79,6 +88,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                     Log.i("DruidNetWorker", "Populated database with new data.")
                 }
                 userPreferencesRepository.updateDatabaseVersion(res.versionDB)
+                plantsDbUpdated = true
                 Log.i("DruidNetWorker", "Database updated successfully to version ${res.versionDB}!")
             } else {
                 Log.i("DruidNetWorker", "Database is already up to date (version $currentDBVersion).")
@@ -92,6 +102,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                         "recommendations",
                         res.versionRecommendations
                     )
+                    recommendationsUpdated = true
                     Log.i("DruidNetWorker", "Recommendations updated to version ${res.versionRecommendations}.")
                 } else {
                     Log.w("DruidNetWorker", "Failed to download recommendations.")
@@ -106,19 +117,27 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                         "glossary",
                         res.versionGlossary
                     )
+                    glossaryUpdated = true
                     Log.i("DruidNetWorker", "Glossary updated to version ${res.versionGlossary}.")
                 } else {
                     Log.w("DruidNetWorker", "Failed to download glossary.")
                 }
             }
             Log.i("DruidNetWorker", "DatabaseUpdateWorker finished successfully.")
-            Result.success()
+
+            val outputData = workDataOf(
+                KEY_PLANTS_DB_UPDATED to plantsDbUpdated,
+                KEY_RECOMMENDATIONS_UPDATED to recommendationsUpdated,
+                KEY_GLOSSARY_UPDATED to glossaryUpdated
+            )
+            Result.success(outputData)
+
         } catch (e: SerializationException) {
             Log.e("DruidNetWorker", "Serialization Error during database update: ${e.message}", e)
-            Result.failure()
+            Result.failure() // Consider adding outputData with error details if needed
         } catch (e: UnknownHostException) {
             Log.e("DruidNetWorker", "No internet connection during database update: ${e.message}", e)
-            Result.retry() // Retry if there's no network
+            Result.retry()
         } catch (e: IOException) {
             Log.e("DruidNetWorker", "IO Error during database update: ${e.message}", e)
             Result.failure()

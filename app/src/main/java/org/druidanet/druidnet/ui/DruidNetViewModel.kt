@@ -1,8 +1,10 @@
 package org.druidanet.druidnet.ui
 
-import android.util.Log // Keep Log for potential future use or if other methods use it
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,12 +34,13 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.mergeOrderedLists
-import org.druidanet.druidnet.workmanager.WorkManagerRepository // Added this import
+import org.druidanet.druidnet.workers.KEY_GLOSSARY_UPDATED
+import org.druidanet.druidnet.workers.KEY_PLANTS_DB_UPDATED
+import org.druidanet.druidnet.workers.KEY_RECOMMENDATIONS_UPDATED
+import org.druidanet.druidnet.workmanager.WorkManagerRepository
 import java.text.Collator
 import java.util.Locale
 import javax.inject.Inject
-
-// WorkManager related imports are removed as they are now encapsulated in WorkManagerRepository
 
 @HiltViewModel
 class DruidNetViewModel @Inject constructor(
@@ -47,7 +50,7 @@ class DruidNetViewModel @Inject constructor(
     private val plantsRepository: PlantsRepository,
     private val documentsRepository: DocumentsRepository,
     private val appDatabase: AppDatabase,
-    private val workManagerRepository: WorkManagerRepository // Changed from workManager to workManagerRepository
+    private val workManagerRepository: WorkManagerRepository
 ) : ViewModel() {
 
     /****** STATE VARIABLES *****/
@@ -55,10 +58,8 @@ class DruidNetViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
 
-    /*
-    private val _searchText = MutableStateFlow("")
-    val catalogSearchQuery = _searchText.asStateFlow()
-    */
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
 
     private val preferencesState: StateFlow<PreferencesState> =
         userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
@@ -77,18 +78,62 @@ class DruidNetViewModel @Inject constructor(
     var LANGUAGE_APP = preferencesState.value.displayLanguage
     var allPlantsFlow = getAllPlants(LANGUAGE_APP)
 
+    init {
+        viewModelScope.launch {
+            workManagerRepository.databaseUpdateWorkInfo.asFlow().collect { workInfos ->
+                // For unique work, the list should contain one WorkInfo instance, or be empty.
+                val workInfo = workInfos.firstOrNull()
+                if (workInfo != null) {
+                    when (workInfo.state) {
+                        WorkInfo.State.ENQUEUED -> {
+                            // You might not want to show a Snackbar for this,
+                            // or a very brief one if checkAndUpdateDatabase is user-initiated.
+                            // _snackbarMessage.value = "Database update scheduled."
+                        }
+                        WorkInfo.State.RUNNING -> {
+                            _snackbarMessage.value = "Comprobando actualizaciones de la base de datos..."
+                        }
+                        WorkInfo.State.SUCCEEDED -> {
+                            // Check if the database was actually updated or already up-to-date.
+                            val outputData = workInfo.outputData
+                            val updatedItems = mutableListOf<String>()
+                            if (outputData.getBoolean(KEY_PLANTS_DB_UPDATED, false)) updatedItems.add("Base de datos de plantas")
+                            if (outputData.getBoolean(KEY_RECOMMENDATIONS_UPDATED, false)) updatedItems.add("Recomendaciones")
+                            if (outputData.getBoolean(KEY_GLOSSARY_UPDATED, false)) updatedItems.add("Glosario")
+                            if (updatedItems.isEmpty()) {
+                                _snackbarMessage.value = "¡La base de datos está al día!\nNada que actualizar"
+                            } else {
+                                _snackbarMessage.value = "¡Se actualizó: ${updatedItems.joinToString(separator = ", ")} !"
+                            }
+                        }
+                        WorkInfo.State.FAILED -> {
+                             _snackbarMessage.value = "Error actualizando la base de datos"
+                            // Optionally, retrieve a more specific error message from workInfo.outputData
+                            // val errorMessage = workInfo.outputData.getString("ERROR_MESSAGE_KEY")
+                            // _snackbarMessage.value = errorMessage ?: "Database update failed."
+                        }
+                        WorkInfo.State.BLOCKED -> {
+//                            _snackbarMessage.value = "Todavía no se puede actualizar la base de datos"
+                        }
+                        WorkInfo.State.CANCELLED -> {
+                            _snackbarMessage.value = "Se ha cancelado la actualización de la base de datos."
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /****** USER INTERACTION (UI) FUNCTIONS *****/
+
+    fun onSnackbarMessageShown() {
+        _snackbarMessage.value = null
+    }
 
     /****** NETWORK FUNCTIONS *****/
     fun checkAndUpdateDatabase() {
         Log.i("DruidNetViewModel", "Requesting database update via WorkManagerRepository.")
         workManagerRepository.startDatabaseUpdateWork()
-        // The detailed WorkManager logic (creating request, constraints, enqueueing)
-        // is now handled within WorkManagerRepository.
-        // You can still observe the work status via LiveData from WorkManagerRepository if needed:
-        // For example, if WorkManagerRepository exposes LiveData<WorkInfo>
-        // val workInfoLiveData = workManagerRepository.getDatabaseUpdateWorkInfo()
-        // workInfoLiveData.observe(lifecycleOwner, { workInfo -> ... update UI ... })
     }
 
     /****** DATABASE FUNCTIONS *****/
