@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -44,10 +45,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import org.druidanet.druidnet.navigation.DruidNetNavHost
 import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.navigation.WelcomeDestination
@@ -58,7 +60,7 @@ import org.druidanet.druidnet.ui.DruidNetViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DruidNetApp(
-    viewModel: DruidNetViewModel = viewModel( factory = DruidNetViewModel.factory ),
+    viewModel: DruidNetViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
 
@@ -74,6 +76,7 @@ fun DruidNetApp(
     val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage by viewModel.snackbarMessage.collectAsState()
 
     var justStartedApp by remember { mutableStateOf(true)}
 
@@ -102,7 +105,8 @@ fun DruidNetApp(
                     WindowInsets.safeDrawing.exclude(
                         WindowInsets.ime,
                     ),
-                ),)
+                ),
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -119,7 +123,21 @@ fun DruidNetApp(
         if (justStartedApp) {
             LaunchedEffect(Unit) {
                 justStartedApp = false
-                viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
+                viewModel.checkAndUpdateDatabase()
+            }
+        }
+
+        // Show Snackbar when a message is available
+        LaunchedEffect(snackbarMessage) {
+            snackbarMessage?.let { message ->
+                launch {
+                    snackbarHostState.showSnackbar(
+                        message = message,
+                        duration = SnackbarDuration.Short
+                    )
+                    // After the snackbar is shown and dismissed, clear the message.
+                    viewModel.onSnackbarMessageShown()
+                }
             }
         }
 
@@ -174,7 +192,7 @@ fun DruidNetAppBar(
     onActionClick: () -> Unit = {},
     actionIconContentDescription: String? = null,
     actionIcon: ImageVector? = null
-): Unit {
+) {
 
             CenterAlignedTopAppBar(
                 title = {

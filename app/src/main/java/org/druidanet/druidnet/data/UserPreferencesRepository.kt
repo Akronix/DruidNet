@@ -15,7 +15,7 @@ import org.druidanet.druidnet.model.LanguageEnum
 import java.io.IOException
 import java.util.Locale
 
-private val DEFAULT_LANGUAGE = when (Locale.getDefault().getLanguage()) {
+private val DEFAULT_LANGUAGE = when (Locale.getDefault().language) {
     "es" -> LanguageEnum.CASTELLANO
     "ca" -> LanguageEnum.CATALAN
     "ga" -> LanguageEnum.GALLEGO

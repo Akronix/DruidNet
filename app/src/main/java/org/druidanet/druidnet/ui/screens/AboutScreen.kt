@@ -2,7 +2,6 @@ package org.druidanet.druidnet.ui.screens
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
@@ -255,7 +255,7 @@ fun AboutItem(
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
-        Row(verticalAlignment = Alignment.CenterVertically,)
+        Row(verticalAlignment = Alignment.CenterVertically)
         {
             if (imageVector != null)
                 Icon(
@@ -285,7 +285,7 @@ fun AboutItem(
 fun openURIAction(context: Context, uri: String) {
 
     val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(uri)
+        data = uri.toUri()
     }
     context.startActivity(intent)
 }
@@ -293,7 +293,7 @@ fun openURIAction(context: Context, uri: String) {
 fun sendEmailAction(context: Context) {
 
     val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:")
+    data = "mailto:".toUri()
         putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
         putExtra(Intent.EXTRA_SUBJECT, "DruidNetApp: ")
     }

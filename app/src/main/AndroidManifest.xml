@@ -16,6 +16,14 @@
         android:theme="@style/Theme.DruidNet"
         tools:targetApi="31" >
 
+        <!-- If you want to disable android.startup completely. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -28,5 +36,7 @@
             </intent-filter>
         </activity>
     </application>
+
+
 
 </manifest>

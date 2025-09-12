@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("androidx.room")
     alias(libs.plugins.compose.compiler)
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -100,6 +101,16 @@ android {
 
 
 dependencies {
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+
+    // WorkManager dependency
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Coil
 //    implementation("io.coil-kt.coil3:coil-compose:3.1.0")

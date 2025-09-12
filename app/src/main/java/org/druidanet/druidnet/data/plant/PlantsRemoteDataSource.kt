@@ -1,7 +1,8 @@
 package org.druidanet.druidnet.data.plant
 
-import org.druidanet.druidnet.network.BackendApi
+import org.druidanet.druidnet.network.BackendApiService
+import javax.inject.Inject
 
-class PlantsRemoteDataSource() {
-    suspend fun downloadPlantData() = BackendApi.retrofitService.downloadPlantData()
+class PlantsRemoteDataSource @Inject constructor(private val backendApiService: BackendApiService) {
+    suspend fun downloadPlantData() = backendApiService.downloadPlantData()
 }

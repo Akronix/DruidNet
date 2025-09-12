@@ -1,13 +1,15 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+// import androidx.lifecycle.ViewModelProvider // REMOVED
+// import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY // REMOVED
+// import androidx.lifecycle.createSavedStateHandle // REMOVED (Hilt handles SavedStateHandle)
+// import androidx.lifecycle.viewmodel.initializer // REMOVED
+// import androidx.lifecycle.viewmodel.viewModelFactory // REMOVED
+// import org.druidanet.druidnet.DruidNetApplication // REMOVED
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,38 +19,24 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
-import org.druidanet.druidnet.DruidNetApplication
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.navigation.PlantSheetDestination
+import javax.inject.Inject
 
 private const val TIMEOUT_MILLIS = 5_000L
 
-class PlantSheetViewModel (
-    savedStatedHandle: SavedStateHandle,
-    plantsRepository: PlantsRepository,
-    userPreferencesRepository: UserPreferencesRepository
+@HiltViewModel
+class PlantSheetViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle, // Hilt provides this
+    plantsRepository: PlantsRepository, // Hilt provides this
+    userPreferencesRepository: UserPreferencesRepository // Hilt provides this
 ) : ViewModel() {
-
-    /****** VIEW MODEL CONSTRUCTOR *****/
-
-    companion object {
-        val factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as DruidNetApplication)
-                PlantSheetViewModel(
-                    this.createSavedStateHandle(),
-                    application.plantsRepository,
-                    application.userPreferencesRepository
-                )
-            }
-        }
-    }
 
     /***** Local vars *****/
 
-    private val plantArg: String = checkNotNull(savedStatedHandle[PlantSheetDestination.plantArg])
+    private val plantArg: String = checkNotNull(savedStateHandle[PlantSheetDestination.plantArg])
     private val plantLatinName = plantArg.replace('_', ' ')
 
     private val preferencesState: StateFlow<PreferencesState> =
