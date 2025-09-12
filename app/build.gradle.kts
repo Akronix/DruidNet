@@ -110,7 +110,7 @@ dependencies {
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
 
     // WorkManager dependency
-    implementation("androidx.work:work-runtime-ktx:2.10.4")
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Coil
 //    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
