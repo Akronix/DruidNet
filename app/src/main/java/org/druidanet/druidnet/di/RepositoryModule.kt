@@ -21,6 +21,7 @@ import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.network.BackendApiService
 import org.druidanet.druidnet.network.BackendScalarApiService
+import org.druidanet.druidnet.workmanager.WorkManagerRepository
 import javax.inject.Singleton
 
 @Module
@@ -81,5 +82,14 @@ object RepositoryModule {
         // Assuming BibliographyRepository constructor takes BackendApiService and BibliographyDAO
         return BibliographyRepository(backendApiService)
     }
+
+    @Provides
+    @Singleton
+    fun provideWorkManagerRepository(
+        @ApplicationContext context: Context
+    ): WorkManagerRepository {
+        return WorkManagerRepository(context)
+    }
+
 }
 

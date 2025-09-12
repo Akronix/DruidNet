@@ -1,16 +1,8 @@
 package org.druidanet.druidnet.ui
 
-// import androidx.lifecycle.ViewModelProvider // REMOVED
-// import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY // REMOVED
-// import androidx.lifecycle.viewmodel.initializer // REMOVED
-// import androidx.lifecycle.viewmodel.viewModelFactory // REMOVED
-// import androidx.room.RoomDatabase // REMOVED (or change to AppDatabase if it's the specific type needed elsewhere)
-// import org.druidanet.druidnet.DruidNetApplication // REMOVED
-import android.util.Log
-import androidx.compose.material3.SnackbarHostState
+import android.util.Log // Keep Log for potential future use or if other methods use it
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.withTransaction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerializationException
 import org.druidanet.druidnet.data.AppDatabase
 import org.druidanet.druidnet.data.DocumentsRepository
 import org.druidanet.druidnet.data.DruidNetUiState
@@ -31,8 +22,6 @@ import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
-import org.druidanet.druidnet.data.bibliography.BibliographyRepository
-import org.druidanet.druidnet.data.images.ImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantData
 import org.druidanet.druidnet.data.plant.PlantsRepository
@@ -42,25 +31,23 @@ import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.Usage
-import org.druidanet.druidnet.network.BackendApiService
 import org.druidanet.druidnet.utils.mergeOrderedLists
-import java.io.IOException
-import java.net.UnknownHostException
+import org.druidanet.druidnet.workmanager.WorkManagerRepository // Added this import
 import java.text.Collator
 import java.util.Locale
 import javax.inject.Inject
 
-@HiltViewModel // ADDED
-class DruidNetViewModel @Inject constructor( // ADDED @Inject
+// WorkManager related imports are removed as they are now encapsulated in WorkManagerRepository
+
+@HiltViewModel
+class DruidNetViewModel @Inject constructor(
     private val plantDao: PlantDAO,
     private val biblioDao: BibliographyDAO,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val plantsRepository: PlantsRepository,
-    private val biblioRepository: BibliographyRepository,
-    private val imagesRepository: ImagesRepository,
     private val documentsRepository: DocumentsRepository,
-    private val appDatabase: AppDatabase, // CHANGED from roomDatabase: RoomDatabase
-    private val backendApiService: BackendApiService // ADDED
+    private val appDatabase: AppDatabase,
+    private val workManagerRepository: WorkManagerRepository // Changed from workManager to workManagerRepository
 ) : ViewModel() {
 
     /****** STATE VARIABLES *****/
@@ -93,96 +80,20 @@ class DruidNetViewModel @Inject constructor( // ADDED @Inject
     /****** USER INTERACTION (UI) FUNCTIONS *****/
 
     /****** NETWORK FUNCTIONS *****/
-    fun checkAndUpdateDatabase(snackbarHost: SnackbarHostState) {
-        viewModelScope.launch {
-            try {
-                /* TO RETHINK ALL THIS CODE */
-                val currentDBVersion: Long = userPreferencesRepository.getDatabaseVersion.first()
-                // Use injected backendApiService instead of BackendApi.retrofitService
-                val res = backendApiService.getLastUpdate()
-                Log.i(
-                    "DruidNet",
-                    "Checking new versions of the database...Last update: ${res.versionDB}. Current version: $currentDBVersion"
-                )
-
-                // If current version older than new update version:
-                if (res.versionDB > currentDBVersion) {
-
-                    snackbarHost.showSnackbar("Descargando actualización de la base de datos...")
-
-                    //  1. Download all plants and bibliography entries
-                    val data = plantsRepository.fetchPlantData()
-                    val biblio = biblioRepository.getBiblioData()
-                    Log.i("DruidNet", "Downloaded ${biblio.size} bibliography entries")
-
-                    //  2. Download images
-                    val imageList = res.images
-                    Log.i("DruidNet", "Downloading images:\n $imageList")
-                    imagesRepository.fetchImages(imageList)
-
-                    // 3. Download credits.md
-                    documentsRepository.downloadCreditsMd()
-
-                    // (The next two steps, ideally, would be done in one atomic transaction)
-//                 withContext(Dispatchers.IO) {
-                    appDatabase.withTransaction { // MODIFIED: Use injected appDatabase
-
-                        //  3. Delete all data in localdb
-                        clearDB()
-                        //  4. Substitute new data in localdb
-                        plantDao.populatePlants(data.plants)
-                        plantDao.populateConfusions(data.confusions)
-                        plantDao.populateNames(data.names)
-                        plantDao.populateUsages(data.usages)
-                        biblioDao.populateData(biblio)
-                    }
-                    userPreferencesRepository.updateDatabaseVersion(res.versionDB)
-                    snackbarHost.showSnackbar("¡Base de datos actualizada con éxito!")
-                    Log.i("DruidNet", "Database updated!")
-                } else {
-                    Log.i("DruidNet", "La base de datos está al día.")
-                }
-
-                if (res.versionRecommendations > userPreferencesRepository.getRecommendationsVersion.first()) {
-                    Log.i("DruidNet", "Downloading recommendations...")
-                    snackbarHost.showSnackbar("Actualizando texto de recomendaciones...")
-                    if (documentsRepository.downloadRecommendationsMd()) {
-                        userPreferencesRepository.updateVersion(
-                            "recommendations",
-                            res.versionRecommendations)
-                        Log.i("DruidNet", "Recommendations updated!")
-                    }
-
-                }
-                if (res.versionGlossary > userPreferencesRepository.getGlossaryVersion.first()) {
-                    Log.i("DruidNet", "Downloading glossary...")
-                    snackbarHost.showSnackbar("Actualizando glosario...")
-                    if (documentsRepository.downloadGlossaryMd()) {
-                        userPreferencesRepository.updateVersion(
-                            "glossary",
-                            res.versionGlossary
-                        )
-                        Log.i("DruidNet", "Glossary updated!")
-                    }
-
-                }
-
-
-            } catch (e: SerializationException) {
-                Log.e("DruidNet", "Serialization Error: ${e.message}", e)
-                snackbarHost.showSnackbar("Error procesando los datos de descarga")
-            } catch (e: UnknownHostException) {
-                Log.e("DruidNet", "No internet connection.", e)
-            } catch (e: IOException) {
-                Log.e("DruidNet", "IO Error: ${e.message}", e)
-                snackbarHost.showSnackbar("Error actualizando la base de datos")
-            }
-        }
+    fun checkAndUpdateDatabase() {
+        Log.i("DruidNetViewModel", "Requesting database update via WorkManagerRepository.")
+        workManagerRepository.startDatabaseUpdateWork()
+        // The detailed WorkManager logic (creating request, constraints, enqueueing)
+        // is now handled within WorkManagerRepository.
+        // You can still observe the work status via LiveData from WorkManagerRepository if needed:
+        // For example, if WorkManagerRepository exposes LiveData<WorkInfo>
+        // val workInfoLiveData = workManagerRepository.getDatabaseUpdateWorkInfo()
+        // workInfoLiveData.observe(lifecycleOwner, { workInfo -> ... update UI ... })
     }
 
     /****** DATABASE FUNCTIONS *****/
 
-    fun getPlantsFilteredByName(queryName: String) : Flow<List<PlantCard>> {
+    fun getPlantsFilteredByName(queryName: String): Flow<List<PlantCard>> {
         return if (queryName.isNotEmpty()) plantsRepository.searchPlantsByName(
             name = queryName,
             originalListPlants = allPlantsFlow
@@ -259,7 +170,8 @@ class DruidNetViewModel @Inject constructor( // ADDED @Inject
     fun getBibliography(): Flow<List<BibliographyEntity>> =
         biblioDao.getAllBibliographyEntries()
 
-    fun clearDB() = appDatabase.clearAllTables() // If AppDatabase doesn't have this, adjust to appDatabase.runInTransaction { plantDao.clear(); biblioDao.clear(); ... }
+    fun clearDB() =
+        appDatabase.clearAllTables() // If AppDatabase doesn't have this, adjust to appDatabase.runInTransaction { plantDao.clear(); biblioDao.clear(); ... }
 
 
     /****** USER PREFERENCES FUNCTIONS *****/
@@ -278,7 +190,6 @@ class DruidNetViewModel @Inject constructor( // ADDED @Inject
             LANGUAGE_APP = language
             allPlantsFlow = getAllPlants(language)
         }
-
     }
 
     fun getDisplayNameLanguage(): LanguageEnum = LANGUAGE_APP /* It should use userPreferencesRepository.getDisplayNameLanguagePreference ??
@@ -313,34 +224,29 @@ class DruidNetViewModel @Inject constructor( // ADDED @Inject
 //    }
 
 }
-    /****** OTHERS - HELPER FUNCTIONS *****/
 
-    fun PlantData.toPlant(displayName: String): Plant =
-        Plant(
-            plantId = p.plantId,
-            latinName = p.latinName,
+/****** OTHERS - HELPER FUNCTIONS *****/
 
-            commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
-
-            displayName = displayName,
-
-            usages = usages
-                .map { Usage(it.type, it.subType, it.text) }
-                .groupBy { it.type },
-            family = p.family,
-
-            toxic = p.toxic,
-            toxic_text = p.toxicText,
-
-            description = p.description,
-            habitat = p.habitat,
-            phenology = p.phenology,
-            distribution = p.distribution,
-            confusions = confusions.map {
-                Confusion(it.latinName, it.text, it.imagePath, it.captionText)
-            }.toTypedArray(),
-            observations = p.observations,
-            curiosities = p.curiosities,
-
-            imagePath = p.imagePath
-        )
+fun PlantData.toPlant(displayName: String): Plant =
+    Plant(
+        plantId = p.plantId,
+        latinName = p.latinName,
+        commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
+        displayName = displayName,
+        usages = usages
+            .map { Usage(it.type, it.subType, it.text) }
+            .groupBy { it.type },
+        family = p.family,
+        toxic = p.toxic,
+        toxic_text = p.toxicText,
+        description = p.description,
+        habitat = p.habitat,
+        phenology = p.phenology,
+        distribution = p.distribution,
+        confusions = confusions.map {
+            Confusion(it.latinName, it.text, it.imagePath, it.captionText)
+        }.toTypedArray(),
+        observations = p.observations,
+        curiosities = p.curiosities,
+        imagePath = p.imagePath
+    )

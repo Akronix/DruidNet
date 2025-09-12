@@ -119,7 +119,7 @@ fun DruidNetApp(
         if (justStartedApp) {
             LaunchedEffect(Unit) {
                 justStartedApp = false
-                viewModel.checkAndUpdateDatabase(snackbarHost = snackbarHostState)
+                viewModel.checkAndUpdateDatabase()
             }
         }
 

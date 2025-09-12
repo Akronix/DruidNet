@@ -110,7 +110,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     // WorkManager dependency
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.4")
 
     // Coil
 //    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
