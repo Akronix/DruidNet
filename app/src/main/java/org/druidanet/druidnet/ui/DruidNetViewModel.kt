@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui
 
-import android.content.res.AssetManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -188,7 +187,7 @@ class DruidNetViewModel @Inject constructor(
                             )
                         },
                         compareBy = compareBy(
-                            Collator.getInstance(Locale("es", "ES"))
+                            Collator.getInstance(Locale.Builder().setLanguage("es").setRegion("ES").build())
                         ) { it.displayName }
                     )
             }
@@ -276,27 +275,22 @@ class DruidNetViewModel @Inject constructor(
         Plant(
             plantId = p.plantId,
             latinName = p.latinName,
-
-fun PlantData.toPlant(displayName: String): Plant =
-    Plant(
-        plantId = p.plantId,
-        latinName = p.latinName,
-        commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
-        displayName = displayName,
-        usages = usages
-            .map { Usage(it.type, it.subType, it.text) }
-            .groupBy { it.type },
-        family = p.family,
-        toxic = p.toxic,
-        toxic_text = p.toxicText,
-        description = p.description,
-        habitat = p.habitat,
-        phenology = p.phenology,
-        distribution = p.distribution,
-        confusions = confusions.map {
-            Confusion(it.latinName, it.text, it.imagePath, it.captionText)
-        }.toTypedArray(),
-        observations = p.observations,
-        curiosities = p.curiosities,
-        imagePath = p.imagePath
-    )
+            commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
+            displayName = displayName,
+            usages = usages
+                .map { Usage(it.type, it.subType, it.text) }
+                .groupBy { it.type },
+            family = p.family,
+            toxic = p.toxic,
+            toxic_text = p.toxicText,
+            description = p.description,
+            habitat = p.habitat,
+            phenology = p.phenology,
+            distribution = p.distribution,
+            confusions = confusions.map {
+                Confusion(it.latinName, it.text, it.imagePath, it.captionText)
+            }.toTypedArray(),
+            observations = p.observations,
+            curiosities = p.curiosities,
+            imagePath = p.imagePath
+        )
