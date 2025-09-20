@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
@@ -37,8 +38,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -188,6 +192,7 @@ fun DruidNetAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     topBarIconPath: Int? = null,
+    thumbnail: ImageBitmap? = null,
     topBarColor: Color = Color.Unspecified,
     onActionClick: () -> Unit = {},
     actionIconContentDescription: String? = null,
@@ -207,7 +212,17 @@ fun DruidNetAppBar(
                                 painter = painterResource(topBarIconPath),
                                 contentDescription = null
                             )
-                        }
+                        } else if (thumbnail != null) {
+                                Image(
+                                    bitmap = thumbnail,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(dimensionResource(id = R.dimen.bar_image_size))
+                                        .padding(dimensionResource(id = R.dimen.padding_small))
+                                        .clip(CircleShape)
+                                )
+                            }
 
                         Text(
                             text = topBarTitle,

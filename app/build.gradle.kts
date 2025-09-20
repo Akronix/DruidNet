@@ -102,6 +102,9 @@ android {
 
 dependencies {
 
+    //Image manipulation
+    implementation(libs.androidx.compose.ui)
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

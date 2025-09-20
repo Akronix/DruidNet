@@ -47,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -59,7 +58,6 @@ import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.model.Confusion
-import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.assetsToBitmap
@@ -90,11 +88,19 @@ fun PlantSheetScreen(
 
     val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
 
+    val context = LocalContext.current
+
     if (isPlantInDatabase && plant != null) {
+
+        val plantImageBitmap = remember(plant.plantId, context) {
+            plant.let { context.assetsToBitmap(it.imagePath) }
+        }
+
         Scaffold(
             topBar = {DruidNetAppBar(
                 navigateUp = navigateBack,
-                topBarTitle = plant.displayName
+                topBarTitle = plant.displayName,
+                thumbnail = plantImageBitmap
             )},
             bottomBar = PlantSheetBottomBar(
                 onClickBottomNavItem = onChangeSection,
@@ -116,6 +122,7 @@ fun PlantSheetScreen(
                 plant = plant,
                 currentSection,
                 onChangeSection,
+                plantImageBitmap = plantImageBitmap,
                 modifier = modifier.padding(padding)
             )
         }
@@ -202,6 +209,7 @@ fun PlantSheetBody(
     plant: Plant,
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
+    plantImageBitmap: ImageBitmap,
     modifier: Modifier = Modifier
 ) {
 
@@ -211,6 +219,7 @@ fun PlantSheetBody(
             PlantSheetSection.DESCRIPTION -> PlantSheetDescription(
                 plant,
                 onChangeSection(PlantSheetSection.USAGES),
+                imageBitmap = plantImageBitmap,
                 modifier.verticalScroll(rememberScrollState())
             )
 
@@ -228,9 +237,11 @@ fun PlantSheetBody(
 }
 
 @Composable
-fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier: Modifier) {
+fun PlantSheetDescription(plant: Plant,
+                          onClickShowUsages: () -> Unit,
+                          imageBitmap: ImageBitmap,
+                          modifier: Modifier) {
 //    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
-    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
 
     Column (
         modifier = modifier
@@ -561,64 +572,64 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
     }
 }
 
-@Preview
-@Composable
-fun PlantSheetDescriptionPreview() {
-    val plant = Plant(
-        plantId = 1,
-        displayName = "Rose",
-        latinName = "Rosa L.",
-        imagePath = "images/rosa_l.webp", // Replace with a valid image path in your assets
-        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
-        description = "A beautiful flowering plant.",
-        habitat = "Gardens and wild areas.",
-        distribution = "Worldwide.",
-        phenology = "Blooms in summer.",
-        observations = "Known for its thorns.",
-        curiosities = "Symbol of love.",
-        usages = emptyMap(),
-        family = "Rosaceae",
-        confusions = emptyArray()
-    )
-    PlantSheetDescription(plant = plant, onClickShowUsages = {}, modifier = Modifier.fillMaxSize())
-}
-
-@Preview
-@Composable
-fun PlantSheetConfusionsPreview() {
-    val plant = Plant(
-        plantId = 1,
-        displayName = "Rose",
-        latinName = "Rosa L.",
-        imagePath = "images/rosa_l.webp",
-        commonNames = emptyArray(),
-        description = "",
-        habitat = "",
-        distribution = "",
-        phenology = "",
-        usages = emptyMap(),
-        family = "",
-        confusions = arrayOf(
-            Confusion(latinName = "Rubus L.", text = "Similar leaves but different flowers.")
-        )
-    )
-    PlantSheetConfusions(plant = plant, modifier = Modifier.fillMaxSize())
-}
-
-@Preview
-@Composable
-fun PlantSheetUsagesPreview() {
-    val plant = Plant(
-        plantId = 1,
-        displayName = "Rose",
-        latinName = "Rosa L.",
-        imagePath = "images/rosa_l.webp",
-        commonNames = emptyArray(),
-        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
-        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
-        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
-    PlantSheetUsages(plant = plant, modifier = Modifier.fillMaxSize())
-}
+//@Preview
+//@Composable
+//fun PlantSheetDescriptionPreview() {
+//    val plant = Plant(
+//        plantId = 1,
+//        displayName = "Rose",
+//        latinName = "Rosa L.",
+//        imagePath = "images/rosa_l.webp", // Replace with a valid image path in your assets
+//        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
+//        description = "A beautiful flowering plant.",
+//        habitat = "Gardens and wild areas.",
+//        distribution = "Worldwide.",
+//        phenology = "Blooms in summer.",
+//        observations = "Known for its thorns.",
+//        curiosities = "Symbol of love.",
+//        usages = emptyMap(),
+//        family = "Rosaceae",
+//        confusions = emptyArray()
+//    )
+//    PlantSheetDescription(plant = plant, onClickShowUsages = {}, modifier = Modifier.fillMaxSize())
+//}
+//
+//@Preview
+//@Composable
+//fun PlantSheetConfusionsPreview() {
+//    val plant = Plant(
+//        plantId = 1,
+//        displayName = "Rose",
+//        latinName = "Rosa L.",
+//        imagePath = "images/rosa_l.webp",
+//        commonNames = emptyArray(),
+//        description = "",
+//        habitat = "",
+//        distribution = "",
+//        phenology = "",
+//        usages = emptyMap(),
+//        family = "",
+//        confusions = arrayOf(
+//            Confusion(latinName = "Rubus L.", text = "Similar leaves but different flowers.")
+//        )
+//    )
+//    PlantSheetConfusions(plant = plant, modifier = Modifier.fillMaxSize())
+//}
+//
+//@Preview
+//@Composable
+//fun PlantSheetUsagesPreview() {
+//    val plant = Plant(
+//        plantId = 1,
+//        displayName = "Rose",
+//        latinName = "Rosa L.",
+//        imagePath = "images/rosa_l.webp",
+//        commonNames = emptyArray(),
+//        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
+//        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
+//        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
+//    PlantSheetUsages(plant = plant, modifier = Modifier.fillMaxSize())
+//}
 
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.

@@ -2,7 +2,6 @@ package org.druidanet.druidnet.ui.plant_sheet
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -11,7 +10,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,10 +18,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.data.plant.PlantsDataSource
-import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -131,25 +126,25 @@ fun SectionBadgedButton(rowScope: RowScope,
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
  */
-@Preview(showBackground = true)
-@Composable
-fun PlantSheetBottomBarPreview() {
-    val samplePlant = PlantsDataSource.loadPlants()[0]
-
-    DruidNetTheme {
-        Scaffold(
-            bottomBar = PlantSheetBottomBar(
-                onClickBottomNavItem = { _ -> { } },
-                currentSection = PlantSheetSection.USAGES,
-                hasConfusions = samplePlant.confusions.isNotEmpty()
-            ),
-        ) {
-            PlantSheetBody(
-                plant = samplePlant,
-                currentSection = PlantSheetSection.USAGES,
-                onChangeSection = { { } },
-                modifier = Modifier.padding(it)
-            )
-        }
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PlantSheetBottomBarPreview() {
+//    val samplePlant = PlantsDataSource.loadPlants()[0]
+//
+//    DruidNetTheme {
+//        Scaffold(
+//            bottomBar = PlantSheetBottomBar(
+//                onClickBottomNavItem = { _ -> { } },
+//                currentSection = PlantSheetSection.USAGES,
+//                hasConfusions = samplePlant.confusions.isNotEmpty()
+//            ),
+//        ) {
+//            PlantSheetBody(
+//                plant = samplePlant,
+//                currentSection = PlantSheetSection.USAGES,
+//                onChangeSection = { { } },
+//                modifier = Modifier.padding(it),
+//            )
+//        }
+//    }
+//}
