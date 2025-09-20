@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -58,6 +59,7 @@ import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.model.Confusion
+import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.assetsToBitmap
@@ -316,7 +318,7 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
                     typography = markdownTypography(text = MaterialTheme.typography.bodyMedium))
             }
 
-            if (plant.observations != null) {
+            if (!plant.observations.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.padding(
                     dimensionResource(id = R.dimen.space_between_sections)
                 ))
@@ -328,7 +330,7 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
                 }
             }
 
-            if (plant.curiosities != null) {
+            if (!plant.curiosities.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.padding(
                     dimensionResource(id = R.dimen.space_between_sections)
                 ))
@@ -352,7 +354,7 @@ fun PlantSheetDescription(plant: Plant, onClickShowUsages: () -> Unit, modifier:
             )
             {
                 Text(
-                    "Ver USOS ",
+                    "Ver Usos ",
                     style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp),
                     textDecoration = TextDecoration.Underline,
                 )
@@ -559,6 +561,64 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
     }
 }
 
+@Preview
+@Composable
+fun PlantSheetDescriptionPreview() {
+    val plant = Plant(
+        plantId = 1,
+        displayName = "Rose",
+        latinName = "Rosa L.",
+        imagePath = "images/rosa_l.webp", // Replace with a valid image path in your assets
+        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
+        description = "A beautiful flowering plant.",
+        habitat = "Gardens and wild areas.",
+        distribution = "Worldwide.",
+        phenology = "Blooms in summer.",
+        observations = "Known for its thorns.",
+        curiosities = "Symbol of love.",
+        usages = emptyMap(),
+        family = "Rosaceae",
+        confusions = emptyArray()
+    )
+    PlantSheetDescription(plant = plant, onClickShowUsages = {}, modifier = Modifier.fillMaxSize())
+}
+
+@Preview
+@Composable
+fun PlantSheetConfusionsPreview() {
+    val plant = Plant(
+        plantId = 1,
+        displayName = "Rose",
+        latinName = "Rosa L.",
+        imagePath = "images/rosa_l.webp",
+        commonNames = emptyArray(),
+        description = "",
+        habitat = "",
+        distribution = "",
+        phenology = "",
+        usages = emptyMap(),
+        family = "",
+        confusions = arrayOf(
+            Confusion(latinName = "Rubus L.", text = "Similar leaves but different flowers.")
+        )
+    )
+    PlantSheetConfusions(plant = plant, modifier = Modifier.fillMaxSize())
+}
+
+@Preview
+@Composable
+fun PlantSheetUsagesPreview() {
+    val plant = Plant(
+        plantId = 1,
+        displayName = "Rose",
+        latinName = "Rosa L.",
+        imagePath = "images/rosa_l.webp",
+        commonNames = emptyArray(),
+        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
+        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
+        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
+    PlantSheetUsages(plant = plant, modifier = Modifier.fillMaxSize())
+}
 
 /**
  * Composable that displays what the UI of the app looks like in light theme in the design tab.
