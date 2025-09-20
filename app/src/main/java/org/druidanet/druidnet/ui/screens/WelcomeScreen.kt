@@ -84,6 +84,14 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 )
                 Spacer(modifier = Modifier.height(48.dp))
                 Button(
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                ) {
+                    Text("\uD83D\uDCF7\uFE0F " + stringResource(R.string.greetings_identifier_btn),
+                        style = MaterialTheme.typography.labelMedium)
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
                     onClick = { onNavigationButtonClick(CatalogDestination) },
                     modifier = Modifier.fillMaxWidth().height(48.dp)
                 ) {
@@ -122,15 +130,6 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-//            Text("Próximamente:",
-//                color = Color.DarkGray)
-//            Button(
-//                onClick = {},
-//                modifier = Modifier.fillMaxWidth(),
-//                enabled = false
-//            ) {
-//                Text("🔮 " + stringResource(R.string.greetings_identifier_btn))
-//            }
             }
         }
     }
