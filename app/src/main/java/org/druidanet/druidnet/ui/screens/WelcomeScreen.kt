@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,15 +86,28 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 Spacer(modifier = Modifier.height(48.dp))
                 Button(
                     onClick = {},
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary),
+                        modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
                 ) {
-                    Text("\uD83D\uDCF7\uFE0F " + stringResource(R.string.greetings_identifier_btn),
-                        style = MaterialTheme.typography.labelMedium)
+                    Text("\uD83D\uDCF7 ",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom=3.dp)
+                    )
+                    Text(
+                        stringResource(R.string.greetings_identifier_btn),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { onNavigationButtonClick(CatalogDestination) },
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
                 ) {
                     Text(
                         "\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn),
@@ -104,29 +118,30 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
 
                 // Bottom buttons
 
-                Button(
-                    onClick = { onNavigationButtonClick(RecommendationsDestination) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
+                Text(
+                    "\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.secondary, // Link color
                     ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        "\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
-                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp)
-                    )
-                }
+                    textDecoration = TextDecoration.Underline,
+                    textAlign = TextAlign.Center, // Center the text,
+                    modifier = Modifier.clickable { onNavigationButtonClick(RecommendationsDestination) }
+                        .padding(10.dp)
+                        .fillMaxWidth()
+                )
+
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(
-                    onClick = { onNavigationButtonClick(GlossaryDestination) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
+
+                Text("\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.secondary, // Link color
                     ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
-                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp))
-                }
+                    textDecoration = TextDecoration.Underline,
+                    textAlign = TextAlign.Center, // Center the text,
+                    modifier = Modifier.clickable { onNavigationButtonClick(GlossaryDestination) }
+                        .padding(10.dp)
+
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
