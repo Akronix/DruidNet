@@ -164,7 +164,7 @@ fun SwitchLanguageDialog(viewModel: DruidNetViewModel, closeDialog: () -> Unit) 
             }
         },
         onDismissRequest = {
-            // Close dialog
+            viewModel.setLanguage(selectedLanguage)
             closeDialog()
         },
         title = {
