@@ -474,8 +474,11 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
 
         for (type in usagesTypes) {
             Text(stringResource(type.displayText),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 5.dp)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(bottom = 5.dp),
+                color = MaterialTheme.colorScheme.primary,
             )
 
             plant.usages[type]?.forEach {
