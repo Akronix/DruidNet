@@ -1,7 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -97,11 +97,11 @@ fun PlantSheetScreen(
         }
 
         Scaffold(
-            topBar = {DruidNetAppBar(
+            topBar = { DruidNetAppBar(
                 navigateUp = navigateBack,
                 topBarTitle = plant.displayName,
                 thumbnail = plantImageBitmap
-            )},
+            ) },
             bottomBar = PlantSheetBottomBar(
                 onClickBottomNavItem = onChangeSection,
                 currentSection = plantSheetUiState.currentSection,
@@ -357,26 +357,25 @@ fun PlantSheetDescription(plant: Plant,
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
 
-            Row (
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable(onClick = onClickShowUsages)
-                    .padding(bottom = 10.dp)
+            ShowUsagesButton(onClickShowUsages)
 
-            )
-            {
-                Text(
-                    "Ver Usos ",
-                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp),
-                    textDecoration = TextDecoration.Underline,
-                )
-                Icon(
-                    painter = painterResource(R.drawable.indian_arrow),
-                    contentDescription = null,
-                    modifier = Modifier.height(28.dp)
-                )
-            }
-
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
         }
+    }
+}
+
+@Composable
+fun ShowUsagesButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+    ) {
+        Icon( painterResource(R.drawable.usages),
+            "Botón usos",
+            modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
+            )
+        Text(text = "Ver Usos")
     }
 }
 
