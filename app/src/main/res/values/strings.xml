@@ -41,4 +41,5 @@
     <string name="feature_search_title">Buscar por nombre</string>
     <string name="feature_search_clear_search_text_content_desc">Limpiar búsqueda</string>
     <string name="feature_search_textfield">Nombre común o científico</string>
+    <string name="title_screen_identify">Posibles identificaciones</string>
 </resources>

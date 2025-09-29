@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.navigation.AboutDestination
+import org.druidanet.druidnet.navigation.CameraDestination
 import org.druidanet.druidnet.navigation.CatalogDestination
 import org.druidanet.druidnet.navigation.GlossaryDestination
 import org.druidanet.druidnet.navigation.NavigationDestination
@@ -85,7 +86,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 )
                 Spacer(modifier = Modifier.height(48.dp))
                 Button(
-                    onClick = {},
+                    onClick = {onNavigationButtonClick(CameraDestination)},
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.tertiary),
                         modifier = Modifier

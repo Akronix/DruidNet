@@ -23,6 +23,8 @@ import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.DruidNetViewModel
+import org.druidanet.druidnet.ui.identify.CameraScreen
+import org.druidanet.druidnet.ui.identify.IdentifyScreen
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
@@ -36,6 +38,18 @@ object WelcomeDestination : NavigationDestination() {
     override val route = "welcome"
     override val title = R.string.app_name
     override val hasTopBar = false
+}
+
+object CameraDestination : NavigationDestination() {
+    override val route = "camera"
+    override val title = R.string.app_name
+    override val hasTopBar = false
+}
+
+object IdentifyDestination : NavigationDestination() {
+    override val route = "identify"
+    override val title = R.string.title_screen_identify
+    override val hasTopBar = true
 }
 
 object CatalogDestination : NavigationDestination() {
@@ -133,6 +147,14 @@ fun DruidNetNavHost(
                     .padding(innerPadding)
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center)
+            )
+        }
+        composable( route = CameraDestination.route) {
+            CameraScreen()
+        }
+        composable( route = IdentifyDestination.route) {
+            IdentifyScreen(modifier = Modifier
+                .fillMaxSize()
             )
         }
         composable(route = CatalogDestination.route) {
