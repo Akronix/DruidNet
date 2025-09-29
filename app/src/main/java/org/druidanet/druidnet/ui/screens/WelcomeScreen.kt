@@ -114,9 +114,11 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f)) // This spacer pushes everything below it downwards
 
-                // Bottom buttons
+                Spacer(modifier = Modifier.height(24.dp)) // Ensures minimum space before the links
+
+                // Bottom link buttons
 
                 Text(
                     "\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
