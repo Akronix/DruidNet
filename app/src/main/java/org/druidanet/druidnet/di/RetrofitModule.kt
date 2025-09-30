@@ -7,9 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.druidanet.druidnet.BuildConfig
 import org.druidanet.druidnet.network.BackendApiService
 import org.druidanet.druidnet.network.BackendScalarApiService
 import org.druidanet.druidnet.network.PlantNetApiService
@@ -27,8 +29,31 @@ object RetrofitModule {
 
     @Provides
     @Singleton
+    @Named("GENERIC_OKHTTP")
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("PLANTNET_OKHTTP")
+    fun providePlantNetOkHttpClient(): OkHttpClient {
+        val apiKeyInterceptor = Interceptor { chain ->
+            val original = chain.request()
+            val originalHttpUrl = original.url
+
+            val url = originalHttpUrl.newBuilder()
+                .addQueryParameter("api-key", BuildConfig.PLANTNET_API_KEY)
+                .build()
+
+            val requestBuilder = original.newBuilder().url(url)
+            val request = requestBuilder.build()
+            chain.proceed(request)
+        }
+
+        return OkHttpClient.Builder()
+            .addInterceptor(apiKeyInterceptor)
             .addInterceptor(provideHttpLoggingInterceptor())
             .build()
     }
@@ -36,7 +61,7 @@ object RetrofitModule {
     @Provides
     @Singleton
     @Named("RETROFIT_JSON")
-    fun provideJsonRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideJsonRetrofit(@Named("GENERIC_OKHTTP") okHttpClient: OkHttpClient): Retrofit {
         val contentType = "application/json".toMediaType()
         val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
@@ -55,7 +80,7 @@ object RetrofitModule {
     @Provides
     @Singleton
     @Named("RETROFIT_SCALAR")
-    fun provideScalarRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideScalarRetrofit(@Named("GENERIC_OKHTTP") okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -75,11 +100,6 @@ object RetrofitModule {
                 Log.d("OkHttp", message) // Log messages with "OkHttp" tag at DEBUG level
             }
         })
-        // Set the desired log level.
-        // Level.BASIC logs request method, URL, and response status code.
-        // Level.BODY logs headers and body for both requests and responses (very detailed).
-        // Level.HEADERS logs only headers.
-        // Level.NONE logs nothing (default).
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC)
         return loggingInterceptor
     }
@@ -87,7 +107,7 @@ object RetrofitModule {
      @Provides
      @Singleton
      @Named("RETROFIT_PLANTNET")
-     fun providePlantNetRetrofit(okHttpClient: OkHttpClient): Retrofit {
+     fun providePlantNetRetrofit(@Named("PLANTNET_OKHTTP") okHttpClient: OkHttpClient): Retrofit {
          val contentType = "application/json".toMediaType()
          val json = Json { ignoreUnknownKeys = true }
          return Retrofit.Builder()

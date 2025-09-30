@@ -6,13 +6,11 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
-const val API_KEY = "2b10q4kfKkhG4Xwr0uBYzRNwYu"
-
 // Retrofit interface
 interface PlantNetApiService {
 
     @Multipart
-    @POST("identify/k-southwestern-europe?include-related-images=true&no-reject=false&nb-results=10&lang=es&type=kt&api-key=$API_KEY")
+    @POST("identify/k-southwestern-europe?include-related-images=true&no-reject=false&nb-results=10&lang=es&type=kt")
     suspend fun plantIdentify(
         @Part images: MultipartBody.Part, // Represents the images file part
         @Part("organs") organs: RequestBody    // Represents the 'organs' text part

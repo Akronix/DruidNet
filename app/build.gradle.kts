@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     kotlin("plugin.serialization") version "1.9.10"
     alias(libs.plugins.android.application)
@@ -23,6 +25,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val plantNetApiKey = localProperties.getProperty("PLANTNET_API_KEY", "")
+        buildConfigField("String", "PLANTNET_API_KEY", "\"$plantNetApiKey\"")
 
     }
 
@@ -85,6 +95,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
