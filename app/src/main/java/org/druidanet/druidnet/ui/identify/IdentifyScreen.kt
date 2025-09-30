@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -38,7 +39,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
@@ -47,9 +50,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantNetResponse
 import org.druidanet.druidnet.network.PlantResult
@@ -86,8 +91,15 @@ fun SuccessScreen(
         )
 
         Column (
-            modifier = Modifier.weight(1f)
-        ){
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    top = 0.dp,
+                    start = 10.dp,
+                    end = 10.dp,
+                    bottom = 20.dp)
+        )
+        {
             SimilarPlants(
                 similarPlants = similarPlants,
                 goToSimilarPlant
@@ -112,6 +124,42 @@ fun MostLikelyPlant(plant: Plant,
                 .padding(0.dp)
                 .zoomable(rememberZoomableState())
         ) {
+
+            Box(
+                Modifier.padding(15.dp)
+                    .align(Alignment.TopEnd)
+                    .zIndex(1f)
+            ) {
+
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+//                    .requiredSize()
+                    .background(Color.Green,CircleShape)
+                    .padding(6.dp),
+                    contentAlignment = Alignment.Center,
+            ) {
+                Column(
+                    modifier = Modifier.padding(6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "${(score.times(100)).toInt() ?: 0}%",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        "Confianza",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+        }
+
+
             Image(
                 contentScale = ContentScale.FillWidth,
 //                bitmap = imageBitmap,
@@ -122,7 +170,9 @@ fun MostLikelyPlant(plant: Plant,
             )
         }
         Column(
-            modifier = Modifier.padding(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
                 top = 20.dp,
                 start = 10.dp,
                 end = 10.dp,
@@ -141,6 +191,33 @@ fun MostLikelyPlant(plant: Plant,
                 fontStyle = Italic,
                 style = MaterialTheme.typography.titleLarge,
             )
+
+            TextButton(onClick = { /* TODO: Navigate to details screen */ }) {
+                Text("Leer más", style = MaterialTheme.typography.labelLarge)
+            }
+
+            if (plant.confusions.isNotEmpty()) {
+                // Possible Confusion Section
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Info, contentDescription = "Info",
+                        tint = MaterialTheme.colorScheme.error )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    val confusionTxt = if (plant.confusions.size == 1) "Hay ${plant.confusions.size} posible confusión" else "Hay ${plant.confusions.size} posibles confusiones"
+                        Text(confusionTxt,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.error)
+                }
+            }
+
+            Button(
+                onClick = { },
+            ) {
+                Icon( painterResource(R.drawable.usages),
+                    "Ir a usos",
+                    modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
+                )
+                Text(text = "Ver Usos")
+            }
 
         }
     }
@@ -366,22 +443,7 @@ fun SimilarPlantCard(plantResult: PlantResult) {
 @Composable
 fun SuccessScreenPreview() {
     // 1. Create a dummy 'Plant' object for the most likely result.
-    val dummyPlant = Plant(
-        plantId = 1,
-        latinName = "Eschscholzia californica",
-        displayName = "Amapola de California",
-        imagePath = "", // This is unused as the Composable uses a painterResource
-        commonNames = arrayOf(),
-        usages = emptyMap(),
-        family = "Papaveraceae",
-        toxic = false,
-        toxic_text = null,
-        description = "Description of the plant.",
-        habitat = "Habitat of the plant.",
-        phenology = "Phenology of the plant.",
-        distribution = "Distribution of the plant.",
-        confusions = arrayOf()
-    )
+    val dummyPlant = PlantsDataSource.loadPlants()[0]
 
     // 2. Create a dummy list of 'PlantResult' for similar plants.
     val dummySpeciesInfo2 = SpeciesInfo(
