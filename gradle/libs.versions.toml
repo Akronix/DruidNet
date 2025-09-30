@@ -28,7 +28,7 @@ roomRuntime = "2.8.0"
 uiTooling = "1.8.3"
 workRuntimeKtx = "2.10.4"
 zoomable = "0.16.0"
-ui = "1.9.1"
+ui = "1.9.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

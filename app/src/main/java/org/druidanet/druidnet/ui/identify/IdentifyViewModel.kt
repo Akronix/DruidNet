@@ -9,12 +9,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.druidanet.druidnet.network.PlantNetApiService
+import org.druidanet.druidnet.network.PlantNetResponse
+import retrofit2.HttpException
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -27,15 +30,21 @@ class IdentifyViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _identificationStatus = MutableStateFlow<String>("")
-    val identificationStatus: StateFlow<String> = _identificationStatus
+    val identificationStatus: StateFlow<String> = _identificationStatus.asStateFlow()
 
-    // Companion object for TAG if you prefer, or just use string literal
+    private val _loading = MutableStateFlow<Boolean>(false)
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    private val _apiResponse = MutableStateFlow<PlantNetResponse?>(null)
+    val apiResponse: StateFlow<PlantNetResponse?> = _apiResponse.asStateFlow()
+
     companion object {
         private const val TAG = "IdentifyViewModel"
     }
 
     fun identify(imageBitmap: Bitmap) {
         viewModelScope.launch {
+            _loading.value = true // Set loading true at the start
             val identifyingMsg = "Identifying..."
             _identificationStatus.value = identifyingMsg
             Log.i(TAG, identifyingMsg)
@@ -56,22 +65,48 @@ class IdentifyViewModel @Inject constructor(
                     )
 
                     val bestMatchName = response.results?.firstOrNull()?.species?.scientificName ?: "Unknown"
-                    val successMsg = "Success: Best match - $bestMatchName. Full response: ${response.toString()}"
+                    val successMsg = "Success: Best match - $bestMatchName."
                     _identificationStatus.value = successMsg
-                    Log.i(TAG, successMsg)
+                    Log.i(TAG, "$successMsg Full response: ${response.toString()}")
+
+                    _apiResponse.value = response
+
                     imageFile.delete()
                 } else {
                     val convertErrorMsg = "Error: Could not convert image to file."
                     _identificationStatus.value = convertErrorMsg
                     Log.i(TAG, convertErrorMsg)
                 }
+            } catch (e: HttpException) {
+                if (e.code() == 404) {
+                    val notFoundMsg = "No identification available for this image."
+                    _identificationStatus.value = notFoundMsg
+                    Log.w(TAG, "$notFoundMsg (HTTP 404)", e)
+                } else {
+                    val httpErrorMsg = "HTTP Error: ${e.code()} - ${e.message()}"
+                    _identificationStatus.value = httpErrorMsg
+                    Log.e(TAG, httpErrorMsg, e)
+                }
+            } catch (e: IOException) {
+                val networkErrorMsg = "Network error: Could not connect to the service. Please check your internet connection."
+                _identificationStatus.value = networkErrorMsg
+                Log.e(TAG, networkErrorMsg, e)
             } catch (e: Exception) {
-                val exceptionMsg = "Error: ${e.message}"
+                val exceptionMsg = "Error: ${e.message ?: "An unexpected error occurred."}"
                 _identificationStatus.value = exceptionMsg
-                Log.e(TAG, exceptionMsg, e) // Log exception with error level and throwable
-                // e.printStackTrace() // Log.e with throwable is generally preferred
+                Log.e(TAG, exceptionMsg, e)
+            } finally {
+                _loading.value = false // Ensure loading is set to false in all cases
             }
         }
+    }
+
+    /**
+     * Call this function from your UI after navigation has been handled
+     * to prevent re-navigation on configuration changes.
+     */
+    fun onNavigationToResultsDone() {
+        _apiResponse.value = null
     }
 
     private fun bitmapToFile(bitmap: Bitmap, fileName: String): File? {
@@ -85,8 +120,7 @@ class IdentifyViewModel @Inject constructor(
             fos.close()
             return file
         } catch (e: IOException) {
-            Log.e(TAG, "Error converting bitmap to file", e) // Also log here
-            // e.printStackTrace()
+            Log.e(TAG, "Error converting bitmap to file", e)
             return null
         }
     }

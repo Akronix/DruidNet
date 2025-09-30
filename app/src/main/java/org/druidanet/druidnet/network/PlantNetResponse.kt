@@ -2,6 +2,9 @@ package org.druidanet.druidnet.network
 
 import kotlinx.serialization.Serializable
 
+// Using @Serializable for potential use with Kotlinx Serialization, which is common.
+// If you use Gson, these annotations are not strictly needed by Gson itself but don't hurt.
+
 @Serializable
 data class PlantNetResponse(
     val query: QueryDetails? = null,
@@ -17,7 +20,7 @@ data class PlantNetResponse(
 @Serializable
 data class QueryDetails(
     val project: String? = null,
-    val images: List<String>? = null,
+    val images: List<String>? = null, // These are image identifiers, not full image objects
     val organs: List<String>? = null,
     val includeRelatedImages: Boolean? = null,
     val noReject: Boolean? = null,
@@ -26,7 +29,7 @@ data class QueryDetails(
 
 @Serializable
 data class PredictedOrgan(
-    val image: String? = null,
+    val image: String? = null, // Image identifier
     val filename: String? = null,
     val organ: String? = null,
     val score: Double? = null
@@ -36,10 +39,9 @@ data class PredictedOrgan(
 data class PlantResult(
     val score: Double? = null,
     val species: SpeciesInfo? = null,
+    val images: List<PlantImage>? = null, // Added this line to include images list
     val gbif: GbifInfo? = null,
     val powo: PowoInfo? = null
-    // Note: The example JSON does not show commonNames or images directly under PlantResult,
-    // they are nested within species or potentially other objects if the API provides them here.
 )
 
 @Serializable
@@ -57,6 +59,29 @@ data class GenusFamilyInfo(
     val scientificNameWithoutAuthor: String? = null,
     val scientificNameAuthorship: String? = null,
     val scientificName: String? = null
+)
+
+@Serializable
+data class PlantImage(
+    val organ: String? = null,
+    val author: String? = null,
+    val license: String? = null,
+    val date: DateInfo? = null,
+    val url: ImageUrls? = null,
+    val citation: String? = null
+)
+
+@Serializable
+data class DateInfo(
+    val timestamp: Long? = null,
+    val string: String? = null
+)
+
+@Serializable
+data class ImageUrls(
+    val o: String? = null, // Original size URL
+    val m: String? = null, // Medium size URL
+    val s: String? = null  // Small size URL
 )
 
 @Serializable

@@ -150,7 +150,7 @@ fun DruidNetNavHost(
             )
         }
         composable( route = CameraDestination.route) {
-            CameraScreen()
+            CameraScreen({ navController.navigate(IdentifyDestination.route) })
         }
         composable( route = IdentifyDestination.route) {
             IdentifyScreen(modifier = Modifier

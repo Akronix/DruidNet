@@ -8,16 +8,24 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun CameraScreen(
+    goToResultsScreen: () -> Unit,
     identifyViewModel: IdentifyViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val loading = identifyViewModel.loading.collectAsState().value
+
+    val apiResponse = identifyViewModel.apiResponse.collectAsState().value
+    val hasAPIResponded = apiResponse != null
+
     // var capturedImageBitmap by remember { mutableStateOf<ImageBitmap?>(null) } // Example if you want to display the image
 
     val takePictureLauncher = rememberLauncherForActivityResult(
@@ -30,11 +38,8 @@ fun CameraScreen(
                 // capturedImageBitmap = imageBitmap.asImageBitmap()
                 // Or send it to a ViewModel, etc.
                 Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show()
+                // Show loading screen
                 identifyViewModel.identify(imageBitmap)
-//                LoadingScreen()
-                // If identify is successful, go to IdentifyScreen
-
-                // Otherwise, show ErrorScreen
             }
         } else {
             // Handle cases where the image capture was not successful or was cancelled.
@@ -56,6 +61,20 @@ fun CameraScreen(
     LaunchedEffect(Unit) {
         dispatchTakePictureIntent()
     }
+
+    LaunchedEffect(hasAPIResponded) {
+        apiResponse?.let { responseData ->
+            goToResultsScreen()
+            identifyViewModel.onNavigationToResultsDone()
+        }
+
+    }
+
+
+    if (loading)
+        LoadingScreen()
+
+    Text(identifyViewModel.identificationStatus.collectAsState().value)
 
 }
 
