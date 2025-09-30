@@ -49,7 +49,6 @@ object CameraDestination : NavigationDestination() {
 object IdentifyDestination : NavigationDestination() {
     override val route = "identify"
     override val title = R.string.title_screen_identify
-    override val hasTopBar = true
 }
 
 object CatalogDestination : NavigationDestination() {
@@ -111,7 +110,9 @@ val screensByRoute : Map<String, NavigationDestination> =
         BibliographyDestination.route to BibliographyDestination,
         CreditsDestination.route to CreditsDestination,
         RecommendationsDestination.route to RecommendationsDestination,
-        GlossaryDestination.route to GlossaryDestination
+        GlossaryDestination.route to GlossaryDestination,
+        IdentifyDestination.route to IdentifyDestination,
+        CameraDestination.route to CameraDestination,
     )
 
 // Before Implementation:
@@ -150,10 +151,13 @@ fun DruidNetNavHost(
             )
         }
         composable( route = CameraDestination.route) {
-            CameraScreen({ navController.navigate(IdentifyDestination.route) })
+            CameraScreen(
+                goToResultsScreen = { navController.navigate(IdentifyDestination.route) }
+            )
         }
         composable( route = IdentifyDestination.route) {
             IdentifyScreen(modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
             )
         }

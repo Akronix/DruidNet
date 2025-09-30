@@ -47,6 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -114,9 +116,16 @@ fun MostLikelyPlant(plant: Plant,
                     score: Float,
                     goToPlantSheet: () -> Unit) {
 //    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
+    val colorConfidence = when (score) {
+        in 0.0..0.5 -> Color.Red
+        in 0.5..0.85 -> Color.Yellow
+        else -> Color.Green
+    }
+
     Column(
         modifier = Modifier
             .padding(0.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Box(
             modifier = Modifier
@@ -135,7 +144,7 @@ fun MostLikelyPlant(plant: Plant,
                 modifier = Modifier
                     .wrapContentSize()
 //                    .requiredSize()
-                    .background(Color.Green,CircleShape)
+                    .background(colorConfidence, CircleShape)
                     .padding(6.dp),
                     contentAlignment = Alignment.Center,
             ) {
@@ -144,7 +153,7 @@ fun MostLikelyPlant(plant: Plant,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "${(score.times(100)).toInt() ?: 0}%",
+                        text = "${(score.times(100)).toInt()}%",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -192,8 +201,26 @@ fun MostLikelyPlant(plant: Plant,
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            TextButton(onClick = { /* TODO: Navigate to details screen */ }) {
-                Text("Leer más", style = MaterialTheme.typography.labelLarge)
+//            Text(
+//                "Familia ${plant.family}",
+//                style = MaterialTheme.typography.bodyMedium,
+//            )
+
+            Text(
+                "${plant.description}",
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            TextButton(
+                onClick = { /* TODO: Navigate to details screen */ },
+                modifier = Modifier.align(Alignment.End),
+            ) {
+                Text("Leer más",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textDecoration = TextDecoration.Underline,
+                )
             }
 
             if (plant.confusions.isNotEmpty()) {
@@ -210,11 +237,12 @@ fun MostLikelyPlant(plant: Plant,
             }
 
             Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = { },
             ) {
                 Icon( painterResource(R.drawable.usages),
                     "Ir a usos",
-                    modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
+                    modifier = Modifier.width(dimensionResource(R.dimen.section_buttom_img))
                 )
                 Text(text = "Ver Usos")
             }
@@ -272,15 +300,17 @@ fun IdentifyScreen( modifier: Modifier) {
 
     val similarPlantsList = listOf(dummyPlantResult2, dummyPlantResult3)
 
-    // 3. Render the Composable inside the app's theme.
-    SuccessScreen(
-        mostLikelyPlant = dummyPlant,
-        mostLikelyScore = 0.85f,
-        goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
-        similarPlants = similarPlantsList,
-        goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
-        modifier = Modifier.fillMaxSize()
-    )
+    Box (modifier = modifier) {
+        // 3. Render the Composable inside the app's theme.
+        SuccessScreen(
+            mostLikelyPlant = dummyPlant,
+            mostLikelyScore = 0.85f,
+            goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
+            similarPlants = similarPlantsList,
+            goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
 
 @Composable
