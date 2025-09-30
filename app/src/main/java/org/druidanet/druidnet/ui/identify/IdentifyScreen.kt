@@ -34,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -109,10 +108,11 @@ fun MostLikelyPlant(plant: Plant,
                     score: Float,
                     goToPlantSheet: () -> Unit) {
 //    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
-    val colorConfidence = when (score) {
-        in 0.0..0.5 -> Color.Red
-        in 0.5..0.85 -> Color.Yellow
-        else -> Color.Green
+    val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
+        in 0.5..0.7 -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
+        in 0.7..0.85 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+        in 0.85..1.0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.background to MaterialTheme.colorScheme.onBackground
     }
 
     Column(
@@ -137,7 +137,7 @@ fun MostLikelyPlant(plant: Plant,
                 modifier = Modifier
                     .wrapContentSize()
 //                    .requiredSize()
-                    .background(colorConfidence, CircleShape)
+                    .background(confidenceBackgroundColor, CircleShape)
                     .padding(6.dp),
                     contentAlignment = Alignment.Center,
             ) {
@@ -146,16 +146,16 @@ fun MostLikelyPlant(plant: Plant,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "${(score.times(100)).toInt()}%",
+                        text = "${(score * 100).toInt()}%",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        color = confidenceContentColor
                     )
                     Text(
                         "Confianza",
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        color = confidenceContentColor
                     )
                 }
             }
