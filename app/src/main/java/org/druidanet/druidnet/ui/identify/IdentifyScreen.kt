@@ -2,6 +2,7 @@ package org.druidanet.druidnet.ui.identify
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,11 +20,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -31,14 +29,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -51,14 +46,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
-import org.druidanet.druidnet.network.PlantNetResponse
 import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.network.SpeciesInfo
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -87,7 +80,7 @@ fun SuccessScreen(
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 24.dp),
+            modifier = Modifier.padding(vertical = 0.dp),
             thickness = DividerDefaults.Thickness,
             color = DividerDefaults.color
         )
@@ -190,54 +183,62 @@ fun MostLikelyPlant(plant: Plant,
 
         ) {
 
-            Text(
-                plant.displayName,
-                style = MaterialTheme.typography.headlineLarge,
-            )
+            Column(
+                modifier = Modifier
+                    .clickable { goToPlantSheet() },
+            ) {
+                Text(
+                    plant.displayName,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
 
-            Text(
-                "(${plant.latinName})",
-                fontStyle = Italic,
-                style = MaterialTheme.typography.titleLarge,
-            )
+                Text(
+                    "(${plant.latinName})",
+                    fontStyle = Italic,
+                    style = MaterialTheme.typography.titleLarge,
+                )
 
 //            Text(
 //                "Familia ${plant.family}",
 //                style = MaterialTheme.typography.bodyMedium,
 //            )
 
-            Text(
-                "${plant.description}",
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+                Text(
+                    plant.description,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
 
-            TextButton(
-                onClick = { /* TODO: Navigate to details screen */ },
-                modifier = Modifier.align(Alignment.End),
-            ) {
-                Text("Leer más",
+                Text(
+                    "Leer más",
+                    modifier = Modifier
+                        .align(Alignment.End),
                     style = MaterialTheme.typography.bodyMedium,
                     textDecoration = TextDecoration.Underline,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
             if (plant.confusions.isNotEmpty()) {
                 // Possible Confusion Section
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { goToPlantSheet() }
+                    ) {
                     Icon(Icons.Default.Info, contentDescription = "Info",
                         tint = MaterialTheme.colorScheme.error )
                     Spacer(modifier = Modifier.width(8.dp))
                     val confusionTxt = if (plant.confusions.size == 1) "Hay ${plant.confusions.size} posible confusión" else "Hay ${plant.confusions.size} posibles confusiones"
                         Text(confusionTxt,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.error)
                 }
             }
 
             Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 6.dp, top = 6.dp),
                 onClick = { },
             ) {
                 Icon( painterResource(R.drawable.usages),
@@ -259,7 +260,8 @@ fun SimilarPlants(similarPlants: List<PlantResult>,
     Text(
         text = "Otras plantas similares",
         style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier. padding(top = 6.dp)
     )
     Spacer(modifier = Modifier.height(12.dp))
 
@@ -273,7 +275,7 @@ fun SimilarPlants(similarPlants: List<PlantResult>,
             }
         }
     } else {
-        Text("No se ha identificado otra planta similar.", style = MaterialTheme.typography.bodyMedium)
+        Text("No se ha identificado ninguna otra planta similar.", style = MaterialTheme.typography.bodyMedium)
     }
 
 }
@@ -310,147 +312,6 @@ fun IdentifyScreen( modifier: Modifier) {
             goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
             modifier = Modifier.fillMaxSize()
         )
-    }
-}
-
-@Composable
-fun ResultsIdentifyScreen(
-//    identifyViewModel: IdentifyViewModel = hiltViewModel(), // Assuming it might be used or passed through
-    // navController: NavController // Add if navigation actions from this screen are needed
-    responseData: PlantNetResponse?,
-    modifier: Modifier
-) {
-//    val responseData by identifyViewModel.apiResponse.collectAsState()
-
-    val mainResult = responseData?.results?.firstOrNull()
-    val similarPlants = responseData?.results?.drop(1) ?: emptyList()
-
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-        // Image Carousel Section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            // Placeholder for image
-            Icon(
-                painter = painterResource(R.drawable.eco),
-                contentDescription = "Plant Image",
-                modifier = Modifier.size(100.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            // Carousel Arrows (simplified)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { /* TODO: Navigate previous image */ }) {
-                    Icon( Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Previous Image")
-                }
-                IconButton(onClick = { /* TODO: Navigate next image */ }) {
-                    Icon( Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = "Next Image")
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Plant Name and Confidence Section
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top // Align top for confidence score circle
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = mainResult?.species?.commonNames?.firstOrNull() ?: mainResult?.species?.scientificNameWithoutAuthor ?: "Unknown Plant",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "(${mainResult?.species?.scientificName ?: "N/A"})",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
-                    .padding(4.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "${(mainResult?.score?.times(100))?.toInt() ?: 0}% Confianza",
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextButton(onClick = { /* TODO: Navigate to details screen */ }) {
-            Text("Leer más", style = MaterialTheme.typography.labelLarge)
-        }
-
-        // Possible Confusion Section
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Info, contentDescription = "Info", tint = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Posible confusión", style = MaterialTheme.typography.titleMedium)
-            // TODO: Add details about confusion if available
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // View Uses Button
-        Button(
-            onClick = { /* TODO: Navigate to uses screen or show dialog */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("VER USOS")
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 24.dp),
-            thickness = DividerDefaults.Thickness,
-            color = DividerDefaults.color
-        )
-
-        // Other Similar Plants Section
-        Text(
-            text = "Otras plantas similares",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (similarPlants.isNotEmpty()) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(horizontal = 4.dp)
-            ) {
-                items(similarPlants) { plantResult ->
-                    SimilarPlantCard(plantResult)
-                }
-            }
-        } else {
-            Text("No other similar plants found.", style = MaterialTheme.typography.bodyMedium)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp)) // For overall padding at the bottom
     }
 }
 
@@ -521,7 +382,7 @@ fun SuccessScreenPreview() {
     val similarPlantsList = listOf(dummyPlantResult2, dummyPlantResult3)
 
     // 3. Render the Composable inside the app's theme.
-    DruidNetTheme(darkTheme = false) {
+    DruidNetTheme(darkTheme = true) {
         SuccessScreen(
             mostLikelyPlant = dummyPlant,
             mostLikelyScore = 0.85f,
@@ -532,28 +393,3 @@ fun SuccessScreenPreview() {
         )
     }
 }
-
-/*
-@Preview(showBackground = true, widthDp = 360, heightDp = 780)
-@Composable
-fun ResultsIdentifyScreenPreview() {
-    // Create a dummy PlantNetResponse for previewing
-    val dummySpecies = SpeciesInfo(
-        scientificNameWithoutAuthor = "Rosa gallica",
-        scientificName = "Rosa gallica L.",
-        commonNames = listOf("Amapola", "Poppy"),
-        genus = GenusFamilyInfo(scientificName = "Rosa"),
-        family = GenusFamilyInfo(scientificName = "Rosaceae")
-    )
-    val dummyResult1 = PlantResult(score = 0.85, species = dummySpecies)
-    val dummyResult2 = PlantResult(score = 0.72, species = SpeciesInfo(commonNames = listOf("Otra Planta"), scientificName = "Bellis perennis"))
-    val dummyResult3 = PlantResult(score = 0.65, species = SpeciesInfo(commonNames = listOf("Hierba X"), scientificName = "Taraxacum officinale"))
-
-    val dummyResponse = PlantNetResponse(
-        results = listOf(dummyResult1, dummyResult2, dummyResult3),
-        bestMatch = "Rosa gallica L."
-    )
-    DruidNetTheme(darkTheme = false) {
-       // For preview, we directly pass a dummy response if the Composable was designed for it.
-       // Since
-*/
