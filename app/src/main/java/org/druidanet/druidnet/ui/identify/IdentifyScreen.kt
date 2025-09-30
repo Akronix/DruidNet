@@ -252,7 +252,35 @@ fun SimilarPlants(similarPlants: List<PlantResult>,
 
 @Composable
 fun IdentifyScreen( modifier: Modifier) {
-//    SuccessScreen
+    // 1. Create a dummy 'Plant' object for the most likely result.
+    val dummyPlant = PlantsDataSource.loadPlants()[0]
+
+    // 2. Create a dummy list of 'PlantResult' for similar plants.
+    val dummySpeciesInfo2 = SpeciesInfo(
+        scientificNameWithoutAuthor = "Papaver rhoeas",
+        scientificName = "Papaver rhoeas L.",
+        commonNames = listOf("Amapola común")
+    )
+    val dummyPlantResult2 = PlantResult(score = 0.72, species = dummySpeciesInfo2)
+
+    val dummySpeciesInfo3 = SpeciesInfo(
+        scientificNameWithoutAuthor = "Eschscholzia caespitosa",
+        scientificName = "Eschscholzia caespitosa Benth.",
+        commonNames = listOf("Amapola de mechón")
+    )
+    val dummyPlantResult3 = PlantResult(score = 0.65, species = dummySpeciesInfo3)
+
+    val similarPlantsList = listOf(dummyPlantResult2, dummyPlantResult3)
+
+    // 3. Render the Composable inside the app's theme.
+    SuccessScreen(
+        mostLikelyPlant = dummyPlant,
+        mostLikelyScore = 0.85f,
+        goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
+        similarPlants = similarPlantsList,
+        goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
 @Composable
