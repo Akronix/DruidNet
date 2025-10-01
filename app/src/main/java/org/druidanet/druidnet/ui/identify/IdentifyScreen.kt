@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -68,8 +69,9 @@ fun SuccessScreen(
     mostLikelyScore: Double,
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
     similarPlants: List<PlantResult>,
-    goToSimilarPlant: () -> Unit,
-    modifier: Modifier = Modifier
+    goToSimilarPlant: (String, Double) -> Unit,
+    modifier: Modifier = Modifier,
+    imageBitMap: ImageBitmap? = null
 ) {
     Column(
         modifier = modifier
@@ -82,7 +84,8 @@ fun SuccessScreen(
                 PlantInfoDruidNet(
                     plant = mostLikelyPlant,
                     score = mostLikelyScore,
-                    goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) }
+                    goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) },
+                    imageBitmapExt = imageBitMap
                 )
             else if (latinName.isNotEmpty())
                 NotInDatabaseScreen(
@@ -110,7 +113,7 @@ fun SuccessScreen(
         {
             SimilarPlants(
                 similarPlants = similarPlants,
-                { goToSimilarPlant() }
+                goToSimilarPlant
             )
         }
 
@@ -119,9 +122,10 @@ fun SuccessScreen(
 
 @Composable
 fun PlantInfoDruidNet(plant: Plant,
-                    score: Double,
-                    goToPlantSheetSection: (PlantSheetSection) -> Unit) {
-    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
+                      score: Double,
+                      imageBitmapExt: ImageBitmap?,
+                     goToPlantSheetSection: (PlantSheetSection) -> Unit) {
+    val imageBitmap = imageBitmapExt ?: LocalContext.current.assetsToBitmap(plant.imagePath)
     val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
         in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
@@ -268,8 +272,10 @@ fun PlantInfoDruidNet(plant: Plant,
 }
 
 @Composable
-fun SimilarPlants(similarPlants: List<PlantResult>,
-                  goToSimilarPlant: () -> Unit)
+fun SimilarPlants(
+    similarPlants: List<PlantResult>,
+    goToSimilarPlant: (String, Double) -> Unit
+)
 {
     // Other Similar Plants Section
     Text(
@@ -316,32 +322,33 @@ fun IdentifyScreen(
     Box(modifier = modifier) {
         SuccessScreen(
             mostLikelyPlant = plantResultUIState.plant,
+            latinName = plantResultUIState.latinName,
             mostLikelyScore = plantResultUIState.score,
             goToPlantSheet = goToPlantSheet,
             similarPlants = plantResultUIState.similarPlants,
-            goToSimilarPlant = { },
-            latinName = plantResultUIState.latinName,
-            modifier = Modifier.fillMaxSize()
+            goToSimilarPlant = { name: String, s: Double ->
+                identifyViewModel.updatePlantNetResult(name, s)
+            },
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }
 
 @Composable
 fun NotInDatabaseScreen(name: String, score: Double) {
-    Text("Not in database $name")
+    Text("Todavía $name no está en la base de datos de DruidNet :(")
 }
 
 @Composable
 fun SimilarPlantCard(
     plantResult: PlantResult,
-    onClickSimilarPlantCard: () -> Unit
+    onClickSimilarPlantCard: (String, Double) -> Unit
 ) {
     Card(
         modifier = Modifier
             .width(140.dp)
-            .height(180.dp)
-        ,
-        onClick = onClickSimilarPlantCard,
+            .height(180.dp),
+        onClick = { onClickSimilarPlantCard(plantResult.species?.scientificNameWithoutAuthor ?: "", plantResult.score ?: 0.0) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -364,7 +371,7 @@ fun SimilarPlantCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = plantResult.species?.commonNames?.firstOrNull() ?: plantResult.species?.scientificNameWithoutAuthor ?: "Plant",
+                text = plantResult.species?.scientificNameWithoutAuthor ?: "Plant",
                 style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 8.dp),
@@ -407,11 +414,12 @@ fun SuccessScreenPreview() {
         SuccessScreen(
             mostLikelyPlant = dummyPlant,
             mostLikelyScore = 0.85,
-            goToPlantSheet = { _,_ -> { } }, // Dummy lambda for preview
+            goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
             similarPlants = similarPlantsList,
-            goToSimilarPlant = { { } }, // Dummy lambda for preview
+            goToSimilarPlant = { _,_ -> {} }, // Dummy lambda for preview
             modifier = Modifier.fillMaxSize(),
-            latinName = dummyPlant.latinName
+            latinName = dummyPlant.latinName,
+            imageBitMap = ImageBitmap(1, 1)
         )
     }
 }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -26,6 +27,8 @@ import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantNetApiService
 import org.druidanet.druidnet.network.PlantNetResponse
+import org.druidanet.druidnet.network.PlantResult
+import org.druidanet.druidnet.network.SpeciesInfo
 import retrofit2.HttpException
 import java.io.File
 import java.io.FileOutputStream
@@ -120,7 +123,11 @@ class IdentifyViewModel @Inject constructor(
                     val bestMatchName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
                     val bestScore = response.results?.firstOrNull()?.score ?: 0.0
 
-                    _uiState.value = uiState.value.copy(score = bestScore, latinName = bestMatchName)
+                    _uiState.value = uiState.value.copy(
+                        score = bestScore,
+                        latinName = bestMatchName,
+                        similarPlants = response.results?.drop(1) ?: emptyList()
+                        )
 
                     if (response.results != null) {
                         Log.i(TAG, "Best match: $bestMatchName")
@@ -136,7 +143,8 @@ class IdentifyViewModel @Inject constructor(
 
                     val successMsg = "Success: Best match - $bestMatchName."
                     _identificationStatus.value = successMsg
-                    Log.i(TAG, "$successMsg Full response: ${response.toString()}")
+                    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
+                    Log.i(TAG, "$successMsg Full response: \n${json.encodeToString(response)}")
 
                     _apiResponse.value = response
 
@@ -170,6 +178,41 @@ class IdentifyViewModel @Inject constructor(
             } finally {
                 _loading.value = false // Ensure loading is set to false in all cases
             }
+        }
+    }
+
+    fun updatePlantNetResult(newPlantName: String, newScore: Double) {
+        val currentState = _uiState.value
+
+        // Create a PlantResult for the old main plant to add to the similar list
+        val oldPlantResult = PlantResult(
+            score = currentState.score,
+            species = SpeciesInfo(
+                scientificNameWithoutAuthor = currentState.latinName,
+                // If the old plant was from our DB, we can preserve its common names for display
+                commonNames = currentState.plant?.commonNames?.map { it.name }
+            )
+        )
+        val newSimilarPlants = currentState.similarPlants.toMutableList().apply {
+            // Remove the plant that is now the main one
+            removeAll { it.species?.scientificNameWithoutAuthor == newPlantName }
+            // Add the old main plant to the list
+            add(oldPlantResult)
+        }.sortedByDescending { it.score ?: 0.0 }
+
+        viewModelScope.launch {
+            val newPlant: Plant? = plantsRepository.searchPlant(newPlantName, language)
+            if (newPlant != null) {
+                Log.i(TAG, "Plant found in database: $newPlant")
+            }
+            _uiState.value = uiState.value.copy(
+                plant = newPlant,
+                score = newScore,
+                isInDatabase = newPlant != null,
+                latinName = newPlantName,
+                similarPlants = newSimilarPlants
+
+            )
         }
     }
 
