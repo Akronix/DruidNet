@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     kotlin("plugin.serialization") version "1.9.10"
     alias(libs.plugins.android.application)
@@ -23,6 +25,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val plantNetApiKey = localProperties.getProperty("PLANTNET_API_KEY", "")
+        buildConfigField("String", "PLANTNET_API_KEY", "\"$plantNetApiKey\"")
 
     }
 
@@ -85,6 +95,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -107,6 +118,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
@@ -129,6 +141,7 @@ dependencies {
     // Retrofit with Kotlin serialization Converter
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Markdown
     implementation(libs.multiplatform.markdown.renderer)

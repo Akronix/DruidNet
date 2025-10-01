@@ -84,7 +84,7 @@ fun PlantSheetScreen(
     val currentSection = plantSheetUiState.currentSection
 
     val onChangeSection =
-        { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
+        { newSection: PlantSheetSection -> { sheetViewModel.changeSection(newSection) } }
 
     val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
 
@@ -372,7 +372,7 @@ fun ShowUsagesButton(onClick: () -> Unit) {
         onClick = onClick,
     ) {
         Icon( painterResource(R.drawable.usages),
-            "Botón usos",
+            "Ir a usos",
             modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
             )
         Text(text = "Ver Usos")
