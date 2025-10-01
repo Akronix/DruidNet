@@ -159,6 +159,9 @@ fun DruidNetNavHost(
                 CameraScreen(
                     goToResultsScreen = { navController.navigate(IdentifyDestination.route) },
                     identifyViewModel,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
                 )
         }
         composable( route = IdentifyDestination.route) {
@@ -171,8 +174,8 @@ fun DruidNetNavHost(
                     navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=$section")
                 },
                 modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+                    .padding(innerPadding)
+                    .fillMaxSize()
             )
         }
         composable(route = CatalogDestination.route) {

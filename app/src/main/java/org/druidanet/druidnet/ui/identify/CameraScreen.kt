@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 fun CameraScreen(
     goToResultsScreen: () -> Unit,
     identifyViewModel: IdentifyViewModel,
+    modifier: Modifier
 ) {
     val context = LocalContext.current
     val loading by identifyViewModel.loading.collectAsState()
@@ -91,8 +92,9 @@ fun CameraScreen(
     if (loading) {
         LoadingScreen(imageBitmap = capturedImageBitmap)
     } else {
-        // Only show status text when not loading to avoid layout conflicts
-        Text(identifyViewModel.identificationStatus.collectAsState().value)
+        Box( modifier = modifier) {
+            Text(identifyViewModel.identificationStatus.collectAsState().value)
+        }
     }
 
 }
