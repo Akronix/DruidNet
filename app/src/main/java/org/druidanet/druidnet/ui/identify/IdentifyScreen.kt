@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.identify
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -46,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
@@ -58,7 +62,7 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 @Composable
 fun SuccessScreen(
     mostLikelyPlant: Plant,
-    mostLikelyScore: Float,
+    mostLikelyScore: Double,
     goToPlantSheet: (Plant, String) -> () -> Unit,
     similarPlants: List<PlantResult>,
     goToSimilarPlant: (Plant) -> () -> Unit,
@@ -105,14 +109,14 @@ fun SuccessScreen(
 
 @Composable
 fun MostLikelyPlant(plant: Plant,
-                    score: Float,
+                    score: Double,
                     goToPlantSheet: () -> Unit) {
 //    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
     val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
-        in 0.5..0.7 -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
-        in 0.7..0.85 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+        in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+        in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
         in 0.85..1.0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-        else -> MaterialTheme.colorScheme.background to MaterialTheme.colorScheme.onBackground
+        else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
 
     Column(
@@ -281,38 +285,40 @@ fun SimilarPlants(similarPlants: List<PlantResult>,
 }
 
 @Composable
-fun IdentifyScreen( modifier: Modifier) {
-    // 1. Create a dummy 'Plant' object for the most likely result.
-    val dummyPlant = PlantsDataSource.loadPlants()[0]
+fun IdentifyScreen(
+    identifyViewModel: IdentifyViewModel = hiltViewModel(),
+    modifier: Modifier) {
 
-    // 2. Create a dummy list of 'PlantResult' for similar plants.
-    val dummySpeciesInfo2 = SpeciesInfo(
-        scientificNameWithoutAuthor = "Papaver rhoeas",
-        scientificName = "Papaver rhoeas L.",
-        commonNames = listOf("Amapola común")
-    )
-    val dummyPlantResult2 = PlantResult(score = 0.72, species = dummySpeciesInfo2)
+    val plantResultUIState by identifyViewModel.uiState.collectAsState()
+    val isPlantInDatabase = plantResultUIState.plant != null
 
-    val dummySpeciesInfo3 = SpeciesInfo(
-        scientificNameWithoutAuthor = "Eschscholzia caespitosa",
-        scientificName = "Eschscholzia caespitosa Benth.",
-        commonNames = listOf("Amapola de mechón")
-    )
-    val dummyPlantResult3 = PlantResult(score = 0.65, species = dummySpeciesInfo3)
+    Log.i("IdentifyScreen", "Recomposing. Plant in database: $isPlantInDatabase. Plant: ${plantResultUIState.plant?.displayName}")
 
-    val similarPlantsList = listOf(dummyPlantResult2, dummyPlantResult3)
+    if (plantResultUIState.plant != null) {
 
-    Box (modifier = modifier) {
-        // 3. Render the Composable inside the app's theme.
-        SuccessScreen(
-            mostLikelyPlant = dummyPlant,
-            mostLikelyScore = 0.85f,
-            goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
-            similarPlants = similarPlantsList,
-            goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
-            modifier = Modifier.fillMaxSize()
-        )
+        Box(modifier = modifier) {
+            // 3. Render the Composable inside the app's theme.
+            SuccessScreen(
+                mostLikelyPlant = plantResultUIState.plant!!,
+                mostLikelyScore = plantResultUIState.score,
+                goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
+                similarPlants = plantResultUIState.similarPlants,
+                goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    } else {
+        Box(modifier = modifier) {
+            NotInDatabaseScreen(
+                name = plantResultUIState.latinName
+            )
+        }
     }
+}
+
+@Composable
+fun NotInDatabaseScreen(name: String) {
+    Text("Not in database $name")
 }
 
 @Composable
@@ -385,7 +391,7 @@ fun SuccessScreenPreview() {
     DruidNetTheme(darkTheme = true) {
         SuccessScreen(
             mostLikelyPlant = dummyPlant,
-            mostLikelyScore = 0.85f,
+            mostLikelyScore = 0.85,
             goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
             similarPlants = similarPlantsList,
             goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview

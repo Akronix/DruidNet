@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -25,6 +26,7 @@ import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.identify.CameraScreen
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
+import org.druidanet.druidnet.ui.identify.IdentifyViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
@@ -151,12 +153,20 @@ fun DruidNetNavHost(
             )
         }
         composable( route = CameraDestination.route) {
-            CameraScreen(
-                goToResultsScreen = { navController.navigate(IdentifyDestination.route) }
-            )
+                backStackEntry ->
+                val identifyViewModel: IdentifyViewModel = hiltViewModel(backStackEntry)
+                CameraScreen(
+                    goToResultsScreen = { navController.navigate(IdentifyDestination.route) },
+                    identifyViewModel,
+                )
         }
         composable( route = IdentifyDestination.route) {
-            IdentifyScreen(modifier = Modifier
+            val identifyViewModel: IdentifyViewModel = if (navController.previousBackStackEntry != null)
+                hiltViewModel(navController.previousBackStackEntry!!
+            ) else hiltViewModel()
+            IdentifyScreen(
+                identifyViewModel = identifyViewModel,
+                modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
             )

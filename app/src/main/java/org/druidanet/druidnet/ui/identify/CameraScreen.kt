@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,6 +44,8 @@ fun CameraScreen(
     val context = LocalContext.current
     val loading by identifyViewModel.loading.collectAsState()
     val apiResponse by identifyViewModel.apiResponse.collectAsState()
+    val plantResultUIState by identifyViewModel.uiState.collectAsState()
+    val successRequest by identifyViewModel.successRequest.collectAsState()
 
     var capturedImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -77,8 +80,9 @@ fun CameraScreen(
         dispatchTakePictureIntent()
     }
 
-    LaunchedEffect(apiResponse) {
-        apiResponse?.let {
+    LaunchedEffect(successRequest) {
+        if (successRequest) {
+            Log.i("CameraScreen","$plantResultUIState")
             goToResultsScreen()
             identifyViewModel.onNavigationToResultsDone()
         }

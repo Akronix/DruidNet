@@ -8,13 +8,22 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.druidanet.druidnet.data.PreferencesState
+import org.druidanet.druidnet.data.UserPreferencesRepository
+import org.druidanet.druidnet.data.plant.PlantsRepository
+import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantNetApiService
 import org.druidanet.druidnet.network.PlantNetResponse
 import retrofit2.HttpException
@@ -23,10 +32,14 @@ import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
 
+private const val TIMEOUT_MILLIS = 5_000L
+
 @HiltViewModel
 class IdentifyViewModel @Inject constructor(
     private val identifyService: PlantNetApiService,
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val appContext: Context,
+    private val plantsRepository: PlantsRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _identificationStatus = MutableStateFlow<String>("")
@@ -35,8 +48,48 @@ class IdentifyViewModel @Inject constructor(
     private val _loading = MutableStateFlow<Boolean>(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
+    private val _successRequest = MutableStateFlow<Boolean>(false)
+    val successRequest: StateFlow<Boolean> = _successRequest.asStateFlow()
+
     private val _apiResponse = MutableStateFlow<PlantNetResponse?>(null)
     val apiResponse: StateFlow<PlantNetResponse?> = _apiResponse.asStateFlow()
+
+    private val _uiState: MutableStateFlow<PlantNetResultUIState> = MutableStateFlow(PlantNetResultUIState())
+    val uiState = _uiState.asStateFlow()
+
+    private val preferencesState: StateFlow<PreferencesState> =
+        userPreferencesRepository.getDisplayNameLanguagePreference.map { displayLanguage ->
+            PreferencesState(displayLanguage = displayLanguage)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = runBlocking {
+                PreferencesState(
+                    displayLanguage = userPreferencesRepository.getDisplayNameLanguagePreference.first()
+                )
+            }
+        )
+
+    private val language = preferencesState.value.displayLanguage
+
+    // The final combined UI state for the results screen
+    /*
+    val uiState: StateFlow<PlantNetResultUIState> = combine(
+        plantDataFlow, apiResponse
+    ) { plantData, response ->
+        Log.i(TAG, "Plant: $plantData")
+        PlantNetResultUIState(
+            plant = plantData,
+            score = response?.results?.firstOrNull()?.score ?: 0.0,
+            similarPlants = response?.results?.drop(1) ?: emptyList()
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = PlantNetResultUIState()
+    )
+     */
 
     companion object {
         private const val TAG = "IdentifyViewModel"
@@ -64,7 +117,23 @@ class IdentifyViewModel @Inject constructor(
                         organs = organRequestBody
                     )
 
-                    val bestMatchName = response.results?.firstOrNull()?.species?.scientificName ?: "Unknown"
+                    val bestMatchName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
+                    val bestScore = response.results?.firstOrNull()?.score ?: 0.0
+
+                    _uiState.value = uiState.value.copy(score = bestScore, latinName = bestMatchName)
+
+                    if (response.results != null) {
+                        Log.i(TAG, "Best match: $bestMatchName")
+                        Log.i(TAG, "Best match: ${uiState.value.latinName}")
+                        val plant: Plant? = plantsRepository.searchPlant(bestMatchName, language)
+                        if (plant != null) {
+                            Log.i(TAG, "Plant found in database: $plant")
+                            _uiState.value = uiState.value.copy(plant = plant, isInDatabase = true)
+                            Log.i(TAG, "Plant: ${uiState.value.plant}")
+                        }
+
+                    }
+
                     val successMsg = "Success: Best match - $bestMatchName."
                     _identificationStatus.value = successMsg
                     Log.i(TAG, "$successMsg Full response: ${response.toString()}")
@@ -72,6 +141,9 @@ class IdentifyViewModel @Inject constructor(
                     _apiResponse.value = response
 
                     imageFile.delete()
+
+                    _successRequest.value = true
+
                 } else {
                     val convertErrorMsg = "Error: Could not convert image to file."
                     _identificationStatus.value = convertErrorMsg
