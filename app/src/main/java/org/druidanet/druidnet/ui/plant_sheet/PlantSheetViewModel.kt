@@ -1,11 +1,5 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
-// import androidx.lifecycle.ViewModelProvider // REMOVED
-// import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY // REMOVED
-// import androidx.lifecycle.createSavedStateHandle // REMOVED (Hilt handles SavedStateHandle)
-// import androidx.lifecycle.viewmodel.initializer // REMOVED
-// import androidx.lifecycle.viewmodel.viewModelFactory // REMOVED
-// import org.druidanet.druidnet.DruidNetApplication // REMOVED
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,12 +25,13 @@ private const val TIMEOUT_MILLIS = 5_000L
 class PlantSheetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Hilt provides this
     plantsRepository: PlantsRepository, // Hilt provides this
-    userPreferencesRepository: UserPreferencesRepository // Hilt provides this
+    userPreferencesRepository: UserPreferencesRepository, // Hilt provides this
 ) : ViewModel() {
 
     /***** Local vars *****/
 
     private val plantArg: String = checkNotNull(savedStateHandle[PlantSheetDestination.plantArg])
+    private val sectionArg: String? = savedStateHandle[PlantSheetDestination.sectionArg]
     private val plantLatinName = plantArg.replace('_', ' ')
 
     private val preferencesState: StateFlow<PreferencesState> =
@@ -77,8 +72,14 @@ class PlantSheetViewModel @Inject constructor(
        To do that transition, follow this example: https://github.com/android/compose-samples/blob/73b3a51e06a6520efb5b4931e71b771d257bf1dd/JetNews/app/src/main/java/com/example/jetnews/ui/home/HomeViewModel.kt#L150
      */
 
+    private val initialSection = try {
+        sectionArg?.let { PlantSheetSection.valueOf(it.uppercase()) } ?: DEFAULT_SECTION
+    } catch (e: IllegalArgumentException) {
+        DEFAULT_SECTION
+    }
+
     // 1. A MutableStateFlow for the UI-driven state (currentSection)
-    private val _currentSection = MutableStateFlow(DEFAULT_SECTION) // Initialize with a default
+    private val _currentSection = MutableStateFlow(initialSection) // Initialize with a default
 
     // 2. The Flow from the repository
     private val plantDataFlow: Flow<PlantSheetUIState> = plantsRepository

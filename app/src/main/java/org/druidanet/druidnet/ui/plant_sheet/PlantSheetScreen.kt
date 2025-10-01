@@ -84,7 +84,7 @@ fun PlantSheetScreen(
     val currentSection = plantSheetUiState.currentSection
 
     val onChangeSection =
-        { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
+        { newSection: PlantSheetSection -> { sheetViewModel.changeSection(newSection) } }
 
     val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
 

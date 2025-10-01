@@ -34,12 +34,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun CameraScreen(
     goToResultsScreen: () -> Unit,
-    identifyViewModel: IdentifyViewModel = hiltViewModel(),
+    identifyViewModel: IdentifyViewModel,
 ) {
     val context = LocalContext.current
     val loading by identifyViewModel.loading.collectAsState()

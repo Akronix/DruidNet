@@ -179,6 +179,7 @@ class IdentifyViewModel @Inject constructor(
      */
     fun onNavigationToResultsDone() {
         _apiResponse.value = null
+        _successRequest.value = false
     }
 
     private fun bitmapToFile(bitmap: Bitmap, fileName: String): File? {

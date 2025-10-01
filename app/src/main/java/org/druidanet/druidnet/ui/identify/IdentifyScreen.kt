@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,7 +50,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
@@ -57,15 +57,18 @@ import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.network.SpeciesInfo
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
+import org.druidanet.druidnet.utils.assetsToBitmap
 
 @Composable
 fun SuccessScreen(
-    mostLikelyPlant: Plant,
+    mostLikelyPlant: Plant?,
+    latinName: String,
     mostLikelyScore: Double,
-    goToPlantSheet: (Plant, String) -> () -> Unit,
+    goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
     similarPlants: List<PlantResult>,
-    goToSimilarPlant: (Plant) -> () -> Unit,
+    goToSimilarPlant: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -75,11 +78,17 @@ fun SuccessScreen(
         Box(
             modifier = Modifier.weight(2f)
         ) {
-            MostLikelyPlant(
-                plant = mostLikelyPlant,
-                score = mostLikelyScore,
-                goToPlantSheet = goToPlantSheet(mostLikelyPlant, "DESCRIPTION")
-            )
+            if (mostLikelyPlant != null)
+                PlantInfoDruidNet(
+                    plant = mostLikelyPlant,
+                    score = mostLikelyScore,
+                    goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) }
+                )
+            else if (latinName.isNotEmpty())
+                NotInDatabaseScreen(
+                    name = latinName,
+                    score = mostLikelyScore,
+                )
         }
 
         HorizontalDivider(
@@ -95,12 +104,13 @@ fun SuccessScreen(
                     top = 0.dp,
                     start = 10.dp,
                     end = 10.dp,
-                    bottom = 20.dp)
+                    bottom = 20.dp
+                )
         )
         {
             SimilarPlants(
                 similarPlants = similarPlants,
-                goToSimilarPlant
+                { goToSimilarPlant() }
             )
         }
 
@@ -108,10 +118,10 @@ fun SuccessScreen(
 }
 
 @Composable
-fun MostLikelyPlant(plant: Plant,
+fun PlantInfoDruidNet(plant: Plant,
                     score: Double,
-                    goToPlantSheet: () -> Unit) {
-//    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
+                    goToPlantSheetSection: (PlantSheetSection) -> Unit) {
+    val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
     val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
         in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
@@ -132,7 +142,8 @@ fun MostLikelyPlant(plant: Plant,
         ) {
 
             Box(
-                Modifier.padding(15.dp)
+                Modifier
+                    .padding(15.dp)
                     .align(Alignment.TopEnd)
                     .zIndex(1f)
             ) {
@@ -168,8 +179,8 @@ fun MostLikelyPlant(plant: Plant,
 
             Image(
                 contentScale = ContentScale.FillWidth,
-//                bitmap = imageBitmap,
-                painter = painterResource(R.drawable.eco),
+                bitmap = imageBitmap,
+//                painter = painterResource(R.drawable.eco),
                 contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,17 +190,17 @@ fun MostLikelyPlant(plant: Plant,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                top = 20.dp,
-                start = 10.dp,
-                end = 10.dp,
-                bottom = 0.dp,
-            )
+                    top = 20.dp,
+                    start = 10.dp,
+                    end = 10.dp,
+                    bottom = 0.dp,
+                )
 
         ) {
 
             Column(
                 modifier = Modifier
-                    .clickable { goToPlantSheet() },
+                    .clickable { goToPlantSheetSection(PlantSheetSection.DESCRIPTION) },
             ) {
                 Text(
                     plant.displayName,
@@ -227,7 +238,7 @@ fun MostLikelyPlant(plant: Plant,
             if (plant.confusions.isNotEmpty()) {
                 // Possible Confusion Section
                 Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { goToPlantSheet() }
+                    modifier = Modifier.clickable { goToPlantSheetSection(PlantSheetSection.CONFUSIONS) }
                     ) {
                     Icon(Icons.Default.Info, contentDescription = "Info",
                         tint = MaterialTheme.colorScheme.error )
@@ -243,7 +254,7 @@ fun MostLikelyPlant(plant: Plant,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 6.dp, top = 6.dp),
-                onClick = { },
+                onClick = { goToPlantSheetSection(PlantSheetSection.USAGES) },
             ) {
                 Icon( painterResource(R.drawable.usages),
                     "Ir a usos",
@@ -258,7 +269,7 @@ fun MostLikelyPlant(plant: Plant,
 
 @Composable
 fun SimilarPlants(similarPlants: List<PlantResult>,
-                  goToSimilarPlant: (Plant) -> () -> Unit)
+                  goToSimilarPlant: () -> Unit)
 {
     // Other Similar Plants Section
     Text(
@@ -275,7 +286,7 @@ fun SimilarPlants(similarPlants: List<PlantResult>,
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
             items(similarPlants) { plantResult ->
-                SimilarPlantCard(plantResult)
+                SimilarPlantCard(plantResult, goToSimilarPlant)
             }
         }
     } else {
@@ -286,47 +297,51 @@ fun SimilarPlants(similarPlants: List<PlantResult>,
 
 @Composable
 fun IdentifyScreen(
-    identifyViewModel: IdentifyViewModel = hiltViewModel(),
-    modifier: Modifier) {
+    identifyViewModel: IdentifyViewModel,
+    goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
+    modifier: Modifier
+) {
 
     val plantResultUIState by identifyViewModel.uiState.collectAsState()
-    val isPlantInDatabase = plantResultUIState.plant != null
 
-    Log.i("IdentifyScreen", "Recomposing. Plant in database: $isPlantInDatabase. Plant: ${plantResultUIState.plant?.displayName}")
+    Log.i("IdentifyScreen", "Recomposing. Plant in database: Plant: ${plantResultUIState.plant?.displayName}")
 
-    if (plantResultUIState.plant != null) {
+//    val goToSimilarPlant = { (p: Plant, s: Double) -> updateUIState(p, s, similarPlants)  }
 
-        Box(modifier = modifier) {
-            // 3. Render the Composable inside the app's theme.
-            SuccessScreen(
-                mostLikelyPlant = plantResultUIState.plant!!,
-                mostLikelyScore = plantResultUIState.score,
-                goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
-                similarPlants = plantResultUIState.similarPlants,
-                goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-    } else {
-        Box(modifier = modifier) {
-            NotInDatabaseScreen(
-                name = plantResultUIState.latinName
-            )
-        }
+    // TODO: use the customized version of AppTopbar:
+//    Scaffold(
+//        topBar = { DruidNetAppBar(
+//            navigateUp = if (previousBackStack != CameraScreen) navigateBack else goToWelcomeScreen
+//      add thumbnail with input image from user
+    Box(modifier = modifier) {
+        SuccessScreen(
+            mostLikelyPlant = plantResultUIState.plant,
+            mostLikelyScore = plantResultUIState.score,
+            goToPlantSheet = goToPlantSheet,
+            similarPlants = plantResultUIState.similarPlants,
+            goToSimilarPlant = { },
+            latinName = plantResultUIState.latinName,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 
 @Composable
-fun NotInDatabaseScreen(name: String) {
+fun NotInDatabaseScreen(name: String, score: Double) {
     Text("Not in database $name")
 }
 
 @Composable
-fun SimilarPlantCard(plantResult: PlantResult) {
+fun SimilarPlantCard(
+    plantResult: PlantResult,
+    onClickSimilarPlantCard: () -> Unit
+) {
     Card(
         modifier = Modifier
             .width(140.dp)
-            .height(180.dp),
+            .height(180.dp)
+        ,
+        onClick = onClickSimilarPlantCard,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -392,10 +407,11 @@ fun SuccessScreenPreview() {
         SuccessScreen(
             mostLikelyPlant = dummyPlant,
             mostLikelyScore = 0.85,
-            goToPlantSheet = { _, _ -> { } }, // Dummy lambda for preview
+            goToPlantSheet = { _,_ -> { } }, // Dummy lambda for preview
             similarPlants = similarPlantsList,
-            goToSimilarPlant = { _ -> { } }, // Dummy lambda for preview
-            modifier = Modifier.fillMaxSize()
+            goToSimilarPlant = { { } }, // Dummy lambda for preview
+            modifier = Modifier.fillMaxSize(),
+            latinName = dummyPlant.latinName
         )
     }
 }
