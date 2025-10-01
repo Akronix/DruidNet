@@ -130,8 +130,6 @@ class IdentifyViewModel @Inject constructor(
                         )
 
                     if (response.results != null) {
-                        Log.i(TAG, "Best match: $bestMatchName")
-                        Log.i(TAG, "Best match: ${uiState.value.latinName}")
                         val plant: Plant? = plantsRepository.searchPlant(bestMatchName, language)
                         if (plant != null) {
                             Log.i(TAG, "Plant found in database: $plant")

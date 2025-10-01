@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -31,6 +32,7 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,6 +53,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
@@ -336,7 +340,100 @@ fun IdentifyScreen(
 
 @Composable
 fun NotInDatabaseScreen(name: String, score: Double) {
-    Text("Todavía $name no está en la base de datos de DruidNet :(")
+    val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
+        in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+        in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+        in 0.85..1.0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = name.replaceFirstChar { it.uppercase() }.replace('_', ' '),
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "(No está en nuestra base de datos)",
+            style = MaterialTheme.typography.titleMedium,
+            fontStyle = Italic,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box {
+            Image(
+                painter = painterResource(R.drawable.confused_druidess),
+                contentDescription = "Druidess looking confused at a plant",
+                modifier = Modifier.fillMaxWidth()
+            )
+            Box(
+                Modifier
+                    .padding(15.dp)
+                    .align(Alignment.TopEnd)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .background(confidenceBackgroundColor, CircleShape)
+                        .padding(6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.padding(6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "${(score * 100).toInt()}%",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            color = confidenceContentColor
+                        )
+                        Text(
+                            "Confianza",
+                            fontWeight = FontWeight.Bold,
+                            color = confidenceContentColor
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Surface(
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.padding(top = 20.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Markdown(
+                    "**${name.replace('_', ' ')}** todavía no está en nuestros registros.",
+                    typography = markdownTypography(
+                        paragraph = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Markdown(
+                    "¿Te gustaría contribuir a que lo esté?\n\n[¡Envíanos una lechuza mensajera!](mailto:druidnetbeta@gmail.com) 🦉",
+                    typography = markdownTypography(
+                        link = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiaryContainer),
+                        paragraph = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+                    )
+                )
+            }
+        }
+    }
 }
 
 @Composable
