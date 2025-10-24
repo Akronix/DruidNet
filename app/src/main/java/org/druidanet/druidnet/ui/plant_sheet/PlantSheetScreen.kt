@@ -57,6 +57,7 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
@@ -363,19 +364,6 @@ fun PlantSheetDescription(plant: Plant,
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
         }
-    }
-}
-
-@Composable
-fun ShowUsagesButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-    ) {
-        Icon( painterResource(R.drawable.usages),
-            "Botón usos",
-            modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
-            )
-        Text(text = "Ver Usos")
     }
 }
 

@@ -24,6 +24,7 @@ import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
@@ -76,7 +77,8 @@ object PlantSheetDestination : NavigationDestination() {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
     const val plantArg = "plantLatinName"
-    val routeWithArgs = "$route/{$plantArg}"
+    const val sectionArg = "section"
+    val routeWithArgs = "$route/{$plantArg}?$sectionArg={$sectionArg}"
     override val hasTopBar = false
 }
 
@@ -140,6 +142,9 @@ fun DruidNetNavHost(
                 onClickPlantCard = { plant ->
                     navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
                 },
+                onClickShowUsages = { plant ->
+                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=USAGES")
+                },
                 listState = scrollStateCatalog,
                 viewModel = viewModel,
                 navigateBack = { navController.navigateUp() },
@@ -151,16 +156,26 @@ fun DruidNetNavHost(
         }
         composable(
             route = PlantSheetDestination.routeWithArgs,
-            arguments = listOf(navArgument(PlantSheetDestination.plantArg) {
-                type = NavType.StringType
-            }),
+            arguments = listOf(
+                navArgument(PlantSheetDestination.plantArg) {
+                    type = NavType.StringType
+                },
+                navArgument(PlantSheetDestination.sectionArg) {
+                    type = NavType.StringType
+                    defaultValue = "DESCRIPTION"
+                }
+            ),
             deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}?section={section}"
+                },
                 navDeepLink {
                     uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}"
                 }
             )
-        ) {
-            val plantLatinName: String? = it.arguments?.getString("plantLatinName")
+        ) { backStackEntry ->
+            val plantLatinName: String? = backStackEntry.arguments?.getString(PlantSheetDestination.plantArg)
+            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
 
             if (plantLatinName != null) {
                 val defaultUriHandler = LocalUriHandler.current
@@ -178,7 +193,7 @@ fun DruidNetNavHost(
                     }
                 }) {
                     PlantSheetScreen(
-                        plantLatinName,
+                        plantLatinName = plantLatinName,
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
                         modifier = Modifier
