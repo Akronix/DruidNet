@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -56,7 +54,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 .offset(x = (-40).dp) // Offset from the end by a specific amount
         ) {
             Icon(
-                Icons.Outlined.Settings,
+                painterResource(R.drawable.settings),
                 "Abre ajustes de la aplicación",
                 modifier = Modifier.clickable { onNavigationButtonClick(AboutDestination) }
             )

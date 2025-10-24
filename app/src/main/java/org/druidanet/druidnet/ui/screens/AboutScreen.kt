@@ -17,9 +17,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -104,7 +100,7 @@ fun AboutScreen (
                 AboutItem(
                     { onNavigationButtonClick(CreditsDestination) },
                     stringResource(R.string.title_screen_credits),
-                    imageVector = Icons.Default.Star,
+                    imageResource = R.drawable.star,
                     additionalText = null
                 )
 
@@ -130,7 +126,7 @@ fun AboutScreen (
                     { sendEmailAction(context) },
                     "Contacta",
                     additionalText = "¿Alguna sugerencia? ¿Quieres colaborar?",
-                    imageVector = Icons.Default.Email
+                    imageResource = R.drawable.email
                 )
             }
 
@@ -237,7 +233,6 @@ fun AboutItem(
     action: () -> Unit,
     label: String,
     imageResource: Int? = null,
-    imageVector: ImageVector? = null,
     additionalText: String? = null
 ) {
     Column(modifier = Modifier
@@ -257,15 +252,7 @@ fun AboutItem(
 
         Row(verticalAlignment = Alignment.CenterVertically)
         {
-            if (imageVector != null)
-                Icon(
-                    imageVector,
-                    null,
-                    modifier = Modifier.padding(
-                        end = 20.dp
-                    )
-                )
-            else if (imageResource != null)
+            if (imageResource != null)
                 Icon(
                     painter = painterResource(imageResource),
                     null,
@@ -293,7 +280,7 @@ fun openURIAction(context: Context, uri: String) {
 fun sendEmailAction(context: Context) {
 
     val intent = Intent(Intent.ACTION_SENDTO).apply {
-    data = "mailto:".toUri()
+        data = "mailto:".toUri()
         putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
         putExtra(Intent.EXTRA_SUBJECT, "DruidNetApp: ")
     }
