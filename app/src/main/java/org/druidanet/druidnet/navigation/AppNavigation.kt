@@ -28,6 +28,7 @@ import org.druidanet.druidnet.ui.identify.CameraScreen
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
 import org.druidanet.druidnet.ui.identify.IdentifyViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
@@ -182,6 +183,9 @@ fun DruidNetNavHost(
             CatalogScreen(
                 onClickPlantCard = { plant ->
                     navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
+                },
+                onClickShowUsages = { plant ->
+                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=USAGES")
                 },
                 listState = scrollStateCatalog,
                 viewModel = viewModel,

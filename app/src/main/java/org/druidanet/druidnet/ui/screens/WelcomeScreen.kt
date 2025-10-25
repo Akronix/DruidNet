@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -57,7 +55,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 .offset(x = (-40).dp) // Offset from the end by a specific amount
         ) {
             Icon(
-                Icons.Outlined.Settings,
+                painterResource(R.drawable.settings),
                 "Abre ajustes de la aplicación",
                 modifier = Modifier.clickable { onNavigationButtonClick(AboutDestination) }
             )
@@ -117,17 +115,17 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
-                Spacer(modifier = Modifier.weight(1f)) // This spacer pushes everything below it downwards
+                Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.height(24.dp)) // Ensures minimum space before the links
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Bottom link buttons
+                // Bottom buttons
 
                 TextButton(
                     onClick = { onNavigationButtonClick(RecommendationsDestination) },
                     modifier = Modifier
                         .fillMaxWidth()
-//                    contentPadding = PaddingValues(10.dp)
+
                 ) {
                     Text(
                         "\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
@@ -143,11 +141,8 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
 
                 TextButton(
                     onClick = { onNavigationButtonClick(GlossaryDestination) },
-                    modifier = Modifier
-                    .fillMaxWidth()
-//                    contentPadding = PaddingValues(10.dp)
-                )
-                {
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.secondary, // Link color

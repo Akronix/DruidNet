@@ -57,6 +57,8 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.component.CollapsableSection
+import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
@@ -372,7 +374,7 @@ fun ShowUsagesButton(onClick: () -> Unit) {
         onClick = onClick,
     ) {
         Icon( painterResource(R.drawable.usages),
-            "Ir a usos",
+            "Botón usos",
             modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
             )
         Text(text = "Ver Usos")
@@ -473,31 +475,34 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
         }
 
         for (type in usagesTypes) {
-            Text(stringResource(type.displayText),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 5.dp)
-            )
 
-            plant.usages[type]?.forEach {
-                    usage: Usage ->
-                Text("~ " + usage.subType + " ~",
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Markdown(usage.text,
-                    colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
-                    typography = markdownTypography(
-                        text = MaterialTheme.typography.bodyLarge,
-                        link = MaterialTheme.typography. bodyLarge. copy(
-                            fontWeight = FontWeight. Bold,
-                            textDecoration = TextDecoration.Underline,
-                            color = MaterialTheme.colorScheme.primary
+            CollapsableSection(stringResource(type.displayText)) {
+
+                plant.usages[type]?.forEach { usage: Usage ->
+                    Text(
+                        "~ " + usage.subType + " ~",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Markdown(
+                        usage.text,
+                        colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
+                        typography = markdownTypography(
+                            text = MaterialTheme.typography.bodyLarge,
+                            link = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                textDecoration = TextDecoration.Underline,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         )
                     )
-                )
-                Spacer(modifier = Modifier.padding(
-                    dimensionResource(id = R.dimen.space_between_sections)
-                ))
+                    Spacer(
+                        modifier = Modifier.padding(
+                            dimensionResource(id = R.dimen.space_between_sections)
+                        )
+                    )
+                }
             }
+
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
             ))

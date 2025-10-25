@@ -23,8 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -248,7 +246,8 @@ fun PlantInfoDruidNet(plant: Plant,
                 Row(verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable { goToPlantSheetSection(PlantSheetSection.CONFUSIONS) }
                     ) {
-                    Icon(Icons.Default.Info, contentDescription = "Info",
+                    Icon(painterResource(R.drawable.info),
+                        contentDescription = "Info",
                         tint = MaterialTheme.colorScheme.error )
                     Spacer(modifier = Modifier.width(8.dp))
                     val confusionTxt = if (plant.confusions.size == 1) "Hay ${plant.confusions.size} posible confusión" else "Hay ${plant.confusions.size} posibles confusiones"

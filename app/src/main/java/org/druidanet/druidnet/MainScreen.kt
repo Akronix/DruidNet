@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -160,7 +157,7 @@ fun Disclaimer(
     onAcceptDisclaimer: () -> Unit) {
     AlertDialog(
         icon = {
-            Icon(Icons.Default.Warning, contentDescription = "Icono de aviso")
+            Icon(painterResource(R.drawable.warning), contentDescription = "Icono de aviso")
         },
         title = {
             Text(text = "Soy una guía")
@@ -196,7 +193,7 @@ fun DruidNetAppBar(
     topBarColor: Color = Color.Unspecified,
     onActionClick: () -> Unit = {},
     actionIconContentDescription: String? = null,
-    actionIcon: ImageVector? = null
+    actionIconRes: Int? = null
 ) {
 
             CenterAlignedTopAppBar(
@@ -236,16 +233,16 @@ fun DruidNetAppBar(
                 navigationIcon = {
                     IconButton(onClick = navigateUp) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painterResource(R.drawable.arrow_back),
                             contentDescription = stringResource(R.string.back_button)
                         )
                     }
                 },
                 actions = {
-                    if (actionIcon != null && actionIconContentDescription != null) {
+                    if (actionIconRes != null && actionIconContentDescription != null) {
                         IconButton(onClick = onActionClick) {
                             Icon(
-                                imageVector = actionIcon,
+                                painterResource(actionIconRes),
                                 contentDescription = actionIconContentDescription,
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )

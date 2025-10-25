@@ -28,10 +28,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -62,6 +58,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -74,6 +71,7 @@ import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollba
 import com.mikepenz.markdown.m3.Markdown
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.navigation.CatalogDestination
 import org.druidanet.druidnet.ui.DruidNetViewModel
@@ -81,7 +79,12 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 
 @Composable
-fun PlantCard(plant: PlantCard, onClickPlantCard: (PlantCard) -> Unit, modifier: Modifier) {
+fun PlantCard(
+    plant: PlantCard,
+    onClickPlantCard: (PlantCard) -> Unit,
+    onClickShowUsages: (PlantCard) -> Unit,
+    modifier: Modifier
+) {
 
     val imageBitmap = LocalContext.current.assetsToBitmap(plant.imagePath)
 
@@ -90,14 +93,22 @@ fun PlantCard(plant: PlantCard, onClickPlantCard: (PlantCard) -> Unit, modifier:
         modifier = modifier
     ) {
         Column {
-            Image(
-                bitmap = imageBitmap,
-                contentDescription = "{plant.displayName}",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(194.dp),
-                contentScale = ContentScale.Crop
-            )
+            Box {
+                Image(
+                    bitmap = imageBitmap,
+                    contentDescription = "{plant.displayName}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(194.dp),
+                    contentScale = ContentScale.Crop
+                )
+                ShowUsagesButton(
+                    onClick = { onClickShowUsages(plant) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
+            }
             Text(
                 text = plant.displayName,
                 modifier = Modifier.padding(16.dp),
@@ -114,6 +125,7 @@ fun PlantCard(plant: PlantCard, onClickPlantCard: (PlantCard) -> Unit, modifier:
 fun PlantsList(
     plantsList: List<PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
+    onClickShowUsages: (PlantCard) -> Unit,
     listState: LazyListState,
     modifier: Modifier = Modifier
 ) {
@@ -129,6 +141,7 @@ fun PlantsList(
                 PlantCard(
                     plant = plant,
                     onClickPlantCard = onClickPlantCard,
+                    onClickShowUsages = onClickShowUsages,
                     modifier = Modifier.padding(8.dp)
                 )
 
@@ -161,6 +174,7 @@ fun PlantsList(
 @Composable
 fun CatalogScreen(
     onClickPlantCard: (PlantCard) -> Unit,
+    onClickShowUsages: (PlantCard) -> Unit,
     listState: LazyListState,
     viewModel: DruidNetViewModel,
     navigateBack: () -> Unit,
@@ -187,7 +201,7 @@ fun CatalogScreen(
                         topBarTitle = stringResource(CatalogDestination.title),
                         navigateUp = navigateBack,
                         topBarIconPath = CatalogDestination.topBarIconPath,
-                        actionIcon = Icons.Default.Search,
+                        actionIconRes = R.drawable.search,
                         actionIconContentDescription = stringResource(R.string.appbar_search_button),
                         onActionClick = { isSearchBar = true }
                     )
@@ -219,6 +233,7 @@ fun CatalogScreen(
             PlantsList(
                 plantsList = plantList,
                 onClickPlantCard = onClickPlantCard,
+                onClickShowUsages = onClickShowUsages,
                 listState = listState,
                 modifier = Modifier.padding(paddingValues)
             )
@@ -261,7 +276,7 @@ private fun SearchToolbar(
     ) {
         IconButton(onClick = { onBackClick() }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                painterResource(R.drawable.arrow_back),
                 contentDescription = stringResource(
                     id = R.string.back_button,
                 ),
@@ -298,7 +313,7 @@ private fun SearchTextField(
         placeholder = {Text(stringResource(R.string.feature_search_textfield))},
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search,
+                painterResource(R.drawable.search),
                 contentDescription = stringResource(
                     id = R.string.feature_search_title,
                 ),
@@ -313,7 +328,7 @@ private fun SearchTextField(
                     },
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Close,
+                        painterResource(R.drawable.close),
                         contentDescription = stringResource(
                             id = R.string.feature_search_clear_search_text_content_desc,
                         ),

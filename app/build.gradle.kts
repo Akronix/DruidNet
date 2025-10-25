@@ -18,8 +18,8 @@ android {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 19
-        versionName = "1.5.1"
+        versionCode = 22
+        versionName = "1.5.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -106,6 +106,20 @@ android {
     ndkVersion = rootProject.extra["ndkVersion"] as String
     room {
         schemaDirectory("$projectDir/schemas")
+    }
+
+    tasks.register<Zip>("zipNativeDebugSymbols") {
+        from("build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib")
+        exclude("armeabi*")
+        exclude("mips")
+        archiveFileName.set("native-debug-symbols.zip")
+        destinationDirectory.set(file("release"))
+    }
+
+    afterEvaluate {
+        tasks.named("bundleRelease") {
+            finalizedBy("zipNativeDebugSymbols")
+        }
     }
 
 }
