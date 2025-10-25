@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,16 +14,19 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -84,6 +88,56 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     )
                 )
                 Spacer(modifier = Modifier.height(48.dp))
+
+                // --- MODIFICATION START ---
+            Box(
+                contentAlignment = Alignment.TopEnd, // Align ribbon to the top end
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = { onNavigationButtonClick(CameraDestination) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "\uD83D\uDCF7 ",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(bottom = 3.dp)
+                        )
+                        Text(
+                            stringResource(R.string.greetings_identifier_btn),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+
+                // The "BETA" ribbon
+                Surface(
+                    shape = RoundedCornerShape(topEnd = 8.dp, bottomStart = 8.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .graphicsLayer(
+                            rotationZ = 15f // Slightly rotate the ribbon
+                        )
+                        .offset(x = 10.dp, y = (-8).dp) // Adjust position
+                ) {
+                    Text(
+                        text = "BETA",
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+            }
+
+                /* Button without 'BETA' Ribbon
                 Button(
                     onClick = {onNavigationButtonClick(CameraDestination)},
 //                    onClick = {onNavigationButtonClick(IdentifyDestination)},
@@ -103,6 +157,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
+                 */
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { onNavigationButtonClick(CatalogDestination) },
@@ -119,7 +174,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Bottom buttons
+                // Bottom link buttons
 
                 TextButton(
                     onClick = { onNavigationButtonClick(RecommendationsDestination) },
@@ -143,7 +198,8 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     onClick = { onNavigationButtonClick(GlossaryDestination) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
+                    Text(
+                        "\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.secondary, // Link color
                         ),

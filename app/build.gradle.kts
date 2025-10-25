@@ -18,8 +18,8 @@ android {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 22
-        versionName = "1.5.3"
+        versionCode = 21
+        versionName = "1.6.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
