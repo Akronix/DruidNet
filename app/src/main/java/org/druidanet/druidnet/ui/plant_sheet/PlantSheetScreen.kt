@@ -22,7 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +56,7 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.component.CollapsableSection
 import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
@@ -461,34 +461,34 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
         }
 
         for (type in usagesTypes) {
-            Text(stringResource(type.displayText),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(bottom = 5.dp),
-                color = MaterialTheme.colorScheme.primary,
-            )
 
-            plant.usages[type]?.forEach {
-                    usage: Usage ->
-                Text("~ " + usage.subType + " ~",
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Markdown(usage.text,
-                    colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
-                    typography = markdownTypography(
-                        text = MaterialTheme.typography.bodyLarge,
-                        link = MaterialTheme.typography. bodyLarge. copy(
-                            fontWeight = FontWeight. Bold,
-                            textDecoration = TextDecoration.Underline,
-                            color = MaterialTheme.colorScheme.primary
+            CollapsableSection(stringResource(type.displayText)) {
+
+                plant.usages[type]?.forEach { usage: Usage ->
+                    Text(
+                        "~ " + usage.subType + " ~",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Markdown(
+                        usage.text,
+                        colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
+                        typography = markdownTypography(
+                            text = MaterialTheme.typography.bodyLarge,
+                            link = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                textDecoration = TextDecoration.Underline,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         )
                     )
-                )
-                Spacer(modifier = Modifier.padding(
-                    dimensionResource(id = R.dimen.space_between_sections)
-                ))
+                    Spacer(
+                        modifier = Modifier.padding(
+                            dimensionResource(id = R.dimen.space_between_sections)
+                        )
+                    )
+                }
             }
+
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
