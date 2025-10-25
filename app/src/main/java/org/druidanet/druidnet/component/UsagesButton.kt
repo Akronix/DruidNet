@@ -6,8 +6,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import org.druidanet.druidnet.R
 
 @Composable
@@ -18,7 +18,7 @@ fun ShowUsagesButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ) {
         Icon( painterResource(R.drawable.usages),
             "Botón usos",
-            modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
+            modifier = Modifier.size(30.dp)
         )
         Text(text = "Ver usos")
     }

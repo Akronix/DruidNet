@@ -201,7 +201,7 @@ fun CatalogScreen(
                         topBarTitle = stringResource(CatalogDestination.title),
                         navigateUp = navigateBack,
                         topBarIconPath = CatalogDestination.topBarIconPath,
-                        actionIconRes = R.drawable.search_40,
+                        actionIconRes = R.drawable.search,
                         actionIconContentDescription = stringResource(R.string.appbar_search_button),
                         onActionClick = { isSearchBar = true }
                     )
