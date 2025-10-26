@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import coil3.compose.AsyncImage
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -58,6 +59,8 @@ import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
+import org.druidanet.druidnet.network.ImageUrls
+import org.druidanet.druidnet.network.PlantImage
 import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.network.SpeciesInfo
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
@@ -440,11 +443,14 @@ fun SimilarPlantCard(
     plantResult: PlantResult,
     onClickSimilarPlantCard: (String, Double) -> Unit
 ) {
+    val plantName = plantResult.species?.scientificNameWithoutAuthor ?: "Planta similar"
+    val imgURL = plantResult.images?.first()?.url?.m
+
     Card(
         modifier = Modifier
             .width(140.dp)
             .height(180.dp),
-        onClick = { onClickSimilarPlantCard(plantResult.species?.scientificNameWithoutAuthor ?: "", plantResult.score ?: 0.0) },
+        onClick = { onClickSimilarPlantCard(plantName, plantResult.score ?: 0.0) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -458,16 +464,17 @@ fun SimilarPlantCard(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                // Placeholder for similar plant image
-                Icon(
-                    painterResource(R.drawable.eco),
-                    contentDescription = "Similar Plant Image",
-                    modifier = Modifier.size(50.dp)
+                AsyncImage(
+                    model = imgURL,
+                    contentDescription = "Image for $plantName",
+                    fallback = painterResource(R.drawable.eco),
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = plantResult.species?.scientificNameWithoutAuthor ?: "Plant",
+                text = plantName,
                 style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 8.dp),
@@ -492,16 +499,19 @@ fun SuccessScreenPreview() {
     val dummySpeciesInfo2 = SpeciesInfo(
         scientificNameWithoutAuthor = "Papaver rhoeas",
         scientificName = "Papaver rhoeas L.",
-        commonNames = listOf("Amapola común")
+        commonNames = listOf("Amapola común"),
     )
-    val dummyPlantResult2 = PlantResult(score = 0.72, species = dummySpeciesInfo2)
+    val dummySpeciesImages2 = listOf(PlantImage(url = ImageUrls(m= "/home/akronix/Pictures/tanaceto_150_150.jpeg")))
+
+    val dummyPlantResult2 = PlantResult(score = 0.72, species = dummySpeciesInfo2, images = dummySpeciesImages2)
 
     val dummySpeciesInfo3 = SpeciesInfo(
         scientificNameWithoutAuthor = "Eschscholzia caespitosa",
         scientificName = "Eschscholzia caespitosa Benth.",
         commonNames = listOf("Amapola de mechón")
     )
-    val dummyPlantResult3 = PlantResult(score = 0.65, species = dummySpeciesInfo3)
+    val dummySpeciesImages3 = listOf(PlantImage(url = ImageUrls(m= "/home/akronix/Pictures/tanaceto_600_600.jpeg")))
+    val dummyPlantResult3 = PlantResult(score = 0.65, species = dummySpeciesInfo3, images = dummySpeciesImages3)
 
     val similarPlantsList = listOf(dummyPlantResult2, dummyPlantResult3)
 

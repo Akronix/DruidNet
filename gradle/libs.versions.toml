@@ -1,12 +1,14 @@
 [versions]
 agp = "8.13.0"
+coilCompose = "3.3.0"
+coilNetworkOkhttp = "3.3.0"
 datastorePreferences = "1.1.7"
-hiltAndroid = "2.57.1"
-hiltAndroidCompiler = "2.57.1"
+hiltAndroid = "2.57.2"
+hiltAndroidCompiler = "2.57.2"
 hilt = "1.3.0"
 retrofit = "2.11.0"
 coreSplashscreen = "1.2.0-rc01"
-kotlin = "2.2.10"
+kotlin = "2.2.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -39,6 +41,8 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt" }
