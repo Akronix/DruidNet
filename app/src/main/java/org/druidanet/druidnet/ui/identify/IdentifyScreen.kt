@@ -1,6 +1,7 @@
 package org.druidanet.druidnet.ui.identify
 
 import android.util.Log
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,6 +59,7 @@ import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.ImageUrls
@@ -199,7 +202,7 @@ fun PlantInfoDruidNet(plant: Plant,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    top = 20.dp,
+                    top = 0.dp,
                     start = 10.dp,
                     end = 10.dp,
                     bottom = 0.dp,
@@ -208,8 +211,6 @@ fun PlantInfoDruidNet(plant: Plant,
         ) {
 
             Column(
-                modifier = Modifier
-                    .clickable { goToPlantSheetSection(PlantSheetSection.DESCRIPTION) },
             ) {
                 Text(
                     plant.displayName,
@@ -237,8 +238,9 @@ fun PlantInfoDruidNet(plant: Plant,
                 Text(
                     "Leer más",
                     modifier = Modifier
-                        .align(Alignment.End),
-                    style = MaterialTheme.typography.bodyMedium,
+                        .clickable { goToPlantSheetSection(PlantSheetSection.DESCRIPTION) }
+                        .padding(4.dp),
+                    style = MaterialTheme.typography.titleSmall,
                     textDecoration = TextDecoration.Underline,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -260,19 +262,12 @@ fun PlantInfoDruidNet(plant: Plant,
                 }
             }
 
-            Button(
+            ShowUsagesButton(
+                { goToPlantSheetSection(PlantSheetSection.USAGES) },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 6.dp, top = 6.dp),
-                onClick = { goToPlantSheetSection(PlantSheetSection.USAGES) },
-            ) {
-                Icon( painterResource(R.drawable.usages),
-                    "Ir a usos",
-                    modifier = Modifier.width(dimensionResource(R.dimen.section_buttom_img))
                 )
-                Text(text = "Ver Usos")
-            }
-
         }
     }
 }
@@ -285,7 +280,7 @@ fun SimilarPlants(
 {
     // Other Similar Plants Section
     Text(
-        text = "Otras plantas similares",
+        text = "Otras plantas posibles",
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         modifier = Modifier. padding(top = 6.dp)
@@ -302,7 +297,7 @@ fun SimilarPlants(
             }
         }
     } else {
-        Text("No se ha identificado ninguna otra planta similar.", style = MaterialTheme.typography.bodyMedium)
+        Text("No se ha identificado ninguna otra planta posible.", style = MaterialTheme.typography.bodyMedium)
     }
 
 }

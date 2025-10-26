@@ -369,19 +369,6 @@ fun PlantSheetDescription(plant: Plant,
 }
 
 @Composable
-fun ShowUsagesButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-    ) {
-        Icon( painterResource(R.drawable.usages),
-            "Botón usos",
-            modifier = Modifier.size(dimensionResource(R.dimen.section_buttom_img))
-            )
-        Text(text = "Ver Usos")
-    }
-}
-
-@Composable
 fun PlantSheetConfusions(plant: Plant, modifier: Modifier) {
     Column ( modifier =
         modifier.padding(
