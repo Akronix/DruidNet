@@ -71,6 +71,7 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
+import kotlin.toString
 
 
 @Composable
@@ -184,7 +185,8 @@ fun SuccessScreen(
     similarPlants: List<PlantResult>,
     goToSimilarPlant: (String, Double) -> Unit,
     modifier: Modifier = Modifier,
-    imageBitMap: ImageBitmap? = null
+    imageBitMap: ImageBitmap? = null,
+    plantNetImageURL: String? = null
 ) {
     Column(
         modifier = modifier
@@ -204,6 +206,7 @@ fun SuccessScreen(
                 NotInDatabaseScreen(
                     name = latinName,
                     score = mostLikelyScore,
+                    plantNetImageURL = plantNetImageURL
                 )
         }
 
@@ -440,6 +443,7 @@ fun IdentifyScreen(
                     goToSimilarPlant = { name: String, s: Double ->
                         identifyViewModel.updatePlantNetResult(name, s)
                     },
+                    plantNetImageURL = plantResultUIState.currentPlantResult?.images?.first()?.url?.o,
                     modifier = Modifier.fillMaxSize(),
                 )
             } else {
@@ -450,7 +454,7 @@ fun IdentifyScreen(
 }
 
 @Composable
-fun NotInDatabaseScreen(name: String, score: Double) {
+fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) {
     val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
         in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
@@ -479,11 +483,16 @@ fun NotInDatabaseScreen(name: String, score: Double) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Box {
-            Image(
-                painter = painterResource(R.drawable.confused_druidess),
-                contentDescription = "Druidess looking confused at a plant",
-                modifier = Modifier.fillMaxWidth()
-            )
+            AsyncImage(model = plantNetImageURL,
+                contentDescription = "PlantNet image for $name",
+                modifier = Modifier.fillMaxSize(),
+                fallback = painterResource(R.drawable.grass),
+                placeholder = forwardingPainter(
+                    painter = painterResource(R.drawable.eco),
+                    colorFilter = ColorFilter.tint(Color.Gray),
+                    alpha = 0.5f,
+                ),
+                )
             Box(
                 Modifier
                     .padding(15.dp)
@@ -521,6 +530,12 @@ fun NotInDatabaseScreen(name: String, score: Double) {
             contentDescription = "Go down")
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        Image(
+            painter = painterResource(R.drawable.confused_druidess),
+            contentDescription = "Druidess looking confused at a plant",
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Surface(
             color = MaterialTheme.colorScheme.tertiaryContainer,
