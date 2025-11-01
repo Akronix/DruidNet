@@ -16,4 +16,6 @@ data class PlantNetResultUIState (
     val score: Double = 0.0,
 
     val similarPlants: List<PlantResult> = emptyList<PlantResult>(),
+
+    val currentPlantResult: PlantResult? = null
 )

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.core.net.toUri
@@ -24,7 +25,7 @@ import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.DruidNetViewModel
-import org.druidanet.druidnet.ui.identify.CameraScreen
+import org.druidanet.druidnet.ui.identify.CameraXScreen
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
 import org.druidanet.druidnet.ui.identify.IdentifyViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
@@ -157,12 +158,16 @@ fun DruidNetNavHost(
         composable( route = CameraDestination.route) {
                 backStackEntry ->
                 val identifyViewModel: IdentifyViewModel = hiltViewModel(backStackEntry)
-                CameraScreen(
-                    goToResultsScreen = { navController.navigate(IdentifyDestination.route) },
-                    identifyViewModel,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize()
+                CameraXScreen(
+                    onImageCaptured = { uri ->
+                        identifyViewModel.identify(uri)
+                        navController.navigate(IdentifyDestination.route)
+                    }
+//                    goToResultsScreen = { navController.navigate(IdentifyDestination.route) },
+//                    identifyViewModel,
+//                    modifier = Modifier
+//                        .padding(innerPadding)
+//                        .fillMaxSize()
                 )
         }
         composable( route = IdentifyDestination.route) {
@@ -174,6 +179,7 @@ fun DruidNetNavHost(
                 goToPlantSheet = { plant, section ->
                     navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=$section")
                 },
+                navController = navController,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()

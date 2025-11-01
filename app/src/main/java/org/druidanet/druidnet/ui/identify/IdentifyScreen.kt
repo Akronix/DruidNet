@@ -1,7 +1,7 @@
 package org.druidanet.druidnet.ui.identify
 
+import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,22 +27,27 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
@@ -53,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
@@ -69,6 +75,66 @@ import org.druidanet.druidnet.network.SpeciesInfo
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
+import org.druidanet.druidnet.utils.forwardingPainter
+
+
+@Composable
+fun ErrorScreen(errorMsg: String, retry: () -> Unit) {
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(errorMsg,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.background(MaterialTheme.colorScheme.errorContainer))
+        Button(onClick = retry) { Text("Reintentar") }
+    }
+}
+
+@Preview
+@Composable
+fun ErrorScreenPreview() {
+  DruidNetTheme {
+    ErrorScreen(errorMsg = "Ha ocurrido un error inesperado.", retry = {})
+  }
+}
+
+
+@Composable
+fun LoadingScreen(imageBitmap: Bitmap?) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (imageBitmap != null) {
+            Image(
+                bitmap = imageBitmap.asImageBitmap(),
+                contentDescription = "Image being identified",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        // Scrim to darken the background
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+        )
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(modifier = Modifier.size(64.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Identificando...",
+                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+    }
+}
+
+
 
 @Composable
 fun SuccessScreen(
@@ -306,32 +372,41 @@ fun SimilarPlants(
 fun IdentifyScreen(
     identifyViewModel: IdentifyViewModel,
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
+    navController: NavController,
     modifier: Modifier
 ) {
-
+    val loading by identifyViewModel.loading.collectAsState()
+    val success by identifyViewModel.successRequest.collectAsState()
+    val status by identifyViewModel.identificationStatus.collectAsState()
     val plantResultUIState by identifyViewModel.uiState.collectAsState()
 
     Log.i("IdentifyScreen", "Recomposing. Plant in database: Plant: ${plantResultUIState.plant?.displayName}")
 
-//    val goToSimilarPlant = { (p: Plant, s: Double) -> updateUIState(p, s, similarPlants)  }
-
-    // TODO: use the customized version of AppTopbar:
+    Box(modifier = modifier) {
+        if (loading) {
+            LoadingScreen(imageBitmap = null)
+        } else {
+            if (success) {
+                // TODO: use the customized version of AppTopbar to go back to WelcomeScreen?? and include thumbnail :
 //    Scaffold(
 //        topBar = { DruidNetAppBar(
 //            navigateUp = if (previousBackStack != CameraScreen) navigateBack else goToWelcomeScreen
 //      add thumbnail with input image from user
-    Box(modifier = modifier) {
-        SuccessScreen(
-            mostLikelyPlant = plantResultUIState.plant,
-            latinName = plantResultUIState.latinName,
-            mostLikelyScore = plantResultUIState.score,
-            goToPlantSheet = goToPlantSheet,
-            similarPlants = plantResultUIState.similarPlants,
-            goToSimilarPlant = { name: String, s: Double ->
-                identifyViewModel.updatePlantNetResult(name, s)
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
+                SuccessScreen(
+                    mostLikelyPlant = plantResultUIState.plant,
+                    latinName = plantResultUIState.latinName,
+                    mostLikelyScore = plantResultUIState.score,
+                    goToPlantSheet = goToPlantSheet,
+                    similarPlants = plantResultUIState.similarPlants,
+                    goToSimilarPlant = { name: String, s: Double ->
+                        identifyViewModel.updatePlantNetResult(name, s)
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                ErrorScreen(status, { navController.navigateUp() } )
+            }
+        }
     }
 }
 
@@ -403,6 +478,9 @@ fun NotInDatabaseScreen(name: String, score: Double) {
             }
         }
 
+        Image(painter = painterResource(R.drawable.arrow_down),
+            contentDescription = "Go down")
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Surface(
@@ -462,7 +540,12 @@ fun SimilarPlantCard(
                 AsyncImage(
                     model = imgURL,
                     contentDescription = "Image for $plantName",
-                    fallback = painterResource(R.drawable.eco),
+                    fallback = painterResource(R.drawable.grass),
+                    placeholder = forwardingPainter(
+                        painter = painterResource(R.drawable.eco),
+                        colorFilter = ColorFilter.tint(Color.Gray),
+                        alpha = 0.5f,
+                    ),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )

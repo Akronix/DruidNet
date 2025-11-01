@@ -2,7 +2,7 @@
 buildscript {
     extra.apply {
         set("lifecycle_version", "2.9.1")
-        set("room_version", "2.7.1")
+        set("room_version", "2.8.0")
         set("compose_version", "1.8.2")
     }
 }

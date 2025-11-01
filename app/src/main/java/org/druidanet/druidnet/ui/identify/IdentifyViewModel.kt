@@ -2,9 +2,11 @@ package org.druidanet.druidnet.ui.identify
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import okhttp3.CacheControl
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -98,15 +101,32 @@ class IdentifyViewModel @Inject constructor(
         private const val TAG = "IdentifyViewModel"
     }
 
-    fun identify(imageBitmap: Bitmap) {
+    private fun reset() {
+        _apiResponse.value = null;
+        _successRequest.value = false;
+        _identificationStatus.value = "";
+        _loading.value = false;
+        _uiState.value = PlantNetResultUIState();
+    }
+
+    fun identifyOld(imageBitmap: Bitmap) {}
+
+    fun identify(uri: Uri) {
+
         viewModelScope.launch {
+//            _uiState.value = PlantNetResultUIState()
+            reset()
             _loading.value = true // Set loading true at the start
             val identifyingMsg = "Identifying..."
             _identificationStatus.value = identifyingMsg
             Log.i(TAG, identifyingMsg)
 
+            // Declare the file variable here to be accessible in finally
+            var imageFile: File? = null
+
             try {
-                val imageFile = bitmapToFile(imageBitmap, "plant_image.jpg")
+//                val imageFile = bitmapToFile(uri, "plant_image.jpg")
+                imageFile = getFileFromUri(appContext, uri)
 
                 if (imageFile != null) {
                     val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
@@ -126,7 +146,8 @@ class IdentifyViewModel @Inject constructor(
                     _uiState.value = uiState.value.copy(
                         score = bestScore,
                         latinName = bestMatchName,
-                        similarPlants = response.results?.drop(1) ?: emptyList()
+                        similarPlants = response.results?.drop(1) ?: emptyList(),
+                        currentPlantResult = response.results?.first()
                         )
 
                     if (response.results != null) {
@@ -175,6 +196,7 @@ class IdentifyViewModel @Inject constructor(
                 Log.e(TAG, exceptionMsg, e)
             } finally {
                 _loading.value = false // Ensure loading is set to false in all cases
+                imageFile?.delete() // Safely delete the temporary file
             }
         }
     }
@@ -183,19 +205,19 @@ class IdentifyViewModel @Inject constructor(
         val currentState = _uiState.value
 
         // Create a PlantResult for the old main plant to add to the similar list
-        val oldPlantResult = PlantResult(
-            score = currentState.score,
-            species = SpeciesInfo(
-                scientificNameWithoutAuthor = currentState.latinName,
-                // If the old plant was from our DB, we can preserve its common names for display
-                commonNames = currentState.plant?.commonNames?.map { it.name }
-            )
-        )
+        val oldPlantResult = currentState.currentPlantResult
+
+        // Find the full PlantResult object for the newly selected plant.
+        //    This is the missing piece.
+        val newCurrentPlantResult = currentState.similarPlants.find {
+            it.species?.scientificNameWithoutAuthor == newPlantName
+        }
+
         val newSimilarPlants = currentState.similarPlants.toMutableList().apply {
             // Remove the plant that is now the main one
             removeAll { it.species?.scientificNameWithoutAuthor == newPlantName }
             // Add the old main plant to the list
-            add(oldPlantResult)
+            add(oldPlantResult!!)
         }.sortedByDescending { it.score ?: 0.0 }
 
         viewModelScope.launch {
@@ -208,9 +230,35 @@ class IdentifyViewModel @Inject constructor(
                 score = newScore,
                 isInDatabase = newPlant != null,
                 latinName = newPlantName,
-                similarPlants = newSimilarPlants
-
+                similarPlants = newSimilarPlants,
+                currentPlantResult = newCurrentPlantResult
             )
+        }
+    }
+
+    /**
+     * Copies the data from a Uri to a temporary file in the app's cache directory.
+     * This is the reliable way to get a File from a content Uri.
+     */
+    private fun getFileFromUri(context: Context, uri: Uri): File? {
+        return try {
+            val contentResolver = context.contentResolver
+            // Create a temporary file in the app's cache directory
+            val tempFile = File.createTempFile("plant_image_", ".jpg", context.cacheDir)
+            // Ensure the file is deleted when the VM is shut down, as a fallback.
+            tempFile.deleteOnExit()
+
+            // Open an InputStream to the URI's content and a FileOutputStream to the temp file
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                FileOutputStream(tempFile).use { outputStream ->
+                    // Copy the data from the input stream to the output stream
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            tempFile
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to create temp file from URI", e)
+            null
         }
     }
 

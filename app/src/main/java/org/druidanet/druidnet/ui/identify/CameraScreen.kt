@@ -43,7 +43,6 @@ fun CameraScreen(
 ) {
     val context = LocalContext.current
     val loading by identifyViewModel.loading.collectAsState()
-    val apiResponse by identifyViewModel.apiResponse.collectAsState()
     val plantResultUIState by identifyViewModel.uiState.collectAsState()
     val successRequest by identifyViewModel.successRequest.collectAsState()
 
@@ -56,7 +55,7 @@ fun CameraScreen(
             val imageBitmap = result.data?.extras?.get("data") as? Bitmap
             if (imageBitmap != null) {
                 capturedImageBitmap = imageBitmap
-                identifyViewModel.identify(imageBitmap)
+                identifyViewModel.identifyOld(imageBitmap)
             }
         } else {
             // Handle cases where the image capture was not successful or was cancelled.
@@ -100,7 +99,7 @@ fun CameraScreen(
 }
 
 @Composable
-fun LoadingScreen(imageBitmap: Bitmap?) {
+fun LoadingScreenOld(imageBitmap: Bitmap?) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
