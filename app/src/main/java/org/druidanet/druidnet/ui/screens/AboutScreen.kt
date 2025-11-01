@@ -54,6 +54,8 @@ import org.druidanet.druidnet.navigation.CreditsDestination
 import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
+import org.druidanet.druidnet.utils.openURIAction
+import org.druidanet.druidnet.utils.sendEmailAction
 
 @Composable
 fun AboutScreen (
@@ -267,24 +269,6 @@ fun AboutItem(
             )
         }
     }
-}
-
-fun openURIAction(context: Context, uri: String) {
-
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = uri.toUri()
-    }
-    context.startActivity(intent)
-}
-
-fun sendEmailAction(context: Context) {
-
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = "mailto:".toUri()
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
-        putExtra(Intent.EXTRA_SUBJECT, "DruidNetApp: ")
-    }
-    context.startActivity(intent)
 }
 
 @Composable

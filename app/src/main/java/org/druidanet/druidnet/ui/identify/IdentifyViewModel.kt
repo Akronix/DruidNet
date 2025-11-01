@@ -172,27 +172,24 @@ class IdentifyViewModel @Inject constructor(
                     _successRequest.value = true
 
                 } else {
-                    val convertErrorMsg = "Error: Could not convert image to file."
-                    _identificationStatus.value = convertErrorMsg
-                    Log.i(TAG, convertErrorMsg)
+                    _identificationStatus.value = "Hubo un fallo con la lectura de la imagen."
+                    Log.i(TAG, "Error: Could not convert image to file.")
                 }
             } catch (e: HttpException) {
                 if (e.code() == 404) {
-                    val notFoundMsg = "No identification available for this image."
-                    _identificationStatus.value = notFoundMsg
-                    Log.w(TAG, "$notFoundMsg (HTTP 404)", e)
+                    _identificationStatus.value = "No se ha encontrado ninguna identificación posible para esta imagen."
+                    Log.w(TAG, "No identification available for this image. (HTTP 404)", e)
                 } else {
                     val httpErrorMsg = "HTTP Error: ${e.code()} - ${e.message()}"
                     _identificationStatus.value = httpErrorMsg
                     Log.e(TAG, httpErrorMsg, e)
                 }
             } catch (e: IOException) {
-                val networkErrorMsg = "Network error: Could not connect to the service. Please check your internet connection."
-                _identificationStatus.value = networkErrorMsg
-                Log.e(TAG, networkErrorMsg, e)
+                _identificationStatus.value = "El servicio de identificación necesita acceso a internet. Por favor, comprueba tu conexión e inténtalo de nuevo."
+                Log.e(TAG, "Network error: Could not connect to the service. Please check your internet connection.", e)
             } catch (e: Exception) {
                 val exceptionMsg = "Error: ${e.message ?: "An unexpected error occurred."}"
-                _identificationStatus.value = exceptionMsg
+                _identificationStatus.value = "Ha ocurrido un error inesperado."
                 Log.e(TAG, exceptionMsg, e)
             } finally {
                 _loading.value = false // Ensure loading is set to false in all cases

@@ -34,12 +34,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,31 +64,72 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.ShowUsagesButton
-import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
-import org.druidanet.druidnet.network.ImageUrls
-import org.druidanet.druidnet.network.PlantImage
 import org.druidanet.druidnet.network.PlantResult
-import org.druidanet.druidnet.network.SpeciesInfo
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.forwardingPainter
+import org.druidanet.druidnet.utils.sendEmailAction
 
 
 @Composable
 fun ErrorScreen(errorMsg: String, retry: () -> Unit) {
-    Column (
+    val context = LocalContext.current
+
+    Column(
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
     ) {
-        Text(errorMsg,
+        Icon(
+            painter = painterResource(id = R.drawable.warning),
+            contentDescription = "Error",
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.error
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "¡Oh, no!",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.error
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = errorMsg,
             color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.background(MaterialTheme.colorScheme.errorContainer))
-        Button(onClick = retry) { Text("Reintentar") }
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center // Centra el texto si ocupa varias líneas
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(onClick = retry) {
+            Text("Reintentar")
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        TextButton(
+            onClick = {
+                // 2. Llama a la función para abrir el cliente de email
+                sendEmailAction(context)
+            }
+        ) {
+            Text("Informar de un fallo de la app",
+                style= MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary)
+        }
     }
 }
+
 
 @Preview
 @Composable
@@ -567,6 +606,7 @@ fun SimilarPlantCard(
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun SuccessScreenPreview() {
@@ -606,4 +646,4 @@ fun SuccessScreenPreview() {
             imageBitMap = ImageBitmap(1, 1)
         )
     }
-}
+}*/
