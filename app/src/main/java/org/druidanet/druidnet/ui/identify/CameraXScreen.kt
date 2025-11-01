@@ -12,12 +12,13 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,12 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
+import org.druidanet.druidnet.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -76,18 +78,13 @@ fun CameraXScreen(
         }
     )
 
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (hasCamPermission) {
             if (imageUri != null) {
-//                Image(
-//                    painter = AsyncImage(imageUri),
-//                    contentDescription = "Selected image",
-//                    modifier = Modifier.fillMaxSize()
-//                )
                 AsyncImage(model=imageUri.toString(), contentDescription = "Selected image", modifier = Modifier.fillMaxSize())
             } else {
                 AndroidView(
@@ -118,23 +115,47 @@ fun CameraXScreen(
             Text("Camera permission not granted")
         }
 
-        Column(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
-            Button(onClick = { galleryLauncher.launch("image/*") }) {
-                Text("Open Gallery")
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            IconButton(
+                onClick = { galleryLauncher.launch("image/*") },
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.photo_library),
+                    contentDescription = "Open Gallery",
+                    tint = Color.White
+                )
             }
-            Button(onClick = {
-                takePhoto(context, imageCapture) { uri ->
-                    imageUri = uri
-                    onImageCaptured(uri)
-                }
-            }) {
-                Text("Take Photo")
+            IconButton(
+                onClick = {
+                    takePhoto(context, imageCapture) { uri ->
+                        imageUri = uri
+                        onImageCaptured(uri)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(80.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.shoot),
+                    contentDescription = "Take Photo",
+                    tint = Color.White,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
         Text(
-            text = "Hello CameraX!",
+            text = "Enfoca un órgano de la planta",
             color = Color.White,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top=100.dp)
         )
     }
 }
@@ -146,7 +167,7 @@ fun takePhoto(
 ) {
     val photoFile = File(
         context.filesDir,
-        SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
+        SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale("es", "ES"))
             .format(System.currentTimeMillis()) + ".jpg"
     )
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
@@ -166,9 +187,3 @@ fun takePhoto(
         }
     )
 }
-//
-//@androidx.compose.ui.tooling.preview.Preview
-//@Composable
-//fun CameraXScreenPreview() {
-//    CameraXScreen(onImageCaptured = {})
-//}
