@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +49,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
@@ -55,6 +59,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -131,7 +136,7 @@ fun ErrorScreen(errorMsg: String, retry: () -> Unit) {
     }
 }
 
-
+/*
 @Preview
 @Composable
 fun ErrorScreenPreview() {
@@ -139,6 +144,7 @@ fun ErrorScreenPreview() {
     ErrorScreen(errorMsg = "Ha ocurrido un error inesperado.", retry = {})
   }
 }
+ */
 
 
 @Composable
@@ -454,7 +460,7 @@ fun IdentifyScreen(
 }
 
 @Composable
-fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) {
+fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?, page: Int = 0) {
     val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
         in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
@@ -462,107 +468,145 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
         else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = name.replaceFirstChar { it.uppercase() }.replace('_', ' '),
-            style = MaterialTheme.typography.headlineLarge,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "(No está en nuestra base de datos)",
-            style = MaterialTheme.typography.titleMedium,
-            fontStyle = Italic,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    val pagerState = rememberPagerState(page, pageCount = {
+        2
+    })
 
-        Box {
-            AsyncImage(model = plantNetImageURL,
-                contentDescription = "PlantNet image for $name",
-                modifier = Modifier.fillMaxSize(),
-                fallback = painterResource(R.drawable.grass),
-                placeholder = forwardingPainter(
-                    painter = painterResource(R.drawable.eco),
-                    colorFilter = ColorFilter.tint(Color.Gray),
-                    alpha = 0.5f,
-                ),
-                )
-            Box(
-                Modifier
-                    .padding(15.dp)
-                    .align(Alignment.TopEnd)
+    VerticalPager(state = pagerState) { page ->
+        if (page == 0) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .background(confidenceBackgroundColor, CircleShape)
-                        .padding(6.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        modifier = Modifier.padding(6.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                Text(
+                    text = name.replaceFirstChar { it.uppercase() }.replace('_', ' '),
+                    style = MaterialTheme.typography.headlineLarge,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "(No tenemos usos en nuestra base de datos)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontStyle = Italic,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box {
+                    AsyncImage(
+                        model = plantNetImageURL,
+                        contentDescription = "PlantNet image for $name",
+                        modifier = Modifier.fillMaxSize(),
+                        fallback = painterResource(R.drawable.grass),
+                        placeholder = forwardingPainter(
+                            painter = painterResource(R.drawable.eco),
+                            colorFilter = ColorFilter.tint(Color.Gray),
+                            alpha = 0.5f,
+                        ),
+                    )
+                    Box(
+                        Modifier
+                            .padding(15.dp)
+                            .align(Alignment.TopEnd)
                     ) {
-                        Text(
-                            text = "${(score * 100).toInt()}%",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            color = confidenceContentColor
-                        )
-                        Text(
-                            "Confianza",
-                            fontWeight = FontWeight.Bold,
-                            color = confidenceContentColor
-                        )
+                        Box(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .background(confidenceBackgroundColor, CircleShape)
+                                .padding(6.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "${(score * 100).toInt()}%",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    color = confidenceContentColor
+                                )
+                                Text(
+                                    "Confianza",
+                                    fontWeight = FontWeight.Bold,
+                                    color = confidenceContentColor
+                                )
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        Image(painter = painterResource(R.drawable.arrow_down),
-            contentDescription = "Go down")
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Image(
-            painter = painterResource(R.drawable.confused_druidess),
-            contentDescription = "Druidess looking confused at a plant",
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Surface(
-            color = MaterialTheme.colorScheme.tertiaryContainer,
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.padding(top = 20.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Markdown(
-                    "**${name.replace('_', ' ')}** todavía no está en nuestros registros.",
-                    typography = markdownTypography(
-                        paragraph = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+        } else if (page == 1) {
+                Column(
+                    modifier = Modifier
+                        .padding(dimensionResource(R.dimen.padding_large))
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Markdown(
+                        "Todavía no tenemos a _${name}_ en nuestros registros.",
+                        modifier = Modifier,
+                        typography = markdownTypography(
+                            paragraph =
+                                MaterialTheme.typography.headlineSmall.copy(
+                                    textAlign = TextAlign.Center
+                                )
+                        )
                     )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Markdown(
-                    "¿Te gustaría contribuir a que lo esté?\n\n[¡Envíanos una lechuza mensajera!](mailto:druidnetbeta@gmail.com) 🦉",
-                    typography = markdownTypography(
-                        link = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiaryContainer),
-                        paragraph = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+
+                    Image(
+                        painterResource(R.drawable.confused_druidess),
+                        "Una druidesa confundida observando una planta que desconoce."
                     )
-                )
-            }
+                    Surface(
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.padding(top = 20.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(20.dp)
+                        )
+                        {
+                            Markdown(
+                                "¿Te gustaría contribuir a que _${name}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com) 🦉",
+                                modifier = Modifier,
+                                typography = markdownTypography(
+                                    paragraph =
+                                        MaterialTheme.typography.titleSmall
+                                            .copy(
+                                                textAlign = TextAlign.Center,
+                                                fontSize = 18.sp
+                                            ),
+                                    link = MaterialTheme.typography.titleSmall
+                                        .copy(
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textDecoration = TextDecoration.Underline
+                                        ),
+                                    text = MaterialTheme.typography.titleSmall
+                                        .copy(textAlign = TextAlign.Center)
+                                )
+                            )
+                        }
+                    }
+                }
         }
     }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NotInDatabaseScreenPreview() {
+    val name = "Quercus ilex"
+    val score = 0.87
+    val plantNetImageURL = "https://bs.plantnet.org/image/o/a9e693a35121b113f5a349b139260c685dc4bf0b"
+    NotInDatabaseScreen(name, score, plantNetImageURL, 1)
 }
 
 @Composable
