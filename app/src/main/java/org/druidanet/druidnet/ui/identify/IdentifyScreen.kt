@@ -43,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
@@ -69,6 +70,7 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.ShowUsagesButton
+import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
@@ -302,6 +304,22 @@ fun PlantInfoDruidNet(plant: Plant,
             }
         }
 
+        Box(
+            Modifier
+                .padding(15.dp)
+                .align(Alignment.TopStart)
+                .zIndex(1f)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.druidnet_logo),
+                contentDescription = "In database badge",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape),
+                tint = Color.Unspecified
+            )
+        }
+
 
             Image(
                 contentScale = ContentScale.FillWidth,
@@ -383,6 +401,20 @@ fun PlantInfoDruidNet(plant: Plant,
                     .padding(bottom = 6.dp, top = 6.dp),
                 )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PlantInfoDruidNetPreview() {
+    val plant = PlantsDataSource.loadPlants()[0]
+    DruidNetTheme {
+        PlantInfoDruidNet(
+            plant = plant,
+            score = 0.92,
+            imageBitmapExt = ImageBitmap(1024, 768),
+            goToPlantSheetSection = {}
+        )
     }
 }
 
