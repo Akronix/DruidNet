@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,8 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +47,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
@@ -78,7 +74,6 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
-import kotlin.toString
 
 
 @Composable
@@ -304,32 +299,33 @@ fun PlantInfoDruidNet(plant: Plant,
             }
         }
 
-        Box(
-            Modifier
-                .padding(15.dp)
-                .align(Alignment.TopStart)
-                .zIndex(1f)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.druidnet_logo),
-                contentDescription = "In database badge",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                tint = Color.Unspecified
-            )
-        }
+            Box(
+                Modifier
+                    .padding(15.dp)
+                    .align(Alignment.TopStart)
+                    .zIndex(1f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.druidnet_logo),
+                    contentDescription = "In database badge",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    tint = Color.Unspecified
+                )
+            }
 
 
             Image(
                 contentScale = ContentScale.FillWidth,
                 bitmap = imageBitmap,
-//                painter = painterResource(R.drawable.eco),
                 contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
             )
+
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -492,7 +488,7 @@ fun IdentifyScreen(
 }
 
 @Composable
-fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?, page: Int = 0) {
+fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) {
     val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
         in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
@@ -500,54 +496,33 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?, 
         else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
 
-    val pagerState = rememberPagerState(page, pageCount = {
-        2
-    })
-
-    VerticalPager(state = pagerState) { page ->
-        if (page == 0) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(0.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = name.replaceFirstChar { it.uppercase() }.replace('_', ' '),
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "(No tenemos usos en nuestra base de datos)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontStyle = Italic,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(16.dp))
 
-                Box {
-                    AsyncImage(
-                        model = plantNetImageURL,
-                        contentDescription = "PlantNet image for $name",
-                        modifier = Modifier.fillMaxSize(),
-                        fallback = painterResource(R.drawable.grass),
-                        placeholder = forwardingPainter(
-                            painter = painterResource(R.drawable.eco),
-                            colorFilter = ColorFilter.tint(Color.Gray),
-                            alpha = 0.5f,
-                        ),
-                    )
+                Box(
+                    modifier = Modifier
+                        .height(250.dp)
+                        .padding(0.dp)
+                        .zoomable(rememberZoomableState())
+                ) {
+
                     Box(
                         Modifier
                             .padding(15.dp)
                             .align(Alignment.TopEnd)
+                            .zIndex(1f)
                     ) {
+
                         Box(
                             modifier = Modifier
                                 .wrapContentSize()
+//                    .requiredSize()
                                 .background(confidenceBackgroundColor, CircleShape)
                                 .padding(6.dp),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Column(
                                 modifier = Modifier.padding(6.dp),
@@ -568,31 +543,71 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?, 
                             }
                         }
                     }
-                }
-            }
 
-        } else if (page == 1) {
-                Column(
-                    modifier = Modifier
-                        .padding(dimensionResource(R.dimen.padding_large))
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Markdown(
-                        "Todavía no tenemos a _${name}_ en nuestros registros.",
-                        modifier = Modifier,
-                        typography = markdownTypography(
-                            paragraph =
-                                MaterialTheme.typography.headlineSmall.copy(
-                                    textAlign = TextAlign.Center
-                                )
+                    Box(
+                        Modifier
+                            .padding(15.dp)
+                            .align(Alignment.TopStart)
+                            .zIndex(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.druidnet_logo),
+                            contentDescription = "In database badge",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            tint = Color.Unspecified
+                        )
+
+                        Icon(
+                            painter = painterResource(R.drawable.close),
+                            contentDescription = "Not in database cross",
+                            modifier = Modifier.size(40.dp), // Make it slightly smaller than the background
+                            tint = Color.Red.copy(alpha = 0.8f) // A semi-transparent red is a good choice
+                        )
+                    }
+
+
+                    AsyncImage(
+                        model = plantNetImageURL,
+                        contentDescription = "PlantNet image for $name",
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth,
+                        fallback = painterResource(R.drawable.grass),
+                        placeholder = forwardingPainter(
+                            painter = painterResource(R.drawable.eco),
+                            colorFilter = ColorFilter.tint(Color.Gray),
+                            alpha = 0.5f,
                         )
                     )
+                }
 
-                    Image(
-                        painterResource(R.drawable.confused_druidess),
-                        "Una druidesa confundida observando una planta que desconoce."
+                /* Scientific name + Message not in db */
+                Column(
+                    modifier = Modifier
+                        .padding(
+                            top = 0.dp,
+                            start = 10.dp,
+                            end = 10.dp,
+                            bottom = 0.dp,
+                        )
+
+                ) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontStyle = Italic,
                     )
+
+                    Text(
+                        text = "Todavía no tenemos usos de esta planta en nuestros registros",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+
                     Surface(
                         color = MaterialTheme.colorScheme.tertiaryContainer,
                         shape = RoundedCornerShape(10.dp),
@@ -626,9 +641,12 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?, 
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                 }
-        }
-    }
+
+            }
 
 }
 
@@ -638,7 +656,7 @@ fun NotInDatabaseScreenPreview() {
     val name = "Quercus ilex"
     val score = 0.87
     val plantNetImageURL = "https://bs.plantnet.org/image/o/a9e693a35121b113f5a349b139260c685dc4bf0b"
-    NotInDatabaseScreen(name, score, plantNetImageURL, 1)
+    NotInDatabaseScreen(name, score, plantNetImageURL)
 }
 
 @Composable
