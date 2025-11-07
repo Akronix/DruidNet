@@ -40,6 +40,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -306,7 +307,7 @@ fun PlantInfoDruidNet(plant: Plant,
                     .zIndex(1f)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.druidnet_logo),
+                    painter = painterResource(id = R.drawable.logo_is_indb),
                     contentDescription = "In database badge",
                     modifier = Modifier
                         .size(40.dp)
@@ -552,19 +553,14 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.druidnet_logo),
+                            painter = painterResource(id = R.drawable.logo_no_indb),
                             contentDescription = "In database badge",
                             modifier = Modifier
                                 .size(40.dp)
-                                .clip(CircleShape),
-                            tint = Color.Unspecified
-                        )
-
-                        Icon(
-                            painter = painterResource(R.drawable.close),
-                            contentDescription = "Not in database cross",
-                            modifier = Modifier.size(40.dp), // Make it slightly smaller than the background
-                            tint = Color.Red.copy(alpha = 0.8f) // A semi-transparent red is a good choice
+                                .clip(CircleShape)
+                                .alpha(0.60f)
+                            ,
+                            tint = Color.Unspecified,
                         )
                     }
 
