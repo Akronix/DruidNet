@@ -51,6 +51,7 @@ object CameraDestination : NavigationDestination() {
 object IdentifyDestination : NavigationDestination() {
     override val route = "identify"
     override val title = R.string.title_screen_identify
+    override val hasTopBar = false
 }
 
 object CatalogDestination : NavigationDestination() {
@@ -179,8 +180,8 @@ fun DruidNetNavHost(
                     navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=$section")
                 },
                 navController = navController,
+                innerPadding = innerPadding,
                 modifier = Modifier
-                    .padding(innerPadding)
                     .fillMaxSize()
             )
         }

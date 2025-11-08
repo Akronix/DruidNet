@@ -11,15 +11,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,6 +39,7 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -65,6 +73,7 @@ import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
+import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.data.plant.PlantsDataSource
@@ -450,6 +459,7 @@ fun IdentifyScreen(
     identifyViewModel: IdentifyViewModel,
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
     navController: NavController,
+    innerPadding: PaddingValues,
     modifier: Modifier
 ) {
     val loading by identifyViewModel.loading.collectAsState()
@@ -459,33 +469,73 @@ fun IdentifyScreen(
 
     Log.i("IdentifyScreen", "Recomposing. Plant in database: Plant: ${plantResultUIState.plant?.displayName}")
 
-    Box(modifier = modifier) {
         if (loading) {
-            LoadingScreen(imageBitmap = null)
+                Box (modifier = Modifier.padding(innerPadding)) {
+                    LoadingScreen(
+                        imageBitmap = null
+                    )
+            }
         } else {
             if (success) {
-                // TODO: use the customized version of AppTopbar to go back to WelcomeScreen?? and include thumbnail :
+
+                Scaffold(
+                    topBar = { DruidNetAppBar(
+                        navigateUp = { navController.navigateUp() },
+                        topBarTitle = stringResource(R.string.title_screen_identify)
+//                        TODO thumbnail = plantImageBitmap
+                    ) },
+                    modifier = modifier
+                        .padding(innerPadding)
+                        .consumeWindowInsets(innerPadding)
+                        .windowInsetsPadding(
+                            WindowInsets.safeDrawing.only(
+                                WindowInsetsSides.Horizontal,
+                            ),
+                        )
+                ) { padding ->
+                    // TODO: use the customized version of AppTopbar to go back to WelcomeScreen?? and include thumbnail :
 //    Scaffold(
 //        topBar = { DruidNetAppBar(
 //            navigateUp = if (previousBackStack != CameraScreen) navigateBack else goToWelcomeScreen
 //      add thumbnail with input image from user
-                SuccessScreen(
-                    mostLikelyPlant = plantResultUIState.plant,
-                    latinName = plantResultUIState.latinName,
-                    mostLikelyScore = plantResultUIState.score,
-                    goToPlantSheet = goToPlantSheet,
-                    similarPlants = plantResultUIState.similarPlants,
-                    goToSimilarPlant = { name: String, s: Double ->
-                        identifyViewModel.updatePlantNetResult(name, s)
-                    },
-                    plantNetImageURL = plantResultUIState.currentPlantResult?.images?.first()?.url?.o,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                    SuccessScreen(
+                        mostLikelyPlant = plantResultUIState.plant,
+                        latinName = plantResultUIState.latinName,
+                        mostLikelyScore = plantResultUIState.score,
+                        goToPlantSheet = goToPlantSheet,
+                        similarPlants = plantResultUIState.similarPlants,
+                        goToSimilarPlant = { name: String, s: Double ->
+                            identifyViewModel.updatePlantNetResult(name, s)
+                        },
+                        plantNetImageURL = plantResultUIState.currentPlantResult?.images?.first()?.url?.o,
+                        modifier = Modifier.fillMaxSize().padding(padding) ,
+                    )
+                }
             } else {
-                ErrorScreen(status, { navController.navigateUp() } )
+                Scaffold(
+                    topBar = { DruidNetAppBar(
+                        navigateUp = { navController.navigateUp() },
+                        topBarTitle = "¡Error!",
+                        topBarIconPath = R.drawable.warning
+                    ) },
+                    modifier = modifier
+                        .padding(innerPadding)
+                        .consumeWindowInsets(innerPadding)
+                        .windowInsetsPadding(
+                            WindowInsets.safeDrawing.only(
+                                WindowInsetsSides.Horizontal,
+                            ),
+                        )
+                ) { padding ->
+                    Box (modifier = Modifier.padding(padding)) {
+                        ErrorScreen(status,
+                            { navController.navigateUp() }
+                        )
+                    }
+                }
+
             }
         }
-    }
 }
 
 @Composable
