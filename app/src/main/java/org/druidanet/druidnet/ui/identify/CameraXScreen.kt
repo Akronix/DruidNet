@@ -45,6 +45,7 @@ import java.util.Locale
 fun CameraXScreen(
     modifier: Modifier = Modifier,
     onImageCaptured: (Uri) -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
     var hasCamPermission by remember {
@@ -81,6 +82,7 @@ fun CameraXScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
+    val onCancel = navigateBack
 
     Box(modifier = modifier.fillMaxSize()) {
         if (hasCamPermission) {
@@ -122,12 +124,12 @@ fun CameraXScreen(
                 .padding(16.dp),
         ) {
             IconButton(
-                onClick = { galleryLauncher.launch("image/*") },
+                onClick = onCancel,
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.photo_library),
-                    contentDescription = "Open Gallery",
+                    painter = painterResource(R.drawable.close_500),
+                    contentDescription = "Leave Camera Screen",
                     tint = Color.White
                 )
             }
@@ -147,6 +149,16 @@ fun CameraXScreen(
                     contentDescription = "Take Photo",
                     tint = Color.White,
                     modifier = Modifier.fillMaxSize()
+                )
+            }
+            IconButton(
+                onClick = { galleryLauncher.launch("image/*") },
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.photo_library),
+                    contentDescription = "Open Gallery",
+                    tint = Color.White
                 )
             }
         }

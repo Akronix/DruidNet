@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.core.net.toUri
@@ -29,7 +28,6 @@ import org.druidanet.druidnet.ui.identify.CameraXScreen
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
 import org.druidanet.druidnet.ui.identify.IdentifyViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
-import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
@@ -162,7 +160,8 @@ fun DruidNetNavHost(
                     onImageCaptured = { uri ->
                         identifyViewModel.identify(uri)
                         navController.navigate(IdentifyDestination.route)
-                    }
+                    },
+                    navigateBack = { navController.navigateUp() }
 //                    goToResultsScreen = { navController.navigate(IdentifyDestination.route) },
 //                    identifyViewModel,
 //                    modifier = Modifier
