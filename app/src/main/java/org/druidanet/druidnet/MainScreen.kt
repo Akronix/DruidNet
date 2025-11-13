@@ -239,7 +239,7 @@ fun DruidNetAppBar(
                     }
                 },
                 actions = {
-                    if (actionIconRes != null && actionIconContentDescription != null) {
+                    if (actionIconRes != null) {
                         IconButton(onClick = onActionClick) {
                             Icon(
                                 painterResource(actionIconRes),

@@ -36,24 +36,28 @@ import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
 
+@Serializable
 object WelcomeDestination : NavigationDestination() {
     override val route = "welcome"
     override val title = R.string.app_name
     override val hasTopBar = false
 }
 
+@Serializable
 object CameraDestination : NavigationDestination() {
     override val route = "camera"
     override val title = R.string.app_name
     override val hasTopBar = false
 }
 
+@Serializable
 object IdentifyDestination : NavigationDestination() {
     override val route = "identify"
     override val title = R.string.title_screen_identify
     override val hasTopBar = false
 }
 
+@Serializable
 object CatalogDestination : NavigationDestination() {
     override val route = "catalog"
     override val title = R.string.title_screen_catalog
@@ -61,26 +65,31 @@ object CatalogDestination : NavigationDestination() {
     override val hasTopBar = false
 }
 
+@Serializable
 object AboutDestination : NavigationDestination() {
     override val route = "about"
     override val title = R.string.title_screen_about
 }
 
+@Serializable
 object BibliographyDestination : NavigationDestination() {
     override val route = "bibliography"
     override val title = R.string.title_screen_bibliography
 }
 
+@Serializable
 object CreditsDestination : NavigationDestination() {
     override val route = "credits"
     override val title = R.string.title_screen_credits
 }
 
+@Serializable
 object RecommendationsDestination : NavigationDestination() {
     override val route = "recommendations"
     override val title = R.string.title_screen_recommendations
 }
 
+@Serializable
 object GlossaryDestination : NavigationDestination() {
     override val route = "glossary"
     override val title = R.string.title_screen_glossary
@@ -154,6 +163,7 @@ fun DruidNetNavHost(
                     .wrapContentSize(Alignment.Center)
             )
         }
+        //TODO: Remove this Destination and handle everything in IdentifyDestination
         composable( route = CameraDestination.route) {
                 backStackEntry ->
                 val identifyViewModel: IdentifyViewModel = hiltViewModel(backStackEntry)
@@ -179,7 +189,14 @@ fun DruidNetNavHost(
                 goToPlantSheet = { plant, section ->
                     navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=$section")
                 },
-                navController = navController,
+                onPressBackButton = {
+                    navController.popBackStack(WelcomeDestination.route, false)
+//                    if (navController.previousBackStackEntry?.destination?.route != CameraDestination.route ) navController.navigateUp()
+//                    else navController.popBackStack(WelcomeDestination.route, false)
+                },
+                navigateToCameraScreen = {
+                    navController.popBackStack(CameraDestination.route, false)
+                },
                 innerPadding = innerPadding,
                 modifier = Modifier
                     .fillMaxSize()

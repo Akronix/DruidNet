@@ -2,6 +2,7 @@ package org.druidanet.druidnet.ui.identify
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +27,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,7 +67,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
@@ -458,7 +457,8 @@ fun SimilarPlants(
 fun IdentifyScreen(
     identifyViewModel: IdentifyViewModel,
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
-    navController: NavController,
+    onPressBackButton: () -> Unit,
+    navigateToCameraScreen: () -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier
 ) {
@@ -468,6 +468,10 @@ fun IdentifyScreen(
     val plantResultUIState by identifyViewModel.uiState.collectAsState()
 
     Log.i("IdentifyScreen", "Recomposing. Plant in database: Plant: ${plantResultUIState.plant?.displayName}")
+
+    BackHandler(true) {
+        onPressBackButton()
+    }
 
         if (loading) {
                 Box (modifier = Modifier.padding(innerPadding)) {
@@ -480,9 +484,12 @@ fun IdentifyScreen(
 
                 Scaffold(
                     topBar = { DruidNetAppBar(
-                        navigateUp = { navController.navigateUp() },
-                        topBarTitle = stringResource(R.string.title_screen_identify)
-//                        TODO thumbnail = plantImageBitmap
+                        navigateUp = onPressBackButton,
+                        topBarTitle = stringResource(R.string.title_screen_identify),
+//                        TODO thumbnail = plantImageBitmap,
+                        onActionClick = navigateToCameraScreen,
+                        actionIconRes = R.drawable.reset_image_24px,
+                        actionIconContentDescription = "Volver a capturar imagen"
                     ) },
                     modifier = modifier
                         .padding(innerPadding)
@@ -493,11 +500,6 @@ fun IdentifyScreen(
                             ),
                         )
                 ) { padding ->
-                    // TODO: use the customized version of AppTopbar to go back to WelcomeScreen?? and include thumbnail :
-//    Scaffold(
-//        topBar = { DruidNetAppBar(
-//            navigateUp = if (previousBackStack != CameraScreen) navigateBack else goToWelcomeScreen
-//      add thumbnail with input image from user
                     SuccessScreen(
                         mostLikelyPlant = plantResultUIState.plant,
                         latinName = plantResultUIState.latinName,
@@ -514,7 +516,7 @@ fun IdentifyScreen(
             } else {
                 Scaffold(
                     topBar = { DruidNetAppBar(
-                        navigateUp = { navController.navigateUp() },
+                        navigateUp = onPressBackButton,
                         topBarTitle = "¡Error!",
                         topBarIconPath = R.drawable.warning
                     ) },
@@ -529,7 +531,7 @@ fun IdentifyScreen(
                 ) { padding ->
                     Box (modifier = Modifier.padding(padding)) {
                         ErrorScreen(status,
-                            { navController.navigateUp() }
+                            retry = navigateToCameraScreen
                         )
                     }
                 }
