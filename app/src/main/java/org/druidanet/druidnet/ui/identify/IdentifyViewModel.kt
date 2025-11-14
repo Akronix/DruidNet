@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -116,29 +117,37 @@ class IdentifyViewModel @Inject constructor(
     fun identify(uri: Uri) {
 
         viewModelScope.launch {
-//            _uiState.value = PlantNetResultUIState()
             reset()
-            _loading.value = true // Set loading true at the start
-            val identifyingMsg = "Identifying..."
-            _identificationStatus.value = identifyingMsg
-            Log.i(TAG, identifyingMsg)
 
-            // Declare the file variable here to be accessible in finally
-            var imageFile: File? = null
+            val originalImageFile = getFileFromUri(appContext, uri)
+            var compressedImage: File
+
+            // First, we compress the image and save the result in the uiState
+            if (originalImageFile != null) {
+                _loading.value = true // Set loading true at the start
+                _identificationStatus.value = "Comprimiendo..."
+                Log.i(TAG, "Compressing...")
+                // Compress the image before uploading
+                //                    val imageSizeBc = originalImageFile.length() / 1024 // In KBYTES
+                //                    Log.d("image_before_compress", imageSizeBc.toString())
+                compressedImage = compressImage(uri, appContext)
+                _uiState.value = uiState.value.copy(imageForIdentification = compressedImage)
+                //                    val imageSizeAC = compressedImage.length() / 1024 // In KBYTES
+                //                    Log.d("image_after_compress", imageSizeAC.toString())
+
+            } else { // Missing input image file :/
+                _identificationStatus.value = "Hubo un fallo con la lectura de la imagen."
+                Log.i(TAG, "Error: Could not convert image to file.")
+                _loading.value = false
+                return@launch
+            }
+
+            // Second, we start the identifying API request
+            val identifyingMsg = "Identificando..."
+            _identificationStatus.value = identifyingMsg
+            Log.i(TAG, "Identifying...")
 
             try {
-//                val imageFile = bitmapToFile(uri, "plant_image.jpg")
-                imageFile = getFileFromUri(appContext, uri)
-
-                if (imageFile != null) {
-
-                    // Compress the image before uploading
-//                    val imageSizeBc = imageFile.length() / 1024 // In KBYTES
-//                    Log.d("image_before_compress", imageSizeBc.toString())
-                    val compressedImage = compressImage(uri, appContext)
-//                    val imageSizeAC = compressedImage.length() / 1024 // In KBYTES
-//                    Log.d("image_after_compress", imageSizeAC.toString())
-
                     // add image to the request
                     val requestFile = compressedImage.asRequestBody("image/jpeg".toMediaTypeOrNull())
                     val imagePart = MultipartBody.Part.createFormData("images", compressedImage.name, requestFile)
@@ -159,7 +168,7 @@ class IdentifyViewModel @Inject constructor(
                         latinName = bestMatchName,
                         similarPlants = response.results?.drop(1) ?: emptyList(),
                         currentPlantResult = response.results?.first()
-                        )
+                    )
 
                     if (response.results != null) {
                         val plant: Plant? = plantsRepository.searchPlant(bestMatchName, language)
@@ -178,34 +187,31 @@ class IdentifyViewModel @Inject constructor(
 
                     _apiResponse.value = response
 
-                    imageFile.delete()
+                    originalImageFile.delete()
 
                     _successRequest.value = true
 
-                } else {
-                    _identificationStatus.value = "Hubo un fallo con la lectura de la imagen."
-                    Log.i(TAG, "Error: Could not convert image to file.")
+
+                } catch (e: HttpException) {
+                    if (e.code() == 404) {
+                        _identificationStatus.value = "No se ha encontrado ninguna identificación posible para esta imagen."
+                        Log.w(TAG, "No identification available for this image. (HTTP 404)", e)
+                    } else {
+                        val httpErrorMsg = "HTTP Error: ${e.code()} - ${e.message()}"
+                        _identificationStatus.value = httpErrorMsg
+                        Log.e(TAG, httpErrorMsg, e)
+                    }
+                } catch (e: IOException) {
+                    _identificationStatus.value = "El servicio de identificación necesita acceso a internet. Por favor, comprueba tu conexión e inténtalo de nuevo."
+                    Log.e(TAG, "Network error: Could not connect to the service. Please check your internet connection.", e)
+                } catch (e: Exception) {
+                    val exceptionMsg = "Error: ${e.message ?: "An unexpected error occurred."}"
+                    _identificationStatus.value = "Ha ocurrido un error inesperado."
+                    Log.e(TAG, exceptionMsg, e)
+                } finally {
+                    _loading.value = false // Ensure loading is set to false in all cases
+                    originalImageFile.delete() // Safely delete the temporary file
                 }
-            } catch (e: HttpException) {
-                if (e.code() == 404) {
-                    _identificationStatus.value = "No se ha encontrado ninguna identificación posible para esta imagen."
-                    Log.w(TAG, "No identification available for this image. (HTTP 404)", e)
-                } else {
-                    val httpErrorMsg = "HTTP Error: ${e.code()} - ${e.message()}"
-                    _identificationStatus.value = httpErrorMsg
-                    Log.e(TAG, httpErrorMsg, e)
-                }
-            } catch (e: IOException) {
-                _identificationStatus.value = "El servicio de identificación necesita acceso a internet. Por favor, comprueba tu conexión e inténtalo de nuevo."
-                Log.e(TAG, "Network error: Could not connect to the service. Please check your internet connection.", e)
-            } catch (e: Exception) {
-                val exceptionMsg = "Error: ${e.message ?: "An unexpected error occurred."}"
-                _identificationStatus.value = "Ha ocurrido un error inesperado."
-                Log.e(TAG, exceptionMsg, e)
-            } finally {
-                _loading.value = false // Ensure loading is set to false in all cases
-                imageFile?.delete() // Safely delete the temporary file
-            }
         }
     }
 

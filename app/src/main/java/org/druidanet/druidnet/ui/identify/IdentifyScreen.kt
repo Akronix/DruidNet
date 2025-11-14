@@ -67,6 +67,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.graphics.decodeBitmap
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
@@ -83,6 +84,7 @@ import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
+import java.io.File
 
 
 @Composable
@@ -154,19 +156,12 @@ fun ErrorScreenPreview() {
 
 
 @Composable
-fun LoadingScreen(imageBitmap: Bitmap?) {
+fun LoadingScreen(text: String, imageForIdentification: File?) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        if (imageBitmap != null) {
-            Image(
-                bitmap = imageBitmap.asImageBitmap(),
-                contentDescription = "Image being identified",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
+
         // Scrim to darken the background
         Box(
             modifier = Modifier
@@ -174,11 +169,20 @@ fun LoadingScreen(imageBitmap: Bitmap?) {
                 .background(Color.Black.copy(alpha = 0.5f))
         )
 
+        if (imageForIdentification != null) {
+            AsyncImage(
+                model = imageForIdentification,
+                contentDescription = "Image being identified",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(modifier = Modifier.size(64.dp))
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Identificando...",
+                text = text,
                 color = Color.White,
                 style = MaterialTheme.typography.headlineSmall
             )
@@ -476,7 +480,8 @@ fun IdentifyScreen(
         if (loading) {
                 Box (modifier = Modifier.padding(innerPadding)) {
                     LoadingScreen(
-                        imageBitmap = null
+                        status,
+                        imageForIdentification = plantResultUIState.imageForIdentification
                     )
             }
         } else {
@@ -510,7 +515,9 @@ fun IdentifyScreen(
                             identifyViewModel.updatePlantNetResult(name, s)
                         },
                         plantNetImageURL = plantResultUIState.currentPlantResult?.images?.first()?.url?.o,
-                        modifier = Modifier.fillMaxSize().padding(padding) ,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding) ,
                     )
                 }
             } else {
@@ -609,8 +616,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .alpha(0.60f)
-                            ,
+                                .alpha(0.60f),
                             tint = Color.Unspecified,
                         )
                     }

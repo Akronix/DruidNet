@@ -2,6 +2,7 @@ package org.druidanet.druidnet.ui.identify
 
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantResult
+import java.io.File
 
 data class PlantNetResultUIState (
     /**
@@ -17,5 +18,7 @@ data class PlantNetResultUIState (
 
     val similarPlants: List<PlantResult> = emptyList<PlantResult>(),
 
-    val currentPlantResult: PlantResult? = null
+    val currentPlantResult: PlantResult? = null,
+
+    val imageForIdentification: File? = null
 )

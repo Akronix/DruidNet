@@ -45,6 +45,7 @@ fun CameraScreen(
     val loading by identifyViewModel.loading.collectAsState()
     val plantResultUIState by identifyViewModel.uiState.collectAsState()
     val successRequest by identifyViewModel.successRequest.collectAsState()
+    val identificationStatusTxt by identifyViewModel.identificationStatus.collectAsState()
 
     var capturedImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -89,10 +90,10 @@ fun CameraScreen(
 
 
     if (loading) {
-        LoadingScreen(imageBitmap = capturedImageBitmap)
+        LoadingScreen(identificationStatusTxt, null)
     } else {
         Box( modifier = modifier) {
-            Text(identifyViewModel.identificationStatus.collectAsState().value)
+            Text(identificationStatusTxt)
         }
     }
 
