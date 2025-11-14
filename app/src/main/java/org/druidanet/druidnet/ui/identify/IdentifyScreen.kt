@@ -208,7 +208,7 @@ fun SuccessScreen(
             modifier = Modifier.weight(2f)
         ) {
             if (mostLikelyPlant != null)
-                PlantInfoDruidNet(
+                PlantInDruidNet(
                     plant = mostLikelyPlant,
                     score = mostLikelyScore,
                     goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) },
@@ -249,7 +249,7 @@ fun SuccessScreen(
 }
 
 @Composable
-fun PlantInfoDruidNet(plant: Plant,
+fun PlantInDruidNet(plant: Plant,
                       score: Double,
                       imageBitmapExt: ImageBitmap?,
                      goToPlantSheetSection: (PlantSheetSection) -> Unit) {
@@ -270,7 +270,6 @@ fun PlantInfoDruidNet(plant: Plant,
             modifier = Modifier
                 .height(250.dp)
                 .padding(0.dp)
-                .zoomable(rememberZoomableState())
         ) {
 
             Box(
@@ -331,6 +330,7 @@ fun PlantInfoDruidNet(plant: Plant,
                 contentDescription = stringResource(R.string.datasheet_image_cdescp),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .zoomable(rememberZoomableState()),
             )
 
         }
@@ -411,10 +411,10 @@ fun PlantInfoDruidNet(plant: Plant,
 
 @Preview(showBackground = true)
 @Composable
-fun PlantInfoDruidNetPreview() {
+fun PlantInDruidNetPreview() {
     val plant = PlantsDataSource.loadPlants()[0]
     DruidNetTheme {
-        PlantInfoDruidNet(
+        PlantInDruidNet(
             plant = plant,
             score = 0.92,
             imageBitmapExt = ImageBitmap(1024, 768),
@@ -559,7 +559,6 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                     modifier = Modifier
                         .height(250.dp)
                         .padding(0.dp)
-                        .zoomable(rememberZoomableState())
                 ) {
 
                     Box(
@@ -620,7 +619,9 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                     AsyncImage(
                         model = plantNetImageURL,
                         contentDescription = "PlantNet image for $name",
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .zoomable(rememberZoomableState()),
                         contentScale = ContentScale.FillWidth,
                         fallback = painterResource(R.drawable.grass),
                         placeholder = forwardingPainter(
