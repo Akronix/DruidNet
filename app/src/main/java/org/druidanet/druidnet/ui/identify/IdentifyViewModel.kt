@@ -112,8 +112,6 @@ class IdentifyViewModel @Inject constructor(
         _uiState.value = PlantNetResultUIState();
     }
 
-    fun identifyOld(imageBitmap: Bitmap) {}
-
     fun identify(uri: Uri) {
 
         viewModelScope.launch {
