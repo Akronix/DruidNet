@@ -32,10 +32,12 @@ import org.druidanet.druidnet.network.PlantNetApiService
 import org.druidanet.druidnet.network.PlantNetResponse
 import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.network.SpeciesInfo
+import org.druidanet.druidnet.utils.compressImage
 import retrofit2.HttpException
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.lang.System.exit
 import javax.inject.Inject
 
 private const val TIMEOUT_MILLIS = 5_000L
@@ -129,8 +131,17 @@ class IdentifyViewModel @Inject constructor(
                 imageFile = getFileFromUri(appContext, uri)
 
                 if (imageFile != null) {
-                    val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                    val imagePart = MultipartBody.Part.createFormData("images", imageFile.name, requestFile)
+
+                    // Compress the image before uploading
+//                    val imageSizeBc = imageFile.length() / 1024 // In KBYTES
+//                    Log.d("image_before_compress", imageSizeBc.toString())
+                    val compressedImage = compressImage(uri, appContext)
+//                    val imageSizeAC = compressedImage.length() / 1024 // In KBYTES
+//                    Log.d("image_after_compress", imageSizeAC.toString())
+
+                    // add image to the request
+                    val requestFile = compressedImage.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                    val imagePart = MultipartBody.Part.createFormData("images", compressedImage.name, requestFile)
 
                     val organValue = "auto"
                     val organRequestBody = organValue.toRequestBody("text/plain".toMediaTypeOrNull())
