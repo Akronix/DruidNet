@@ -442,7 +442,7 @@ fun IdentifyScreen(
     val status by identifyViewModel.identificationStatus.collectAsState()
     val plantResultUIState by identifyViewModel.uiState.collectAsState()
 
-    Log.i("IdentifyScreen", "Recomposing. Plant in database: Plant: ${plantResultUIState.plant?.displayName}")
+//    Log.i("IdentifyScreen", "Recomposing. Plant in database: Plant: ${plantResultUIState.plant?.displayName}")
 
     //TODO To change by a one destination only (IdentifyDestination) and include CameraDestination here.
     BackHandler(true) {

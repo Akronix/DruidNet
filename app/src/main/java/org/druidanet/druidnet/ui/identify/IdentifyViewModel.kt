@@ -1,12 +1,10 @@
 package org.druidanet.druidnet.ui.identify
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
-import okhttp3.CacheControl
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -31,14 +26,11 @@ import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantNetApiService
 import org.druidanet.druidnet.network.PlantNetResponse
-import org.druidanet.druidnet.network.PlantResult
-import org.druidanet.druidnet.network.SpeciesInfo
 import org.druidanet.druidnet.utils.compressImage
+import org.druidanet.druidnet.utils.getFileFromUri
 import retrofit2.HttpException
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.System.exit
 import javax.inject.Inject
 
 private const val TIMEOUT_MILLIS = 5_000L
@@ -85,24 +77,6 @@ class IdentifyViewModel @Inject constructor(
 
     private val language = preferencesState.value.displayLanguage
 
-    // The final combined UI state for the results screen
-    /*
-    val uiState: StateFlow<PlantNetResultUIState> = combine(
-        plantDataFlow, apiResponse
-    ) { plantData, response ->
-        Log.i(TAG, "Plant: $plantData")
-        PlantNetResultUIState(
-            plant = plantData,
-            score = response?.results?.firstOrNull()?.score ?: 0.0,
-            similarPlants = response?.results?.drop(1) ?: emptyList()
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = PlantNetResultUIState()
-    )
-     */
-
     companion object {
         private const val TAG = "IdentifyViewModel"
     }
@@ -121,7 +95,14 @@ class IdentifyViewModel @Inject constructor(
         viewModelScope.launch {
             reset()
 
-            val originalImageFile = getFileFromUri(appContext, uri)
+            val originalImageFile = try {
+                getFileFromUri(appContext, uri, prefix = "plant_image_", suffix = ".jpg")
+            } catch (e: IOException) {
+                Log.e(TAG, "Failed to create temp file from URI", e)
+                _error.value = true
+                return@launch
+            }
+
             var compressedImage: File
 
             // First, we compress the image and save the result in the uiState
@@ -139,8 +120,9 @@ class IdentifyViewModel @Inject constructor(
 
             } else { // Missing input image file :/
                 _identificationStatus.value = "Hubo un fallo con la lectura de la imagen."
-                Log.i(TAG, "Error: Could not convert image to file.")
+                Log.e(TAG, "Error: Could not convert image to file.")
                 _loading.value = false
+                _error.value = true
                 return@launch
             }
 
@@ -175,17 +157,17 @@ class IdentifyViewModel @Inject constructor(
                     if (response.results != null) {
                         val plant: Plant? = plantsRepository.searchPlant(bestMatchName, language)
                         if (plant != null) {
-                            Log.i(TAG, "Plant found in database: $plant")
+//                            Log.i(TAG, "Plant found in database!")
                             _uiState.value = uiState.value.copy(plant = plant, isInDatabase = true)
-                            Log.i(TAG, "Plant: ${uiState.value.plant}")
+//                            Log.i(TAG, "Plant: ${uiState.value.plant}")
                         }
 
                     }
 
                     val successMsg = "Success: Best match - $bestMatchName."
                     _identificationStatus.value = successMsg
-                    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
-                    Log.i(TAG, "$successMsg Full response: \n${json.encodeToString(response)}")
+//                    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
+//                    Log.i(TAG, "$successMsg Full response: \n${json.encodeToString(response)}")
 
                     _apiResponse.value = response
 
@@ -198,7 +180,7 @@ class IdentifyViewModel @Inject constructor(
                     _error.value = true
                     if (e.code() == 404) {
                         _identificationStatus.value = "No se ha encontrado ninguna identificación posible para esta imagen."
-                        Log.w(TAG, "No identification available for this image. (HTTP 404)", e)
+                        Log.e(TAG, "No identification available for this image. (HTTP 404)", e)
                     } else {
                         val httpErrorMsg = "HTTP Error: ${e.code()} - ${e.message()}"
                         _identificationStatus.value = httpErrorMsg
@@ -241,9 +223,9 @@ class IdentifyViewModel @Inject constructor(
 
         viewModelScope.launch {
             val newPlant: Plant? = plantsRepository.searchPlant(newPlantName, language)
-            if (newPlant != null) {
-                Log.i(TAG, "Plant found in database: $newPlant")
-            }
+//            if (newPlant != null) {
+//                Log.i(TAG, "Plant found in database: $newPlant")
+//            }
             _uiState.value = uiState.value.copy(
                 plant = newPlant,
                 score = newScore,
@@ -256,32 +238,6 @@ class IdentifyViewModel @Inject constructor(
     }
 
     /**
-     * Copies the data from a Uri to a temporary file in the app's cache directory.
-     * This is the reliable way to get a File from a content Uri.
-     */
-    private fun getFileFromUri(context: Context, uri: Uri): File? {
-        return try {
-            val contentResolver = context.contentResolver
-            // Create a temporary file in the app's cache directory
-            val tempFile = File.createTempFile("plant_image_", ".jpg", context.cacheDir)
-            // Ensure the file is deleted when the VM is shut down, as a fallback.
-            tempFile.deleteOnExit()
-
-            // Open an InputStream to the URI's content and a FileOutputStream to the temp file
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                FileOutputStream(tempFile).use { outputStream ->
-                    // Copy the data from the input stream to the output stream
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            tempFile
-        } catch (e: IOException) {
-            Log.e(TAG, "Failed to create temp file from URI", e)
-            null
-        }
-    }
-
-    /**
      * Call this function from your UI after navigation has been handled
      * to prevent re-navigation on configuration changes.
      */
@@ -290,19 +246,4 @@ class IdentifyViewModel @Inject constructor(
         _successRequest.value = false
     }
 
-    private fun bitmapToFile(bitmap: Bitmap, fileName: String): File? {
-        val cacheDir = appContext.cacheDir
-        val file = File(cacheDir, fileName)
-        try {
-            file.createNewFile()
-            val fos = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos)
-            fos.flush()
-            fos.close()
-            return file
-        } catch (e: IOException) {
-            Log.e(TAG, "Error converting bitmap to file", e)
-            return null
-        }
-    }
 }

@@ -1,8 +1,6 @@
 package org.druidanet.druidnet.utils
 
 import android.content.Context
-import java.io.File
-import java.io.FileOutputStream
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
@@ -12,6 +10,9 @@ import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.scale
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 const val COMPRESS_FACTOR = 4
 
@@ -48,6 +49,27 @@ fun compressImage(uri: Uri, context: Context): File {
     return tempFile
 }
 
+/**
+ * Copies the data from a Uri to a temporary file in the app's cache directory.
+ * This is the reliable way to get a File from a content Uri.
+ */
+fun getFileFromUri(context: Context, uri: Uri, prefix: String, suffix: String): File? {
+    val contentResolver = context.contentResolver
+    // Create a temporary file in the app's cache directory
+    val tempFile = File.createTempFile(prefix, suffix, context.cacheDir)
+    // Ensure the file is deleted when the VM is shut down, as a fallback.
+    tempFile.deleteOnExit()
+
+    // Open an InputStream to the URI's content and a FileOutputStream to the temp file
+    contentResolver.openInputStream(uri)?.use { inputStream ->
+        FileOutputStream(tempFile).use { outputStream ->
+            // Copy the data from the input stream to the output stream
+            inputStream.copyTo(outputStream)
+        }
+    }
+    return tempFile
+}
+
 fun fileToImageBitmap(file: File?): ImageBitmap? {
     if (file == null || !file.exists()) return null
 
@@ -56,4 +78,39 @@ fun fileToImageBitmap(file: File?): ImageBitmap? {
 
     // Convert Bitmap to ImageBitmap
     return bitmap?.asImageBitmap()
+}
+
+fun bitmapToFile(bitmap: Bitmap, fileName: String, context: Context): File? {
+    val cacheDir = context.cacheDir
+    val file = File(cacheDir, fileName)
+    try {
+        file.createNewFile()
+        val fos = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos)
+        fos.flush()
+        fos.close()
+        return file
+    } catch (e: IOException) {
+        Log.e("ERROR", "Error converting bitmap to file", e)
+        throw e
+    }
+}
+
+// TODO: Remove and replace by something better (painter to pass to images or Coil)
+fun Context.assetsToBitmap(filename:String): ImageBitmap {
+    val assetManager = this.assets
+    val imgFn = "$filename.webp"
+    val localStorageDir = this.getDir("images", Context.MODE_PRIVATE).absolutePath
+
+    val inputStream = if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
+        assetManager.open("images/plants/$imgFn")
+    else
+        if (File("$localStorageDir/$imgFn").exists())
+            File("$localStorageDir/$imgFn").inputStream()
+        else
+            assetManager.open("images/broken_image.jpg")
+
+    val bitmap = BitmapFactory.decodeStream(inputStream)
+    inputStream.close()
+    return bitmap.asImageBitmap()
 }
