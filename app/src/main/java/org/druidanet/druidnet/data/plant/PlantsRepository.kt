@@ -44,22 +44,30 @@ class PlantsRepository(
     }
 
     suspend fun searchPlant(speciesName: String, language: LanguageEnum): Plant? {
+        // Special case, if we got Taraxacum sect. Taraxacum => convert to Taraxacum officinale
+
+        var queryName = speciesName
+
+        if (queryName == "Taraxacum sect. Taraxacum") {
+            queryName = "Taraxacum officinale"
+        }
+
         // First, try to find the exact species
-        val plantData = plantDao.getPlant(speciesName).firstOrNull()
+        val plantData = plantDao.getPlant(queryName).firstOrNull()
 
         if (plantData != null) {
             // Found the exact species, get display name and convert to Plant object
-            val displayName = plantDao.getDisplayName(plantData.p.plantId, language).firstOrNull() ?: speciesName
+            val displayName = plantDao.getDisplayName(plantData.p.plantId, language).firstOrNull() ?: queryName
             return plantData.toPlant(displayName = displayName)
         }
 
         // If not found, try to find the genus (e.g., "Quercus spp.")
-        val genusName = speciesName.split(" ").first() + " spp."
-        val genusData = plantDao.getPlant(genusName).firstOrNull()
+        queryName = speciesName.split(" ").first() + " spp."
+        val genusData = plantDao.getPlant(queryName).firstOrNull()
 
         if (genusData != null) {
             // Found the genus, get display name and convert to Plant object
-            val displayName = plantDao.getDisplayName(genusData.p.plantId, language).firstOrNull() ?: genusName
+            val displayName = plantDao.getDisplayName(genusData.p.plantId, language).firstOrNull() ?: queryName
             return genusData.toPlant(displayName = displayName)
         }
 
