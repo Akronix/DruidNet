@@ -259,12 +259,6 @@ fun PlantInDruidNet(plant: Plant,
                       imageBitmapExt: ImageBitmap?,
                      goToPlantSheetSection: (PlantSheetSection) -> Unit) {
     val imageBitmap = imageBitmapExt ?: LocalContext.current.assetsToBitmap(plant.imagePath)
-    val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
-        in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
-        in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-        in 0.85..1.0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-        else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
-    }
 
     Column(
         modifier = Modifier
@@ -283,34 +277,8 @@ fun PlantInDruidNet(plant: Plant,
                     .align(Alignment.TopEnd)
                     .zIndex(1f)
             ) {
-
-            Box(
-                modifier = Modifier
-                    .wrapContentSize()
-//                    .requiredSize()
-                    .background(confidenceBackgroundColor, CircleShape)
-                    .padding(6.dp),
-                    contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    modifier = Modifier.padding(6.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "${(score * 100).toInt()}%",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        color = confidenceContentColor
-                    )
-                    Text(
-                        "Confianza",
-                        fontWeight = FontWeight.Bold,
-                        color = confidenceContentColor
-                    )
-                }
+                ConfidenceBadge(score)
             }
-        }
 
             Box(
                 Modifier
@@ -551,13 +519,6 @@ fun IdentifyScreen(
 
 @Composable
 fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) {
-    val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
-        in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
-        in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-        in 0.85..1.0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-        else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
-    }
-
             Column(
                 modifier = Modifier
                     .padding(0.dp)
@@ -572,37 +533,11 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
 
                     Box(
                         Modifier
-                            .padding(15.dp)
+                            .padding(20.dp)
                             .align(Alignment.TopEnd)
                             .zIndex(1f)
                     ) {
-
-                        Box(
-                            modifier = Modifier
-                                .wrapContentSize()
-//                    .requiredSize()
-                                .background(confidenceBackgroundColor, CircleShape)
-                                .padding(6.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(6.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "${(score * 100).toInt()}%",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center,
-                                    color = confidenceContentColor
-                                )
-                                Text(
-                                    "Confianza",
-                                    fontWeight = FontWeight.Bold,
-                                    color = confidenceContentColor
-                                )
-                            }
-                        }
+                        ConfidenceBadge(score)
                     }
 
                     Box(
@@ -622,7 +557,6 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                             tint = Color.Unspecified,
                         )
                     }
-
 
                     AsyncImage(
                         model = plantNetImageURL,
@@ -705,6 +639,45 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
 
             }
 
+}
+
+@Composable
+fun ConfidenceBadge(score: Double) {
+
+    val (confidenceBackgroundColor, confidenceContentColor) = when (score) {
+        in 0.5..0.7 -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+        in 0.7..0.85 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+        in 0.85..1.0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
+    }
+
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+//                    .requiredSize()
+                .background(confidenceBackgroundColor, CircleShape)
+                .padding(6.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                modifier = Modifier.padding(6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "${(score * 100).toInt()}%",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = confidenceContentColor
+                )
+                Text(
+                    "Confianza",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = confidenceContentColor
+                )
+            }
+        }
 }
 
 @Preview(showBackground = true)
