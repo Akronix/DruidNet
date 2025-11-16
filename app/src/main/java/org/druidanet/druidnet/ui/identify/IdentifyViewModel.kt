@@ -57,6 +57,9 @@ class IdentifyViewModel @Inject constructor(
     private val _loading = MutableStateFlow<Boolean>(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
+    private val _error = MutableStateFlow<Boolean>(false)
+    val error: StateFlow<Boolean> = _error.asStateFlow()
+
     private val _successRequest = MutableStateFlow<Boolean>(false)
     val successRequest: StateFlow<Boolean> = _successRequest.asStateFlow()
 
@@ -109,6 +112,7 @@ class IdentifyViewModel @Inject constructor(
         _successRequest.value = false;
         _identificationStatus.value = "";
         _loading.value = false;
+        _error.value = false;
         _uiState.value = PlantNetResultUIState();
     }
 
@@ -191,6 +195,7 @@ class IdentifyViewModel @Inject constructor(
 
 
                 } catch (e: HttpException) {
+                    _error.value = true
                     if (e.code() == 404) {
                         _identificationStatus.value = "No se ha encontrado ninguna identificación posible para esta imagen."
                         Log.w(TAG, "No identification available for this image. (HTTP 404)", e)
@@ -200,9 +205,11 @@ class IdentifyViewModel @Inject constructor(
                         Log.e(TAG, httpErrorMsg, e)
                     }
                 } catch (e: IOException) {
+                    _error.value = true
                     _identificationStatus.value = "El servicio de identificación necesita acceso a internet. Por favor, comprueba tu conexión e inténtalo de nuevo."
                     Log.e(TAG, "Network error: Could not connect to the service. Please check your internet connection.", e)
                 } catch (e: Exception) {
+                    _error.value = true
                     val exceptionMsg = "Error: ${e.message ?: "An unexpected error occurred."}"
                     _identificationStatus.value = "Ha ocurrido un error inesperado."
                     Log.e(TAG, exceptionMsg, e)
