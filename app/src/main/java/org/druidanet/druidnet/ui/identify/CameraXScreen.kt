@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -163,11 +164,12 @@ fun CameraXScreen(
             }
         }
         Text(
-            text = "Enfoca un órgano de la planta",
+            text = "Enfoca la flor, hoja, fruto o corteza de una sola planta",
             color = Color.White,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top=100.dp)
+                .padding(start = 8.dp, top=100.dp, end = 8.dp)
         )
     }
 }
