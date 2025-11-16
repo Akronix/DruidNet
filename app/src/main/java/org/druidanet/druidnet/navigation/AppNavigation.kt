@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,8 +24,10 @@ import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.DruidNetViewModel
+import org.druidanet.druidnet.ui.identify.CameraXScreen
+import org.druidanet.druidnet.ui.identify.IdentifyScreen
+import org.druidanet.druidnet.ui.identify.IdentifyViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
-import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
@@ -33,12 +36,28 @@ import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
 
+@Serializable
 object WelcomeDestination : NavigationDestination() {
     override val route = "welcome"
     override val title = R.string.app_name
     override val hasTopBar = false
 }
 
+@Serializable
+object CameraDestination : NavigationDestination() {
+    override val route = "camera"
+    override val title = R.string.app_name
+    override val hasTopBar = false
+}
+
+@Serializable
+object IdentifyDestination : NavigationDestination() {
+    override val route = "identify"
+    override val title = R.string.title_screen_identify
+    override val hasTopBar = false
+}
+
+@Serializable
 object CatalogDestination : NavigationDestination() {
     override val route = "catalog"
     override val title = R.string.title_screen_catalog
@@ -46,26 +65,31 @@ object CatalogDestination : NavigationDestination() {
     override val hasTopBar = false
 }
 
+@Serializable
 object AboutDestination : NavigationDestination() {
     override val route = "about"
     override val title = R.string.title_screen_about
 }
 
+@Serializable
 object BibliographyDestination : NavigationDestination() {
     override val route = "bibliography"
     override val title = R.string.title_screen_bibliography
 }
 
+@Serializable
 object CreditsDestination : NavigationDestination() {
     override val route = "credits"
     override val title = R.string.title_screen_credits
 }
 
+@Serializable
 object RecommendationsDestination : NavigationDestination() {
     override val route = "recommendations"
     override val title = R.string.title_screen_recommendations
 }
 
+@Serializable
 object GlossaryDestination : NavigationDestination() {
     override val route = "glossary"
     override val title = R.string.title_screen_glossary
@@ -90,7 +114,7 @@ object PlantSheetDestination : NavigationDestination() {
 //    val routeWithArgs = "$route/{$plantId}"
 //}
 
-val screensByRoute : Map<String, NavigationDestination> =
+val screensByRoute : Map<String, NavigationDestination> = 
     mapOf(
         WelcomeDestination.route to WelcomeDestination,
         CatalogDestination.route to CatalogDestination,
@@ -99,7 +123,9 @@ val screensByRoute : Map<String, NavigationDestination> =
         BibliographyDestination.route to BibliographyDestination,
         CreditsDestination.route to CreditsDestination,
         RecommendationsDestination.route to RecommendationsDestination,
-        GlossaryDestination.route to GlossaryDestination
+        GlossaryDestination.route to GlossaryDestination,
+        IdentifyDestination.route to IdentifyDestination,
+        CameraDestination.route to CameraDestination,
     )
 
 // Before Implementation:
@@ -135,6 +161,45 @@ fun DruidNetNavHost(
                     .padding(innerPadding)
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center)
+            )
+        }
+        //TODO: Remove this Destination and handle everything in IdentifyDestination
+        composable( route = CameraDestination.route) {
+                backStackEntry ->
+                val identifyViewModel: IdentifyViewModel = hiltViewModel(backStackEntry)
+                CameraXScreen(
+                    onImageCaptured = { uri ->
+                        identifyViewModel.identify(uri)
+                        navController.navigate(IdentifyDestination.route)
+                    },
+                    navigateBack = { navController.navigateUp() }
+//                    goToResultsScreen = { navController.navigate(IdentifyDestination.route) },
+//                    identifyViewModel,
+//                    modifier = Modifier
+//                        .padding(innerPadding)
+//                        .fillMaxSize()
+                )
+        }
+        composable( route = IdentifyDestination.route) {
+            val identifyViewModel: IdentifyViewModel = if (navController.previousBackStackEntry != null)
+                hiltViewModel(navController.previousBackStackEntry!!
+            ) else hiltViewModel()
+            IdentifyScreen(
+                identifyViewModel = identifyViewModel,
+                goToPlantSheet = { plant, section ->
+                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=$section")
+                },
+                onPressBackButton = {
+                    navController.popBackStack(WelcomeDestination.route, false)
+//                    if (navController.previousBackStackEntry?.destination?.route != CameraDestination.route ) navController.navigateUp()
+//                    else navController.popBackStack(WelcomeDestination.route, false)
+                },
+                navigateToCameraScreen = {
+                    navController.popBackStack(CameraDestination.route, false)
+                },
+                innerPadding = innerPadding,
+                modifier = Modifier
+                    .fillMaxSize()
             )
         }
         composable(route = CatalogDestination.route) {

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     kotlin("plugin.serialization") version "1.9.10"
     alias(libs.plugins.android.application)
@@ -16,13 +18,21 @@ android {
         applicationId = "org.druidanet.druidnet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 22
-        versionName = "1.5.3"
+        versionCode = 21
+        versionName = "1.6.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val plantNetApiKey = localProperties.getProperty("PLANTNET_API_KEY", "")
+        buildConfigField("String", "PLANTNET_API_KEY", "\"$plantNetApiKey\"")
 
     }
 
@@ -85,6 +95,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -121,6 +132,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
@@ -130,8 +142,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     // Coil
-//    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
-//    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Serializable
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
@@ -143,6 +155,7 @@ dependencies {
     // Retrofit with Kotlin serialization Converter
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Markdown
     implementation(libs.multiplatform.markdown.renderer)
@@ -167,6 +180,13 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.core.ktx)
     debugImplementation(libs.ui.tooling)
+
+    // CameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.extensions)
 
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation(libs.androidx.room.ktx)

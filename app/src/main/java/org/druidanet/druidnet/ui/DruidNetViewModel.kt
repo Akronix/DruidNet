@@ -91,7 +91,8 @@ class DruidNetViewModel @Inject constructor(
                             // _snackbarMessage.value = "Database update scheduled."
                         }
                         WorkInfo.State.RUNNING -> {
-                            _snackbarMessage.value = "Comprobando actualizaciones de la base de datos..."
+//                            _snackbarMessage.value = "Comprobando actualizaciones de la base de datos..."
+                            Log.i("WORKMANAGER","Comprobando actualizaciones de la base de datos...")
                         }
                         WorkInfo.State.SUCCEEDED -> {
                             // Check if the database was actually updated or already up-to-date.
@@ -101,7 +102,8 @@ class DruidNetViewModel @Inject constructor(
                             if (outputData.getBoolean(KEY_RECOMMENDATIONS_UPDATED, false)) updatedItems.add("Recomendaciones")
                             if (outputData.getBoolean(KEY_GLOSSARY_UPDATED, false)) updatedItems.add("Glosario")
                             if (updatedItems.isEmpty()) {
-                                _snackbarMessage.value = "¡La base de datos está al día!\nNada que actualizar"
+//                                _snackbarMessage.value = "¡La base de datos está al día!\nNada que actualizar"
+                                Log.i("WORKMANAGER","¡La base de datos está al día!\nNada que actualizar")
                             } else {
                                 _snackbarMessage.value = "¡Se actualizó: ${updatedItems.joinToString(separator = ", ")} !"
                             }

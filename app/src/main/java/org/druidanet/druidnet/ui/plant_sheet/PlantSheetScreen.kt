@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -85,7 +86,7 @@ fun PlantSheetScreen(
     val currentSection = plantSheetUiState.currentSection
 
     val onChangeSection =
-        { section: PlantSheetSection -> { sheetViewModel.changeSection(section) } }
+        { newSection: PlantSheetSection -> { sheetViewModel.changeSection(newSection) } }
 
     val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
 

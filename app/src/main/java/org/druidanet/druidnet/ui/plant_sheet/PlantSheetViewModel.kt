@@ -1,11 +1,5 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
-// import androidx.lifecycle.ViewModelProvider // REMOVED
-// import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY // REMOVED
-// import androidx.lifecycle.createSavedStateHandle // REMOVED (Hilt handles SavedStateHandle)
-// import androidx.lifecycle.viewmodel.initializer // REMOVED
-// import androidx.lifecycle.viewmodel.viewModelFactory // REMOVED
-// import org.druidanet.druidnet.DruidNetApplication // REMOVED
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +25,7 @@ private const val TIMEOUT_MILLIS = 5_000L
 class PlantSheetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Hilt provides this
     plantsRepository: PlantsRepository, // Hilt provides this
-    userPreferencesRepository: UserPreferencesRepository // Hilt provides this
+    userPreferencesRepository: UserPreferencesRepository, // Hilt provides this
 ) : ViewModel() {
 
     /***** Local vars *****/

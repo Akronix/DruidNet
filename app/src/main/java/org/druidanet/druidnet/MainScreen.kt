@@ -43,6 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -186,6 +187,7 @@ fun Disclaimer(
 @Composable
 fun DruidNetAppBar(
     topBarTitle: String,
+    topBarTitleStyle: TextStyle = MaterialTheme.typography.displaySmall,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     topBarIconPath: Int? = null,
@@ -224,7 +226,8 @@ fun DruidNetAppBar(
                         Text(
                             text = topBarTitle,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.displaySmall,
+                            maxLines = 1,
+                            style = topBarTitleStyle,
                             color = topBarColor,
                             modifier = Modifier.padding(start = 6.dp)
                         )
@@ -239,7 +242,7 @@ fun DruidNetAppBar(
                     }
                 },
                 actions = {
-                    if (actionIconRes != null && actionIconContentDescription != null) {
+                    if (actionIconRes != null) {
                         IconButton(onClick = onActionClick) {
                             Icon(
                                 painterResource(actionIconRes),
