@@ -136,7 +136,7 @@ fun ErrorScreen(errorMsg: String, retry: () -> Unit) {
         TextButton(
             onClick = {
                 // 2. Llama a la función para abrir el cliente de email
-                sendEmailAction(context)
+                sendEmailAction(context, "Error", "Me ha ocurrido el siguiente error:\n $errorMsg\n")
             }
         ) {
             Text("Informar de un fallo de la app",

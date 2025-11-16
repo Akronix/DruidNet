@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
 
-fun sendEmailAction(context: Context) {
+fun sendEmailAction(context: Context, subject: String = "DruidNetApp: ", txt: String = "") {
 
     val intent = Intent(Intent.ACTION_SENDTO).apply {
         data = "mailto:".toUri()
         putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
-        putExtra(Intent.EXTRA_SUBJECT, "DruidNetApp: ")
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, txt)
     }
     context.startActivity(intent)
 }
