@@ -9,6 +9,8 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.scale
 
 const val COMPRESS_FACTOR = 4
@@ -44,4 +46,14 @@ fun compressImage(uri: Uri, context: Context): File {
 
     // 4. Return temp file
     return tempFile
+}
+
+fun fileToImageBitmap(file: File?): ImageBitmap? {
+    if (file == null || !file.exists()) return null
+
+    // Decode the file into a Bitmap
+    val bitmap: Bitmap? = BitmapFactory.decodeFile(file.absolutePath)
+
+    // Convert Bitmap to ImageBitmap
+    return bitmap?.asImageBitmap()
 }

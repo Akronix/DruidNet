@@ -82,6 +82,7 @@ import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
+import org.druidanet.druidnet.utils.fileToImageBitmap
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
 import java.io.File
@@ -297,7 +298,7 @@ fun PlantInDruidNet(plant: Plant,
                 ) {
                     Text(
                         text = "${(score * 100).toInt()}%",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         color = confidenceContentColor
@@ -491,7 +492,8 @@ fun IdentifyScreen(
                     topBar = { DruidNetAppBar(
                         navigateUp = onPressBackButton,
                         topBarTitle = stringResource(R.string.title_screen_identify),
-//                        TODO thumbnail = plantImageBitmap,
+                        topBarTitleStyle = MaterialTheme.typography.displaySmall.copy(fontSize = 27.sp),
+                        thumbnail = fileToImageBitmap(plantResultUIState.imageForIdentification),
                         onActionClick = navigateToCameraScreen,
                         actionIconRes = R.drawable.reset_image_24px,
                         actionIconContentDescription = "Volver a capturar imagen"
@@ -589,7 +591,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                             ) {
                                 Text(
                                     text = "${(score * 100).toInt()}%",
-                                    style = MaterialTheme.typography.headlineMedium,
+                                    style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center,
                                     color = confidenceContentColor
