@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -533,7 +534,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
 
                     Box(
                         Modifier
-                            .padding(20.dp)
+                            .padding(15.dp)
                             .align(Alignment.TopEnd)
                             .zIndex(1f)
                     ) {
@@ -655,25 +656,31 @@ fun ConfidenceBadge(score: Double) {
             modifier = Modifier
                 .wrapContentSize()
 //                    .requiredSize()
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = CircleShape
+
+                )
                 .background(confidenceBackgroundColor, CircleShape)
                 .padding(6.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(
-                modifier = Modifier.padding(6.dp),
+                modifier = Modifier.padding(5.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "${(score * 100).toInt()}%",
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.headlineSmall,//.copy(fontSize = 22.sp),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color = confidenceContentColor
                 )
                 Text(
-                    "Confianza",
+                    "confianza",
+                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp),
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleSmall,
                     color = confidenceContentColor
                 )
             }
