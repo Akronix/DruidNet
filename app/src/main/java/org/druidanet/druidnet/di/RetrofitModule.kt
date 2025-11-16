@@ -31,8 +31,11 @@ object RetrofitModule {
     @Singleton
     @Named("GENERIC_OKHTTP")
     fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .build()
+        val okHttpClient = OkHttpClient.Builder()
+        if (BuildConfig.DEBUG) {
+            okHttpClient.addInterceptor(provideHttpLoggingInterceptor())
+        }
+        return okHttpClient.build()
     }
 
     @Provides
@@ -52,10 +55,12 @@ object RetrofitModule {
             chain.proceed(request)
         }
 
-        return OkHttpClient.Builder()
+        val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(apiKeyInterceptor)
-            .addInterceptor(provideHttpLoggingInterceptor())
-            .build()
+        if (BuildConfig.DEBUG) {
+            okHttpClient.addInterceptor(provideHttpLoggingInterceptor())
+        }
+        return okHttpClient.build()
     }
 
     @Provides
