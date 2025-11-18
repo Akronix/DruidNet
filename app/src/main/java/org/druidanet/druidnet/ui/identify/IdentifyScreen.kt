@@ -613,7 +613,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         )
                         {
                             Markdown(
-                                "¿Te gustaría contribuir a que _${name}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com) 🦉",
+                                "¿Te gustaría contribuir a que _${name}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${name}) 🦉",
                                 modifier = Modifier,
                                 typography = markdownTypography(
                                     paragraph =
