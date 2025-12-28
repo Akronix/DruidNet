@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +35,10 @@ fun CollapsableSection(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+//    val iconCategoryRes = "edible";
+    val iconCategoryRes = "usage_category_$title";
+
+
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -45,6 +51,14 @@ fun CollapsableSection(
                 .clickable { expanded = !expanded }
                 .padding(3.dp)
         ) {
+            Icon(
+                painterResource(R.drawable.edible),
+                modifier = Modifier
+                    .size(dimensionResource(R.dimen.section_buttom_img))
+                ,
+                contentDescription = "$title Category icon",
+                tint = MaterialTheme.colorScheme.primary
+            )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(
