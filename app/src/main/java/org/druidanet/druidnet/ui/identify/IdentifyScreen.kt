@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -588,11 +589,13 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         )
 
                 ) {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontStyle = Italic,
-                    )
+                    SelectionContainer {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontStyle = Italic,
+                        )
+                    }
 
                     Text(
                         text = "Todavía no tenemos usos de esta planta en nuestros registros",
