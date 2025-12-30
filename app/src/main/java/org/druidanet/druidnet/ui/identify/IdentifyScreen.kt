@@ -1,8 +1,11 @@
 package org.druidanet.druidnet.ui.identify
 
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -36,7 +40,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,7 +58,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -66,10 +68,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.graphics.decodeBitmap
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
@@ -78,7 +80,6 @@ import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.DruidNetAppBar
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.ShowUsagesButton
-import org.druidanet.druidnet.data.plant.PlantsDataSource
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantResult
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
@@ -88,6 +89,8 @@ import org.druidanet.druidnet.utils.fileToImageBitmap
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
 import java.io.File
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 @Composable
@@ -181,8 +184,37 @@ fun LoadingScreen(text: String, imageForIdentification: File?) {
             )
         }
 
+        // --- Animation setup ---
+        val infiniteTransition = rememberInfiniteTransition(label = "lupa-animation")
+        val angle by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 3000, easing = LinearEasing)
+            ),
+            label = "angle"
+        )
+
+        // --- Circular path calculation ---
+        val radius = 80.dp // The distance of the icon from the center
+        val angleInRadians = Math.toRadians(angle.toDouble())
+        val xOffset: Int = (radius.value * cos(angleInRadians)).toInt()
+        val yOffset: Int = (radius.value * sin(angleInRadians)).toInt()
+
+        // --- Loading indicator + Text ---
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator(modifier = Modifier.size(64.dp))
+            Box(contentAlignment = Alignment.Center) {
+//                CircularProgressIndicator(modifier = Modifier.size(120.dp), strokeWidth = 2.dp)
+                // The moving magnifying glass icon
+                Icon(
+                    painter = painterResource(id = R.drawable.magnifying_glass),
+                    contentDescription = "Searching icon",
+                    modifier = Modifier
+                        .offset { IntOffset(xOffset, yOffset) }
+                        .size(80.dp),
+                    tint = Color.White
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = text,
@@ -190,10 +222,18 @@ fun LoadingScreen(text: String, imageForIdentification: File?) {
                 style = MaterialTheme.typography.headlineSmall
             )
         }
+
     }
 }
 
-
+@Preview(showBackground = true)
+@Composable
+fun LoadingScreenPreview() {
+    DruidNetTheme {
+        LoadingScreen("Identificando...",
+            File("/home/akronix/workspace/DruidNet/app/src/main/assets/images/plants/arbutus_unedo.webp"))
+    }
+}
 
 @Composable
 fun SuccessScreen(
@@ -322,8 +362,7 @@ fun PlantInDruidNet(plant: Plant,
 
         ) {
 
-            Column(
-            ) {
+            Column {
                 Text(
                     plant.displayName,
                     style = MaterialTheme.typography.headlineLarge,
@@ -384,6 +423,7 @@ fun PlantInDruidNet(plant: Plant,
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun PlantInDruidNetPreview() {
@@ -397,6 +437,7 @@ fun PlantInDruidNetPreview() {
         )
     }
 }
+*/
 
 @Composable
 fun SimilarPlants(
@@ -692,15 +733,6 @@ fun ConfidenceBadge(score: Double) {
         }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun NotInDatabaseScreenPreview() {
-    val name = "Quercus ilex"
-    val score = 0.87
-    val plantNetImageURL = "https://bs.plantnet.org/image/o/a9e693a35121b113f5a349b139260c685dc4bf0b"
-    NotInDatabaseScreen(name, score, plantNetImageURL)
-}
-
 @Composable
 fun SimilarPlantCard(
     plantResult: PlantResult,
@@ -756,6 +788,17 @@ fun SimilarPlantCard(
         }
     }
 }
+
+/*
+@Preview(showBackground = true)
+@Composable
+fun NotInDatabaseScreenPreview() {
+    val name = "Quercus ilex"
+    val score = 0.87
+    val plantNetImageURL = "https://bs.plantnet.org/image/o/a9e693a35121b113f5a349b139260c685dc4bf0b"
+    NotInDatabaseScreen(name, score, plantNetImageURL)
+}
+*/
 
 /*
 @Preview(showBackground = true)
