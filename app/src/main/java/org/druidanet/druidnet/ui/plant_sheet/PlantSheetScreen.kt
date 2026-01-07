@@ -418,7 +418,7 @@ fun ConfusionTextBox(confusion: Confusion) {
                 content = confusion.text,
                 typography = markdownTypography(text = MaterialTheme.typography.bodyLarge),
             )
-            if (confusion.imagePath != null) {
+            if (!confusion.imagePath.isNullOrEmpty()) {
                 val imageBitmap = LocalContext.current.assetsToBitmap(confusion.imagePath)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
