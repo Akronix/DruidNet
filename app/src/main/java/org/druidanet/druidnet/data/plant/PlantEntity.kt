@@ -5,6 +5,7 @@ import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Fts4
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -183,6 +184,14 @@ data class PlantData(
         )
     val usages: List<UsageEntity>
 
+)
+
+@Entity(tableName = "PlantUseFTS")
+@Fts4(contentEntity = UsageEntity::class)
+data class PlantUseFtsEntity(
+    @PrimaryKey @ColumnInfo(name = "rowid") val id: Int,
+    @ColumnInfo(name = "text")
+    val text: String
 )
 
 
