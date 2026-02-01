@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -249,6 +250,15 @@ class DruidNetViewModel @Inject constructor(
 
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
+
+    fun searchUses(searchQuery: String) : Flow<List<PlantCard>> {
+        return if (searchQuery.isNotEmpty()) plantsRepository.searchPlantsByUse(
+            name = searchQuery,
+            originalListPlants = allPlantsFlow
+        ) else {
+            flowOf(emptyList())
+        }
+    }
 
     /*
     fun onSearchQueryChanged(query: String) {

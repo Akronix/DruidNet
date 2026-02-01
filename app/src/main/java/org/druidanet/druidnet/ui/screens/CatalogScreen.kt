@@ -60,7 +60,7 @@ import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.ui.components.SearchToolbar
 
 @Composable
-fun PlantCard(
+private fun PlantCard(
     plant: PlantCard,
     onClickPlantCard: (PlantCard) -> Unit,
     onClickShowUsages: (PlantCard) -> Unit,
@@ -103,7 +103,7 @@ fun PlantCard(
 }
 
 @Composable
-fun PlantsList(
+private fun PlantsList(
     plantsList: List<PlantCard>,
     onClickPlantCard: (PlantCard) -> Unit,
     onClickShowUsages: (PlantCard) -> Unit,

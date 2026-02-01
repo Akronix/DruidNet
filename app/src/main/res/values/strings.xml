@@ -42,4 +42,7 @@
     <string name="feature_search_clear_search_text_content_desc">Limpiar búsqueda</string>
     <string name="feature_search_textfield">Nombre común o científico</string>
     <string name="title_screen_identify">Posiblemente…</string>
+    <string name="greetings_search_btn">Buscar por usos</string>
+    <string name="title_screen_search">Búsqueda</string>
+    <string name="search_uses_textfield">Busca por uso</string>
 </resources>

@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,7 @@ import org.druidanet.druidnet.navigation.CatalogDestination
 import org.druidanet.druidnet.navigation.GlossaryDestination
 import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.navigation.RecommendationsDestination
+import org.druidanet.druidnet.navigation.SearchDestination
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
@@ -168,6 +170,22 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     Text(
                         "\uD83D\uDCD6 " + stringResource(R.string.greetings_catalog_btn),
                         style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = { onNavigationButtonClick(SearchDestination) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = org.druidanet.druidnet.ui.theme.purpleContainerLight
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text(
+                        "\uD83D\uDD0D " + stringResource(R.string.greetings_search_btn),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))

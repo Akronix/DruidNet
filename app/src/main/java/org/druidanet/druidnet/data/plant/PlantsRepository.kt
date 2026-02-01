@@ -40,7 +40,6 @@ class PlantsRepository(
             }
         }
         )
-
     }
 
     suspend fun searchPlant(speciesName: String, language: LanguageEnum): Plant? {
@@ -75,4 +74,13 @@ class PlantsRepository(
         return null
     }
 
+    fun searchPlantsByUse(name: String,
+                           originalListPlants: Flow<List<PlantCard>>) : Flow<List<PlantCard>> {
+        val plantsWithUse : Flow<List<Int>> = plantDao.getPlantsWithName(name)
+        return plantsWithUse.combine( originalListPlants, { plantIds, plants ->
+            plants.filter {
+                    plant -> plant.plantId in plantIds
+            }
+        })
+    }
 }

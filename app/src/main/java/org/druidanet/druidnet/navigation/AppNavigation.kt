@@ -34,6 +34,7 @@ import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
+import org.druidanet.druidnet.ui.screens.SearchScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
 
 @Serializable
@@ -106,6 +107,13 @@ object PlantSheetDestination : NavigationDestination() {
     override val hasTopBar = false
 }
 
+@Serializable
+object SearchDestination : NavigationDestination() {
+    override val route = "search"
+    override val title = R.string.title_screen_search
+    override val hasTopBar = false
+}
+
 // We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
 //@Serializable
 //data class PlantSheetDestination(val plantId: Int = 0) : Screen {
@@ -126,6 +134,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         GlossaryDestination.route to GlossaryDestination,
         IdentifyDestination.route to IdentifyDestination,
         CameraDestination.route to CameraDestination,
+        SearchDestination.route to SearchDestination,
     )
 
 // Before Implementation:
@@ -268,6 +277,19 @@ fun DruidNetNavHost(
             } else {
                 Text("Error: There's no plant reference in the route")
             }
+        }
+        composable(route = SearchDestination.route) {
+            SearchScreen(
+                viewModel = viewModel,
+                navigateBack = { navController.navigateUp() },
+                onClickGoToUsage = { plant ->
+                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=USAGES")
+                },
+                innerPadding = innerPadding,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            )
         }
         composable(route = AboutDestination.route) {
             AboutScreen(
