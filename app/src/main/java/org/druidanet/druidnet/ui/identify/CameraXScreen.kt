@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -39,8 +40,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
 import org.druidanet.druidnet.R
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun CameraXScreen(
@@ -179,11 +178,16 @@ fun takePhoto(
     imageCapture: ImageCapture,
     onImageCaptured: (Uri) -> Unit
 ) {
-    val photoFile = File(
-        context.filesDir,
-        SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale("es", "ES"))
-            .format(System.currentTimeMillis()) + ".jpg"
-    )
+    val photoFile = try {
+        File.createTempFile(
+            "IMG_${System.currentTimeMillis()}_",
+            ".jpg",
+            context.cacheDir
+        )
+    } catch (e: Exception) {
+        Log.e("DRUIDNET-CameraX",ImageCaptureException(ImageCapture.ERROR_UNKNOWN, "Failed to create file", e).toString())
+        return
+    }
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
     imageCapture.takePicture(
@@ -191,12 +195,15 @@ fun takePhoto(
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                val savedUri = Uri.fromFile(photoFile)
+                // Use the URI from results if available, fallback to File URI
+                val savedUri = outputFileResults.savedUri ?: Uri.fromFile(photoFile)
                 onImageCaptured(savedUri)
             }
 
             override fun onError(exception: ImageCaptureException) {
-                // handle error
+                // Log and propagate error so the UI can react (e.g., show a Toast)
+                exception.printStackTrace()
+                Log.e("DRUIDNET-CameraX", exception.toString())
             }
         }
     )
