@@ -67,9 +67,3 @@ data class Confusion (
     val imagePath: String? = null,
     val captionText: String? = null
 )
-
-data class Usage (
-    val type: UsageType,
-    val subType: String,
-    val text: String
-)

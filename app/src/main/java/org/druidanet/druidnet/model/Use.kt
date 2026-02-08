@@ -17,6 +17,26 @@ enum class UsageType (@StringRes val displayText: Int){
     SOCIAL(displayText = R.string.social_usage_type),
 }
 
+data class Usage (
+    val type: UsageType,
+    val subType: String,
+    val text: String
+)
+
+data class PlantUseResult (
+    val plantId: Int,
+    val usageId: Int,
+    val text: String,
+    val matchOffsets: String?
+)
+
+data class PlantUseCard (
+    val plant: PlantCard,
+    val usageId: Int,
+    val text: String,
+    val matchOffsets: String?
+)
+
 //enum class UsageType.MEDICINAL.SUBTYPES {
 //    CIRCULATORIO
 //}

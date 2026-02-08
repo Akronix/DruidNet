@@ -190,8 +190,7 @@ data class PlantData(
 @Fts4(contentEntity = UsageEntity::class)
 data class PlantUseFtsEntity(
     @PrimaryKey @ColumnInfo(name = "rowid") val id: Int,
-    @ColumnInfo(name = "text")
-    val text: String
+    @ColumnInfo(name = "usageId") val usageId: Int,
+    @ColumnInfo(name = "plantId") val plantId: Int,
+    @ColumnInfo(name = "text") val text: String,
 )
-
-

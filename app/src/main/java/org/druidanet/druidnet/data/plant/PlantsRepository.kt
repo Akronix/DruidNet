@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
+import org.druidanet.druidnet.model.PlantUseCard
 import org.druidanet.druidnet.network.PlantDataDTO
 import org.druidanet.druidnet.ui.toPlant
 
@@ -74,12 +75,25 @@ class PlantsRepository(
         return null
     }
 
-    fun searchPlantsByUse(name: String,
-                           originalListPlants: Flow<List<PlantCard>>) : Flow<List<PlantCard>> {
-        val plantsWithUse : Flow<List<Int>> = plantDao.getPlantsWithName(name)
-        return plantsWithUse.combine( originalListPlants, { plantIds, plants ->
+    fun searchPlantsByUse(searchText: String,
+                           originalListPlants: Flow<List<PlantCard>>) : Flow<List<PlantUseCard>> {
+        val plantsIdsAndUseIds = plantDao.getPlantsWithUse(searchText)
+        val plantIds: Flow<List<Int>> = plantsIdsAndUseIds.map { list -> list.map { it.plantId }}
+        val plantCards: Flow<List<PlantCard>> = plantIds.combine( originalListPlants, { plantIds, plants ->
             plants.filter {
                     plant -> plant.plantId in plantIds
+            }
+        })
+        return plantsIdsAndUseIds.combine(plantCards, { plantIdsAndUse, plantCards ->
+            plantIdsAndUse.mapNotNull { plantUse ->
+                plantCards.firstOrNull { it.plantId == plantUse.plantId }?.let { plantCard ->
+                    PlantUseCard(
+                        plantCard,
+                        plantUse.usageId,
+                        plantUse.text,
+                        plantUse.matchOffsets
+                    )
+                }
             }
         })
     }

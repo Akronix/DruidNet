@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.PlantBasic
+import org.druidanet.druidnet.model.PlantUseResult
 
 /**
  * Database Access Object to access the Plant Entities in the DruidNet database
@@ -60,6 +61,10 @@ interface PlantDAO {
 
     @Query("SELECT DISTINCT plantId FROM NameView WHERE name_searchable LIKE :name || '%' OR name_searchable LIKE '% ' || :name || '%'")
     fun getPlantsWithName(name: String): Flow<List<Int>>
+
+    @Query("SELECT plantId, usageId, text FROM PlantUseFTS WHERE text MATCH :text ")
+    fun getPlantsWithUse(text: String) : Flow<List<PlantUseResult>>
+
 
     /*** INSERT DATA ***/
 

@@ -33,6 +33,7 @@ import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
+import org.druidanet.druidnet.model.PlantUseCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import org.druidanet.druidnet.workers.KEY_GLOSSARY_UPDATED
@@ -251,9 +252,9 @@ class DruidNetViewModel @Inject constructor(
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
 
-    fun searchUses(searchQuery: String) : Flow<List<PlantCard>> {
+    fun searchUses(searchQuery: String) : Flow<List<PlantUseCard>> {
         return if (searchQuery.isNotEmpty()) plantsRepository.searchPlantsByUse(
-            name = searchQuery,
+            searchText = searchQuery,
             originalListPlants = allPlantsFlow
         ) else {
             flowOf(emptyList())

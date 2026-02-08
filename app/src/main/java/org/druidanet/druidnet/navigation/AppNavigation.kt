@@ -282,8 +282,8 @@ fun DruidNetNavHost(
             SearchScreen(
                 viewModel = viewModel,
                 navigateBack = { navController.navigateUp() },
-                onClickGoToUsage = { plant ->
-                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=USAGES")
+                onClickGoToUsage = { plantUse ->
+                    navController.navigate("${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES")
                 },
                 innerPadding = innerPadding,
                 modifier = Modifier
