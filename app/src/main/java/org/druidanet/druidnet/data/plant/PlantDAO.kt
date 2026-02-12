@@ -62,7 +62,7 @@ interface PlantDAO {
     @Query("SELECT DISTINCT plantId FROM NameView WHERE name_searchable LIKE :name || '%' OR name_searchable LIKE '% ' || :name || '%'")
     fun getPlantsWithName(name: String): Flow<List<Int>>
 
-    @Query("SELECT plantId, usageId, text FROM PlantUseFTS WHERE text MATCH :text ")
+    @Query("SELECT plantId, usageId, text FROM PlantUseFTS WHERE text MATCH :text || '*'")
     fun getPlantsWithUse(text: String) : Flow<List<PlantUseResult>>
 
 
