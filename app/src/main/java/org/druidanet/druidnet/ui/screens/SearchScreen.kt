@@ -2,25 +2,21 @@ package org.druidanet.druidnet.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -28,7 +24,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,33 +40,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.size
 import androidx.compose.ui.unit.sp
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.DraggableScrollbar
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberDraggableScroller
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
+import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.PlantUseCard
-import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.components.SearchToolbar
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
@@ -88,7 +77,7 @@ fun SearchScreen(
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    var searchQuery by remember { mutableStateOf("tos")}
+    var searchQuery by remember { mutableStateOf("tostar")}
 
     val searchTopBar =
         @Composable {
@@ -138,12 +127,58 @@ private fun NoResultsScreen(modifier: Modifier) {
     Box(modifier) {}
 }
 
-fun truncateMarkdown(
-    markdown: String,
+fun formatSearchPreview(
+    text: String,
+    offsetBytes: Int,
+    matchSize: Int,
     maxChars: Int = 80
 ): String {
-    return if (markdown.length <= maxChars) markdown
-    else markdown.take(maxChars).trimEnd() + "…"
+    // 1. Convert string to UTF-8 bytes to match SQLite FTS5 byte offsets
+    val fullBytes = text.toByteArray(Charsets.UTF_8)
+    val contextBytes = 40 // context
+
+    // Safety check to avoid crashes if offsets are wrong
+    if (offsetBytes < 0 || offsetBytes >= fullBytes.size) {
+        return text.take(maxChars).trimEnd() + "…"
+    }
+
+    // 2. Calculate window of text to show in bytes
+    val startWindowContext = (offsetBytes - contextBytes).coerceAtLeast(0)
+    val endMatch = (offsetBytes + matchSize).coerceAtMost(fullBytes.size)
+    val endWindowContext = (endMatch + contextBytes).coerceAtMost(fullBytes.size)
+
+    // 3. Extract parts as Strings (this handles multi-byte char reconstruction)
+    // Use the String(bytes, offset, length, charset) constructor
+    val prefixText = String(fullBytes, startWindowContext, offsetBytes - startWindowContext, Charsets.UTF_8)
+    val matchText = String(fullBytes, offsetBytes, matchSize.coerceAtMost(fullBytes.size - offsetBytes), Charsets.UTF_8)
+    val suffixText = String(fullBytes, endMatch, endWindowContext - endMatch, Charsets.UTF_8)
+
+    // 4. Build highlighted text and ellipsis
+    val highlighted = "$prefixText`$matchText`$suffixText"
+
+    // We show leading … if we had to strip the text from the beginning
+    val leadingEllipsis = if (startWindowContext > 0) "…" else ""
+    // We show trailing … if there's still text left in the usage text
+    val trailingEllipsis = if (endWindowContext < fullBytes.size) "…" else ""
+
+    val result = leadingEllipsis + highlighted + trailingEllipsis
+
+    return if (result.length <= maxChars) {
+        result
+    } else {
+        // Final fallback to ensure it fits the UI card
+        result.take(maxChars).trimEnd() + "…"
+    }
+
+//    // 4. Logic for the final result
+//    return if (highlighted.length <= maxChars) {
+//        if (initMatchContext > 0) "…$highlighted" else highlighted
+//    } else {
+//        // We show leading … if we had to strip the text from the beginning
+//        val prefix = if (initMatchContext > 0) "…" else ""
+//        // Take the snippet starting from our context point, not the whole string
+//        prefix + highlighted.take(maxChars).trimEnd() + "…"
+//    }
 }
 
 
@@ -159,6 +194,12 @@ private fun ResultPlantCard(
             ImageBitmap.imageResource(R.drawable.confused_druidess)
         else
             LocalContext.current.assetsToBitmap(plantUseCard.plant.imagePath)
+
+    val matchOffsets = plantUseCard.matchOffsets.split(" ")
+    val offsetBytes = matchOffsets[2].toInt()
+    val matchSize = matchOffsets[3].toInt()
+
+    println(matchOffsets)
 
     Card(
         colors = CardDefaults.cardColors(
@@ -199,10 +240,18 @@ private fun ResultPlantCard(
                     fontStyle = if (plantUseCard.plant.isLatinName) FontStyle.Italic else FontStyle.Normal
                 )
                 com.mikepenz.markdown.m3.Markdown(
-                    content = truncateMarkdown(plantUseCard.text),
+                    formatSearchPreview(plantUseCard.text, offsetBytes, matchSize),
                     typography = markdownTypography(
                         paragraph = MaterialTheme.typography.bodyMedium,
-                    )
+                        inlineCode = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            background = MaterialTheme.colorScheme.background,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    ),
+                    colors = markdownColor(
+                        codeBackground = MaterialTheme.colorScheme.background
+                    ),
                 )
 
                 /*Text(
@@ -274,7 +323,7 @@ private fun ResultsPlantList(
 @Preview(showBackground = true)
 @Composable
 private fun ResultPlantCardPreview() {
-    DruidNetTheme(darkTheme = false) {
+    DruidNetTheme(darkTheme = true) {
         ResultPlantCard(
             plantUseCard = PlantUseCard(
                 plant = PlantCard(
@@ -285,8 +334,8 @@ private fun ResultPlantCardPreview() {
                     isLatinName = true
                 ),
                 usageId = 1,
-                text = "Medicinal use for anxiety and many other possibilities. Just use it in oil or as a tincture",
-                matchOffsets = null
+                text = "**Medicinal** **use** for anxiety and many other possibilities. Just use it in oil or as a tincture",
+                matchOffsets = "2 0 16 3"
             ),
             onClickPlantUseCard = {},
             modifier = Modifier.padding(8.dp)

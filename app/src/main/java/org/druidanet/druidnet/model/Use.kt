@@ -28,14 +28,14 @@ data class PlantUseResult (
     val plantId: Int,
     val usageId: Int,
     val text: String,
-    val matchOffsets: String?
+    val matchOffsets: String
 )
 
 data class PlantUseCard (
     val plant: PlantCard,
     val usageId: Int,
     val text: String,
-    val matchOffsets: String?
+    val matchOffsets: String
 )
 
 //enum class UsageType.MEDICINAL.SUBTYPES {
