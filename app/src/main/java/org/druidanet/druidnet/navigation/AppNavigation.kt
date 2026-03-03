@@ -103,7 +103,7 @@ object PlantSheetDestination : NavigationDestination() {
     override val title = R.string.title_screen_plant_sheet
     const val plantArg = "plantLatinName"
     const val sectionArg = "section"
-    const val usageArg = "usageId"
+    const val usageArg = "usageParams"
     val routeWithArgs = "$route/{$plantArg}?$sectionArg={$sectionArg}&$usageArg={$usageArg}"
     override val hasTopBar = false
 }
@@ -240,8 +240,8 @@ fun DruidNetNavHost(
                     defaultValue = "DESCRIPTION"
                 },
                 navArgument(PlantSheetDestination.usageArg) {
-                    type = NavType.IntType
-                    defaultValue = -1
+                    type = NavType.IntArrayType
+                    nullable = true
                 }
             ),
             deepLinks = listOf(
@@ -254,7 +254,10 @@ fun DruidNetNavHost(
             )
         ) { backStackEntry ->
             val plantLatinName: String? = backStackEntry.arguments?.getString(PlantSheetDestination.plantArg)
-            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
+//            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
+            val usageParams: IntArray? =
+                backStackEntry.arguments?.getIntArray(PlantSheetDestination.usageArg)
+            println("TEST2: ${usageParams.contentToString()}")
 
             if (plantLatinName != null) {
                 val defaultUriHandler = LocalUriHandler.current
@@ -273,6 +276,7 @@ fun DruidNetNavHost(
                 }) {
                     PlantSheetScreen(
                         plantLatinName = plantLatinName,
+                        usageParams = usageParams,
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
                         modifier = Modifier
@@ -288,8 +292,16 @@ fun DruidNetNavHost(
                 viewModel = viewModel,
                 navigateBack = { navController.navigateUp() },
                 onClickPlantUseCard = { plantUse ->
-                    println("TEST: $plantUse")
-                    navController.navigate("${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES&usageId=${plantUse.usageId}")
+                    val matchOffsets = plantUse.matchOffsets.split(" ")
+                    val offsetBytes = matchOffsets[2].toInt()
+                    val matchSizeBytes = matchOffsets[3].toInt()
+                    val usageParams = intArrayOf(plantUse.usageId, offsetBytes, matchSizeBytes)
+                    val usageQuery = usageParams.joinToString("&") { "usageParams=$it" }
+                    println("TEST: ${usageParams.contentToString()}")
+                    println("TEST: $usageQuery")
+                    navController.navigate(
+                        "${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES&${usageQuery}"
+                    )
                 },
                 innerPadding = innerPadding,
                 modifier = Modifier

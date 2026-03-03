@@ -32,7 +32,6 @@ class PlantSheetViewModel @Inject constructor(
 
     private val plantArg: String = checkNotNull(savedStateHandle[PlantSheetDestination.plantArg])
     private val sectionArg: String? = savedStateHandle[PlantSheetDestination.sectionArg]
-    private val usageArg: Int? = savedStateHandle[PlantSheetDestination.usageArg]
     private val plantLatinName = plantArg.replace('_', ' ')
 
     private val preferencesState: StateFlow<PreferencesState> =
@@ -99,12 +98,12 @@ class PlantSheetViewModel @Inject constructor(
         _currentSection, // The flow that controls the current section,
     ) { plantSheetData, currentSection ->
         // When either flow emits a new value, this lambda is re-executed
-        plantSheetData.copy(currentSection = currentSection, usageArg = usageArg) // Update the section & the usageArg in the combined state
+        plantSheetData.copy(currentSection = currentSection) // Update the section in the combined state
     }.
     stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = PlantSheetUIState(usageArg=usageArg) // initialValue of the StateFlow
+        initialValue = PlantSheetUIState() // Ensure initialValue also has default section
     )
 
     fun changeSection(newSection: PlantSheetSection) {

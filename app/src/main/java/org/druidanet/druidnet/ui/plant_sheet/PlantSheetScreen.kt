@@ -34,13 +34,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,7 +50,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -71,6 +66,7 @@ import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.assetsToBitmap
+import java.util.ArrayList
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -86,6 +82,7 @@ fun PlantSheetScreen(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = hiltViewModel(),
+    usageParams: IntArray?,
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
     val plant = remember (plantSheetUiState.plantUiState?.plantId) {
@@ -99,6 +96,9 @@ fun PlantSheetScreen(
     val isPlantInDatabase = sheetViewModel.isPlantInDatabase.collectAsState().value
 
     val context = LocalContext.current
+
+    println("Atencion!!")
+    println(usageParams.contentToString())
 
     if (isPlantInDatabase && plant != null) {
 
@@ -133,7 +133,7 @@ fun PlantSheetScreen(
                 currentSection,
                 onChangeSection,
                 plantImageBitmap = plantImageBitmap,
-                usageArg = plantSheetUiState.usageArg,
+                usageArg = if (usageParams != null && usageParams.isNotEmpty()) usageParams[0] else null,
                 modifier = modifier.padding(padding),
             )
         }
