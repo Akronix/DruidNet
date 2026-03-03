@@ -49,7 +49,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -85,6 +87,7 @@ fun SearchScreen(
     modifier: Modifier
 ) {
 
+    val keyboardController = LocalSoftwareKeyboardController.current
     var searchQuery by remember { mutableStateOf("tos")}
 
     val searchTopBar =
@@ -118,7 +121,10 @@ fun SearchScreen(
             if (resultPlantList.isNotEmpty()) {
                 ResultsPlantList(
                     plantsList = resultPlantList,
-                    onClickPlantUseCard = onClickPlantUseCard,
+                    onClickPlantUseCard = { plantUseCard ->
+                        keyboardController?.hide()
+                        onClickPlantUseCard(plantUseCard)
+                    },
                     modifier = Modifier.padding(paddingValues)
                 )
             } else {
@@ -181,7 +187,8 @@ private fun ResultPlantCard(
             //Spacer(modifier = Modifier.width(6.dp))
 
             Column (
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .padding(start = 5.dp)
             ) {
                 Text(

@@ -34,7 +34,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -282,11 +285,13 @@ fun PlantSheetDescription(plant: Plant,
 
         ) {
 
-            Text(plant.displayName,
+            Text(
+                plant.displayName,
                 style = MaterialTheme.typography.headlineLarge,
             )
 
-            Text("(${plant.latinName})",
+            Text(
+                "(${plant.latinName})",
                 fontStyle = Italic,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -322,10 +327,12 @@ fun PlantSheetDescription(plant: Plant,
             Column {
                 Text("Distribución y Habitat:",
                     style = MaterialTheme.typography.titleMedium)
-                Markdown(plant.habitat,
+                Markdown(
+                    plant.habitat,
                     typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
                 )
-                Markdown(plant.distribution,
+                Markdown(
+                    plant.distribution,
                     typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
                 )
             }
@@ -483,6 +490,7 @@ fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
                     )
 
                     val isUsageFocused = usageArg == usage.usageId
+//                    var showHighlight by remember(usageArg) { mutableStateOf(isUsageFocused) }
                     val paragraphStyle = if (isUsageFocused) {
                         MaterialTheme.typography.bodyLarge.copy(background = MaterialTheme.colorScheme.outlineVariant)
                     } else {
@@ -493,6 +501,8 @@ fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
                     if (isUsageFocused) {
                         LaunchedEffect(usageArg) {
                             bringIntoViewRequester.bringIntoView()
+//                            kotlinx.coroutines.delay(4000) // Wait 4 seconds
+//                            showHighlight = false
                         }
                     }
 
