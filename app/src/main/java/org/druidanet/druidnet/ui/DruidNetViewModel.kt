@@ -291,7 +291,7 @@ class DruidNetViewModel @Inject constructor(
             commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
             displayName = displayName,
             usages = usages
-                .map { Usage(it.type, it.subType, it.text) }
+                .map { Usage(it.usageId,it.type, it.subType, it.text) }
                 .groupBy { it.type },
             family = p.family,
             toxic = p.toxic,

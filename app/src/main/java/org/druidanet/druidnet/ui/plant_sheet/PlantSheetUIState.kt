@@ -18,5 +18,9 @@ data class PlantSheetUIState(
 
     val displayName: String = "",
 
-    val currentSection: PlantSheetSection = DEFAULT_SECTION
-)
+    /* ui state related to navigation / presentation */
+
+    val currentSection: PlantSheetSection = DEFAULT_SECTION,
+
+    val usageArg: Int? = null
+    )

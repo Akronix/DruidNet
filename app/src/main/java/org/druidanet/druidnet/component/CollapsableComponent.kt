@@ -29,9 +29,10 @@ import org.druidanet.druidnet.R
 fun CollapsableSection(
     title: String,
     modifier: Modifier = Modifier,
+    initiallyExpanded: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(

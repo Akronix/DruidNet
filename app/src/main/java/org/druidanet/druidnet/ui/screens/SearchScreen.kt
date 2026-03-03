@@ -80,12 +80,12 @@ import kotlin.collections.isNotEmpty
 fun SearchScreen(
     navigateBack: () -> Unit,
     viewModel: DruidNetViewModel,
-    onClickGoToUsage: (PlantUseCard) -> Unit,
+    onClickPlantUseCard: (PlantUseCard) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier
 ) {
 
-    var searchQuery by remember { mutableStateOf("")}
+    var searchQuery by remember { mutableStateOf("tos")}
 
     val searchTopBar =
         @Composable {
@@ -118,7 +118,7 @@ fun SearchScreen(
             if (resultPlantList.isNotEmpty()) {
                 ResultsPlantList(
                     plantsList = resultPlantList,
-                    onClickPlantUseCard = onClickGoToUsage,
+                    onClickPlantUseCard = onClickPlantUseCard,
                     modifier = Modifier.padding(paddingValues)
                 )
             } else {
@@ -267,7 +267,7 @@ private fun ResultsPlantList(
 @Preview(showBackground = true)
 @Composable
 private fun ResultPlantCardPreview() {
-    DruidNetTheme(darkTheme = true) {
+    DruidNetTheme(darkTheme = false) {
         ResultPlantCard(
             plantUseCard = PlantUseCard(
                 plant = PlantCard(

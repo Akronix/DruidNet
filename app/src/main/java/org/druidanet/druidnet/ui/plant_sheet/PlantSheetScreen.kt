@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +32,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -125,7 +130,8 @@ fun PlantSheetScreen(
                 currentSection,
                 onChangeSection,
                 plantImageBitmap = plantImageBitmap,
-                modifier = modifier.padding(padding)
+                usageArg = plantSheetUiState.usageArg,
+                modifier = modifier.padding(padding),
             )
         }
 
@@ -212,6 +218,7 @@ fun PlantSheetBody(
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     plantImageBitmap: ImageBitmap,
+    usageArg: Int?,
     modifier: Modifier = Modifier
 ) {
 
@@ -227,7 +234,8 @@ fun PlantSheetBody(
 
             PlantSheetSection.USAGES -> PlantSheetUsages(
                 plant,
-                modifier.verticalScroll(rememberScrollState())
+                usageArg,
+                modifier.verticalScroll(rememberScrollState()),
             )
 
             PlantSheetSection.CONFUSIONS -> PlantSheetConfusions(
@@ -445,8 +453,9 @@ fun ConfusionTextBox(confusion: Confusion) {
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
+fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
     val usagesTypes = plant.usages.keys
 
     Column( modifier =
@@ -462,25 +471,43 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
         }
 
         for (type in usagesTypes) {
+            val typeUsages = plant.usages[type] ?: emptyList()
+            val isUsageTypeFocused = usageArg != null && typeUsages.any { it.usageId == usageArg }
+            
+            CollapsableSection(stringResource(type.displayText), initiallyExpanded = isUsageTypeFocused) {
 
-            CollapsableSection(stringResource(type.displayText)) {
-
-                plant.usages[type]?.forEach { usage: Usage ->
+                typeUsages.forEach { usage: Usage ->
                     Text(
                         "~ " + usage.subType + " ~",
                         style = MaterialTheme.typography.titleSmall
                     )
+
+                    val isUsageFocused = usageArg == usage.usageId
+                    val paragraphStyle = if (isUsageFocused) {
+                        MaterialTheme.typography.bodyLarge.copy(background = MaterialTheme.colorScheme.outlineVariant)
+                    } else {
+                        MaterialTheme.typography.bodyLarge
+                    }
+
+                    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+                    if (isUsageFocused) {
+                        LaunchedEffect(usageArg) {
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+
                     Markdown(
                         usage.text,
                         colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
                         typography = markdownTypography(
-                            text = MaterialTheme.typography.bodyLarge,
+                            paragraph = paragraphStyle,
                             link = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 textDecoration = TextDecoration.Underline,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                        )
+                        ),
+                        modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)
                     )
                     Spacer(
                         modifier = Modifier.padding(
@@ -521,7 +548,8 @@ fun ToxicTextBox(toxicText: String) {
                         .align(Alignment.CenterVertically)
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("¡Atención!",
+                Text(
+                    stringResource(R.string.attention_title),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.align(Alignment.CenterVertically)
@@ -607,19 +635,20 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 //    PlantSheetConfusions(plant = plant, modifier = Modifier.fillMaxSize())
 //}
 //
-//@Preview
+//@Preview(showBackground = true)
 //@Composable
 //fun PlantSheetUsagesPreview() {
-//    val plant = Plant(
-//        plantId = 1,
-//        displayName = "Rose",
-//        latinName = "Rosa L.",
-//        imagePath = "images/rosa_l.webp",
-//        commonNames = emptyArray(),
-//        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
-//        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
-//        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
-//    PlantSheetUsages(plant = plant, modifier = Modifier.fillMaxSize())
+//    val plant = PlantsDataSource.loadPlants()[0]
+////    val plant = Plant(
+////        plantId = 1,
+////        displayName = "Rose",
+////        latinName = "Rosa L.",
+////        imagePath = "images/rosa_l.webp",
+////        commonNames = emptyArray(),
+////        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
+////        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(1,org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
+////        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
+//    PlantSheetUsages(plant = plant, 1, modifier = Modifier.fillMaxSize())
 //}
 
 /**

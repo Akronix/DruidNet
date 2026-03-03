@@ -103,7 +103,8 @@ object PlantSheetDestination : NavigationDestination() {
     override val title = R.string.title_screen_plant_sheet
     const val plantArg = "plantLatinName"
     const val sectionArg = "section"
-    val routeWithArgs = "$route/{$plantArg}?$sectionArg={$sectionArg}"
+    const val usageArg = "usageId"
+    val routeWithArgs = "$route/{$plantArg}?$sectionArg={$sectionArg}&$usageArg={$usageArg}"
     override val hasTopBar = false
 }
 
@@ -237,6 +238,10 @@ fun DruidNetNavHost(
                 navArgument(PlantSheetDestination.sectionArg) {
                     type = NavType.StringType
                     defaultValue = "DESCRIPTION"
+                },
+                navArgument(PlantSheetDestination.usageArg) {
+                    type = NavType.IntType
+                    defaultValue = -1
                 }
             ),
             deepLinks = listOf(
@@ -282,8 +287,9 @@ fun DruidNetNavHost(
             SearchScreen(
                 viewModel = viewModel,
                 navigateBack = { navController.navigateUp() },
-                onClickGoToUsage = { plantUse ->
-                    navController.navigate("${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES")
+                onClickPlantUseCard = { plantUse ->
+                    println("TEST: $plantUse")
+                    navController.navigate("${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES&usageId=${plantUse.usageId}")
                 },
                 innerPadding = innerPadding,
                 modifier = Modifier

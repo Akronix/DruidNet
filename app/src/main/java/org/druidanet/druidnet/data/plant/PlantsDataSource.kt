@@ -55,7 +55,7 @@ object PlantsDataSource {
                         UsageType.MEDICINAL,
                         listOf(
                             Usage(
-                                UsageType.MEDICINAL,
+                                1,UsageType.MEDICINAL,
                                 "Sistema respiratorio",
                                 "Infusión de sus flores para enfermedades respiratorias"
                             )
@@ -64,12 +64,12 @@ object PlantsDataSource {
                     Pair(
                         UsageType.EDIBLE,
                         listOf(
-                            Usage(
+                            Usage(2,
                                 UsageType.EDIBLE,
                                 "Comestibles-Verduras y hortalizas",
                                 "Buñuelos de flores de Saúco"
                             ),
-                            Usage(
+                            Usage(3,
                                 UsageType.EDIBLE,
                                 "Bebidas Alcohólicas",
                                 "Con las flores se prepara el champán de [Saúco](druidnet://druidanet.org/plant_sheet/Sambucus nigra)"

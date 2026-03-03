@@ -18,6 +18,7 @@ enum class UsageType (@StringRes val displayText: Int){
 }
 
 data class Usage (
+    val usageId: Int,
     val type: UsageType,
     val subType: String,
     val text: String

@@ -45,4 +45,5 @@
     <string name="greetings_search_btn">Buscar por usos</string>
     <string name="title_screen_search">Búsqueda</string>
     <string name="search_uses_textfield">Busca por uso</string>
+    <string name="attention_title">¡Atención!</string>
 </resources>
