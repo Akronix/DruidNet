@@ -38,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -49,10 +48,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.size
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.DraggableScrollbar
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberDraggableScroller
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
@@ -65,7 +63,6 @@ import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.components.SearchToolbar
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
-import kotlin.collections.isNotEmpty
 
 @Composable
 fun SearchScreen(
@@ -77,15 +74,15 @@ fun SearchScreen(
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    var searchQuery by remember { mutableStateOf("tostar")}
+    val searchQuery by viewModel.searchUsesQuery.collectAsStateWithLifecycle()
 
     val searchTopBar =
         @Composable {
             SearchToolbar(
                 searchQuery = searchQuery,
                 placeholderSearchText = stringResource(R.string.search_uses_textfield),
-                onSearchQueryChanged = { searchQuery = it },
-                onSearchTriggered = { searchQuery = it.trim() },
+                onSearchQueryChanged = { viewModel.updateSearchUsesQuery(it) },
+                onSearchTriggered = { viewModel.updateSearchUsesQuery(it.trim()) },
                 onBackClick = navigateBack,
                 modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
             )

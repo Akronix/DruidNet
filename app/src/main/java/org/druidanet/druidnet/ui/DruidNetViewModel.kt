@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.druidanet.druidnet.data.AppDatabase
@@ -59,6 +60,14 @@ class DruidNetViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
+
+
+    private val _searchUsesQuery = MutableStateFlow("")
+    val searchUsesQuery: StateFlow<String> = _searchUsesQuery.asStateFlow()
+
+    fun updateSearchUsesQuery(newQuery: String) {
+        _searchUsesQuery.value = newQuery
+    }
 
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()

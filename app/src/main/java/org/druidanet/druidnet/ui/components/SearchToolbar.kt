@@ -15,7 +15,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -28,7 +31,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.druidanet.druidnet.R
@@ -76,9 +81,27 @@ private fun SearchTextField(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    var searchQueryFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = searchQuery,
+                selection = TextRange(searchQuery.length)
+            )
+        )
+    }
+
+    LaunchedEffect(searchQuery) {
+        if (searchQueryFieldValue.text != searchQuery) {
+            searchQueryFieldValue = searchQueryFieldValue.copy(
+                text = searchQuery,
+                selection = TextRange(searchQuery.length)
+            )
+        }
+    }
+
     val onSearchExplicitlyTriggered = {
         keyboardController?.hide()
-        onSearchTriggered(searchQuery)
+        onSearchTriggered(searchQueryFieldValue.text)
     }
 
     TextField(
@@ -98,7 +121,7 @@ private fun SearchTextField(
             )
         },
         trailingIcon = {
-            if (searchQuery.isNotEmpty()) {
+            if (searchQueryFieldValue.text.isNotEmpty()) {
                 IconButton(
                     onClick = {
                         onSearchQueryChanged("")
@@ -115,7 +138,10 @@ private fun SearchTextField(
             }
         },
         onValueChange = {
-            if ("\n" !in it) onSearchQueryChanged(it)
+            if ("\n" !in it.text) {
+                searchQueryFieldValue = it
+                onSearchQueryChanged(it.text)
+            }
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -124,7 +150,7 @@ private fun SearchTextField(
             .focusRequester(focusRequester)
             .onKeyEvent {
                 if (it.key == Key.Enter) {
-                    if (searchQuery.isBlank()) return@onKeyEvent false
+                    if (searchQueryFieldValue.text.isBlank()) return@onKeyEvent false
                     onSearchExplicitlyTriggered()
                     true
                 } else {
@@ -133,7 +159,7 @@ private fun SearchTextField(
             }
             .testTag("searchTextField"),
         shape = RoundedCornerShape(32.dp),
-        value = searchQuery,
+        value = searchQueryFieldValue,
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Search,
         ),
