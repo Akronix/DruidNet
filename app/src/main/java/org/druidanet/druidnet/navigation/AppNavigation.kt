@@ -257,17 +257,14 @@ fun DruidNetNavHost(
 //            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
             val usageParams: IntArray? =
                 backStackEntry.arguments?.getIntArray(PlantSheetDestination.usageArg)
-            println("TEST2: ${usageParams.contentToString()}")
 
             if (plantLatinName != null) {
                 val defaultUriHandler = LocalUriHandler.current
                 CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
                     override fun openUri(uri: String) {
                         if (uri.startsWith("druidnet://")) {
-                            println("TEST for url: $uri")
                             navController.navigate(uri.toUri())
                         } else if (uri.startsWith("plant_sheet/")) {
-                            println("TEST for url: $uri")
                             navController.navigate(uri)
                         } else {
                             defaultUriHandler.openUri(uri)
@@ -297,8 +294,6 @@ fun DruidNetNavHost(
                     val matchSizeBytes = matchOffsets[3].toInt()
                     val usageParams = intArrayOf(plantUse.usageId, offsetBytes, matchSizeBytes)
                     val usageQuery = usageParams.joinToString("&") { "usageParams=$it" }
-                    println("TEST: ${usageParams.contentToString()}")
-                    println("TEST: $usageQuery")
                     navController.navigate(
                         "${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES&${usageQuery}"
                     )

@@ -97,9 +97,6 @@ fun PlantSheetScreen(
 
     val context = LocalContext.current
 
-    println("Atencion!!")
-    println(usageParams.contentToString())
-
     if (isPlantInDatabase && plant != null) {
 
         val plantImageBitmap = remember(plant.plantId, context) {
