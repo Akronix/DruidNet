@@ -150,9 +150,10 @@ fun formatSearchPreview(
     val matchText = String(fullBytes, offsetBytes, matchSize.coerceAtMost(fullBytes.size - offsetBytes), Charsets.UTF_8)
     val suffixText = String(fullBytes, endMatch, endWindowContext - endMatch, Charsets.UTF_8)
 
-    // 4. Build highlighted text and ellipsis
+    // 4. Build highlighted text with inline code (``) for the matching text query
     val highlighted = "$prefixText`$matchText`$suffixText"
 
+    // Add ellipsis when we have cut/omitted some text
     // We show leading … if we had to strip the text from the beginning
     val leadingEllipsis = if (startWindowContext > 0) "…" else ""
     // We show trailing … if there's still text left in the usage text
@@ -166,16 +167,6 @@ fun formatSearchPreview(
         // Final fallback to ensure it fits the UI card
         result.take(maxChars).trimEnd() + "…"
     }
-
-//    // 4. Logic for the final result
-//    return if (highlighted.length <= maxChars) {
-//        if (initMatchContext > 0) "…$highlighted" else highlighted
-//    } else {
-//        // We show leading … if we had to strip the text from the beginning
-//        val prefix = if (initMatchContext > 0) "…" else ""
-//        // Take the snippet starting from our context point, not the whole string
-//        prefix + highlighted.take(maxChars).trimEnd() + "…"
-//    }
 }
 
 

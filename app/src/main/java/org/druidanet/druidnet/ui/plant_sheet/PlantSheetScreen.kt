@@ -133,7 +133,7 @@ fun PlantSheetScreen(
                 currentSection,
                 onChangeSection,
                 plantImageBitmap = plantImageBitmap,
-                usageArg = if (usageParams != null && usageParams.isNotEmpty()) usageParams[0] else null,
+                usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
                 modifier = modifier.padding(padding),
             )
         }
@@ -221,30 +221,39 @@ fun PlantSheetBody(
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     plantImageBitmap: ImageBitmap,
-    usageArg: Int?,
+    usageParams: IntArray?,
     modifier: Modifier = Modifier
 ) {
 
     SelectionContainer {
 
         when (currentSection) {
-            PlantSheetSection.DESCRIPTION -> PlantSheetDescription(
-                plant,
-                onChangeSection(PlantSheetSection.USAGES),
-                imageBitmap = plantImageBitmap,
-                modifier.verticalScroll(rememberScrollState())
-            )
+            PlantSheetSection.DESCRIPTION ->
+                PlantSheetDescription(
+                    plant,
+                    onChangeSection(PlantSheetSection.USAGES),
+                    imageBitmap = plantImageBitmap,
+                    modifier.verticalScroll(rememberScrollState())
+                )
 
-            PlantSheetSection.USAGES -> PlantSheetUsages(
-                plant,
-                usageArg,
-                modifier.verticalScroll(rememberScrollState()),
-            )
+            PlantSheetSection.USAGES ->
+                if (usageParams == null)
+                        PlantSheetUsages(
+                            plant,
+                            modifier.verticalScroll(rememberScrollState())
+                        )
+                else
+                        PlantSheetUsages(
+                            plant,
+                            usageParams,
+                            modifier.verticalScroll(rememberScrollState())
+                        )
 
-            PlantSheetSection.CONFUSIONS -> PlantSheetConfusions(
-                plant = plant,
-                modifier = modifier.verticalScroll(rememberScrollState())
-            )
+            PlantSheetSection.CONFUSIONS ->
+                PlantSheetConfusions(
+                    plant = plant,
+                    modifier = modifier.verticalScroll(rememberScrollState())
+                )
         }
     }
 }
@@ -460,9 +469,9 @@ fun ConfusionTextBox(confusion: Confusion) {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+// PlantSheetUsages without usage selected / text to highlight
 @Composable
-fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
+fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
     val usagesTypes = plant.usages.keys
 
     Column( modifier =
@@ -478,8 +487,95 @@ fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
         }
 
         for (type in usagesTypes) {
+
+            CollapsableSection(stringResource(type.displayText)) {
+
+                plant.usages[type]?.forEach { usage: Usage ->
+                    Text(
+                        "~ " + usage.subType + " ~",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Markdown(
+                        usage.text,
+                        colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
+                        typography = markdownTypography(
+                            text = MaterialTheme.typography.bodyLarge,
+                            link = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                textDecoration = TextDecoration.Underline,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    )
+                    Spacer(
+                        modifier = Modifier.padding(
+                            dimensionResource(id = R.dimen.space_between_sections)
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
+        }
+        Spacer(modifier = Modifier.padding(
+            dimensionResource(id = R.dimen.space_between_sections)
+        ))
+    }
+}
+
+
+fun highlightText(
+    text: String,
+    offsetBytes: Int,
+    matchSize: Int
+): String {
+    // 1. Convert string to UTF-8 bytes to match SQLite FTS5 byte offsets
+    val fullBytes = text.toByteArray(Charsets.UTF_8)
+
+    // Safety check to avoid crashes if offsets are wrong
+    if (offsetBytes < 0 || offsetBytes >= fullBytes.size) {
+        return text
+    }
+
+    // Extract part to be highlighted / shaded
+    // Use the String(bytes, offset, length, charset) constructor
+    val prefixText = String(fullBytes, 0, offsetBytes, Charsets.UTF_8)
+    val matchText = String(fullBytes, offsetBytes, matchSize, Charsets.UTF_8)
+    val suffixText = String(fullBytes,offsetBytes+matchSize, fullBytes.size-offsetBytes-matchSize, Charsets.UTF_8)
+
+    // 4. Build highlighted text with inline code (``) for the matching text query
+    val highlighted = "$prefixText`$matchText`$suffixText"
+    return highlighted
+}
+
+
+// PlantSheetUsages with a usage selected / usage text to highlight
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PlantSheetUsages(plant: Plant, usageParams: IntArray, modifier: Modifier) {
+    val usagesTypes = plant.usages.keys
+
+    val selectedUsage = usageParams[0]
+    val offsetBytes = usageParams[1]
+    val matchSize = usageParams[2]
+
+    Column( modifier =
+        modifier.padding(
+            top = 20.dp,
+            start = 10.dp,
+            end = 10.dp,
+            bottom = 0.dp)
+    ) {
+
+        if (plant.toxic && plant.toxic_text != null) {
+            ToxicTextBox(plant.toxic_text)
+        }
+
+        for (type in usagesTypes) {
             val typeUsages = plant.usages[type] ?: emptyList()
-            val isUsageTypeFocused = usageArg != null && typeUsages.any { it.usageId == usageArg }
+            val isUsageTypeFocused = typeUsages.any { it.usageId == selectedUsage }
             
             CollapsableSection(stringResource(type.displayText), initiallyExpanded = isUsageTypeFocused) {
 
@@ -489,17 +585,11 @@ fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
                         style = MaterialTheme.typography.titleSmall
                     )
 
-                    val isUsageFocused = usageArg == usage.usageId
-//                    var showHighlight by remember(usageArg) { mutableStateOf(isUsageFocused) }
-                    val paragraphStyle = if (isUsageFocused) {
-                        MaterialTheme.typography.bodyLarge.copy(background = MaterialTheme.colorScheme.outlineVariant)
-                    } else {
-                        MaterialTheme.typography.bodyLarge
-                    }
+                    val isUsageFocused = selectedUsage == usage.usageId
 
                     val bringIntoViewRequester = remember { BringIntoViewRequester() }
                     if (isUsageFocused) {
-                        LaunchedEffect(usageArg) {
+                        LaunchedEffect(usageParams) {
                             bringIntoViewRequester.bringIntoView()
 //                            kotlinx.coroutines.delay(4000) // Wait 4 seconds
 //                            showHighlight = false
@@ -507,14 +597,13 @@ fun PlantSheetUsages(plant: Plant, usageArg: Int? = null, modifier: Modifier) {
                     }
 
                     Markdown(
-                        usage.text,
-                        colors = markdownColor(linkText = MaterialTheme.colorScheme.primary),
+                        if (isUsageFocused) highlightText(usage.text, offsetBytes, matchSize) else usage.text,
                         typography = markdownTypography(
-                            paragraph = paragraphStyle,
-                            link = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                textDecoration = TextDecoration.Underline,
-                                color = MaterialTheme.colorScheme.primary
+                            paragraph = MaterialTheme.typography.bodyMedium,
+                            inlineCode = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                background = MaterialTheme.colorScheme.outlineVariant,
+                                fontWeight = FontWeight.SemiBold,
                             )
                         ),
                         modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)
