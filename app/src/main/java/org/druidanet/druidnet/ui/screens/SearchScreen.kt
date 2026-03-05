@@ -124,47 +124,76 @@ private fun NoResultsScreen(modifier: Modifier) {
     Box(modifier) {}
 }
 
-fun formatSearchPreview(
+private val CLEAN_LINKS_REGEX = Regex("""\(druidnet://[^)]*\)""")
+
+private fun cleanFormatting(text: String): String {
+    val noLinksText = CLEAN_LINKS_REGEX.replace(text, "")
+    return noLinksText.filter { it != '*' && it != '[' && it != ']' }
+}
+
+private fun formatSearchPreview(
     text: String,
     offsetBytes: Int,
-    matchSize: Int,
-    maxChars: Int = 80
+    matchSize: Int
 ): String {
+    val maxChars: Int = 80 // max length of the format
+    val context = 30 // context
+
     // 1. Convert string to UTF-8 bytes to match SQLite FTS5 byte offsets
     val fullBytes = text.toByteArray(Charsets.UTF_8)
-    val contextBytes = 40 // context
 
     // Safety check to avoid crashes if offsets are wrong
-    if (offsetBytes < 0 || offsetBytes >= fullBytes.size) {
+    if (
+        offsetBytes < 0 ||
+        offsetBytes >= fullBytes.size ||
+        offsetBytes + matchSize > fullBytes.size
+    ) {
         return text.take(maxChars).trimEnd() + "…"
     }
 
-    // 2. Calculate window of text to show in bytes
-    val startWindowContext = (offsetBytes - contextBytes).coerceAtLeast(0)
-    val endMatch = (offsetBytes + matchSize).coerceAtMost(fullBytes.size)
-    val endWindowContext = (endMatch + contextBytes).coerceAtMost(fullBytes.size)
-
-    // 3. Extract parts as Strings (this handles multi-byte char reconstruction)
+    // 1. Extract part to be highlighted / shaded
     // Use the String(bytes, offset, length, charset) constructor
-    val prefixText = String(fullBytes, startWindowContext, offsetBytes - startWindowContext, Charsets.UTF_8)
-    val matchText = String(fullBytes, offsetBytes, matchSize.coerceAtMost(fullBytes.size - offsetBytes), Charsets.UTF_8)
-    val suffixText = String(fullBytes, endMatch, endWindowContext - endMatch, Charsets.UTF_8)
+    var previousText = String(fullBytes, 0, offsetBytes, Charsets.UTF_8)
+    val matchText = String(fullBytes, offsetBytes, matchSize, Charsets.UTF_8)
+    var restOfText = String(fullBytes,offsetBytes+matchSize, fullBytes.size-offsetBytes-matchSize, Charsets.UTF_8)
 
+    // MicroOptimization:
+    // We squeeze the text so we don't do clean operations in too long text
+    previousText = previousText.takeLast(context * 3)
+    restOfText = restOfText.take(context * 3)
+
+    // 2. clean prefix and suffix of formatting
+    previousText = cleanFormatting(previousText)
+    restOfText = cleanFormatting(restOfText)
+
+    // 3. Show previous context (previousText) and take the rest until fill maxChars
+//    suffixText = suffixText.take(context)
+    val previousContext = previousText.takeLast(context)
+    val leadingEllipsis = if (previousContext.length == context) "…" else ""
     // 4. Build highlighted text with inline code (``) for the matching text query
-    val highlighted = "$prefixText`$matchText`$suffixText"
+    val result = buildString {
+        append(leadingEllipsis)
+        append(previousContext)
+        append('`')
+        append(matchText)
+        append('`')
+        append(restOfText)
+    }
 
     // Add ellipsis when we have cut/omitted some text
     // We show leading … if we had to strip the text from the beginning
-    val leadingEllipsis = if (startWindowContext > 0) "…" else ""
+//    val leadingEllipsis = if (prefixText.length == context) "…" else ""
     // We show trailing … if there's still text left in the usage text
-    val trailingEllipsis = if (endWindowContext < fullBytes.size) "…" else ""
+//    val trailingEllipsis = if (suffixText.length == context) "…" else ""
 
-    val result = leadingEllipsis + highlighted + trailingEllipsis
+    /*
+    var result = leadingEllipsis + highlighted + trailingEllipsis
+    */
 
     return if (result.length <= maxChars) {
-        result
+        result // if it fits in maxChars, do not show ellipsis
     } else {
-        // Final fallback to ensure it fits the UI card
+        // Take up to maxChars and add trailing ellipsis
         result.take(maxChars).trimEnd() + "…"
     }
 }
