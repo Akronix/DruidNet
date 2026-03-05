@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -80,6 +81,7 @@ fun SearchScreen(
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchQuery by viewModel.searchUsesQuery.collectAsStateWithLifecycle()
+    val isSearching by viewModel.isSearchingUses.collectAsStateWithLifecycle()
 
     val searchTopBar =
         @Composable {
@@ -94,6 +96,7 @@ fun SearchScreen(
         }
 
     val resultPlantList : List<PlantUseCard> by viewModel.resultSearchUses.collectAsState(emptyList())
+//    val resultPlantList : List<PlantUseCard> by viewModel.searchUses(searchQuery).collectAsState(emptyList())
 
     Scaffold(
         topBar = searchTopBar,
@@ -109,20 +112,29 @@ fun SearchScreen(
 
         ) { paddingValues ->
 
-            if (resultPlantList.isNotEmpty()) {
-                ResultsPlantList(
-                    plantsList = resultPlantList,
-                    onClickPlantUseCard = { plantUseCard ->
-                        keyboardController?.hide()
-                        onClickPlantUseCard(plantUseCard)
-                    },
-                    modifier = Modifier.padding(paddingValues)
-                )
-            } else {
-                SearchStatusScreen(
-                    searchQuery = searchQuery,
-                    modifier = Modifier.padding(paddingValues)
-                )
+            Box(modifier = Modifier.padding(paddingValues)) {
+                if (isSearching) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (resultPlantList.isNotEmpty()) {
+                    ResultsPlantList(
+                        plantsList = resultPlantList,
+                        onClickPlantUseCard = { plantUseCard ->
+                            keyboardController?.hide()
+                            onClickPlantUseCard(plantUseCard)
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    SearchStatusScreen(
+                        searchQuery = searchQuery,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -133,7 +145,7 @@ private fun SearchStatusScreen(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         contentAlignment = Alignment.TopCenter
     ) {
         val isSearchStarted =  searchQuery.isEmpty() || searchQuery.length < 3;

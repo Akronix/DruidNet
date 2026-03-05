@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -70,8 +71,16 @@ class DruidNetViewModel @Inject constructor(
     private val _searchUsesQuery = MutableStateFlow("")
     val searchUsesQuery: StateFlow<String> = _searchUsesQuery.asStateFlow()
 
+    private val _isSearchingUses = MutableStateFlow(false)
+    val isSearchingUses: StateFlow<Boolean> = _isSearchingUses.asStateFlow()
+
     fun updateSearchUsesQuery(newQuery: String) {
-        _searchUsesQuery.value = newQuery
+        if (_searchUsesQuery.value == newQuery)
+            return
+        else{
+            _searchUsesQuery.value = newQuery
+            _isSearchingUses.value = newQuery.length >= 3
+        }
     }
 
     val resultSearchUses: Flow<List<PlantUseCard>> = _searchUsesQuery
@@ -79,7 +88,9 @@ class DruidNetViewModel @Inject constructor(
         .flatMapLatest { query ->
             if (query.length >= 3) {
                 plantsRepository.searchPlantsByUse(query, allPlantsFlow)
+                    .onEach { _isSearchingUses.value = false }
             } else {
+                _isSearchingUses.value = false
                 flowOf(emptyList())
             }
         }
