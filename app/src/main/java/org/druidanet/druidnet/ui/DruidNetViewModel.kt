@@ -6,13 +6,17 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -45,6 +49,7 @@ import java.text.Collator
 import java.util.Locale
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class DruidNetViewModel @Inject constructor(
     private val plantDao: PlantDAO,
@@ -68,6 +73,21 @@ class DruidNetViewModel @Inject constructor(
     fun updateSearchUsesQuery(newQuery: String) {
         _searchUsesQuery.value = newQuery
     }
+
+    val resultSearchUses: Flow<List<PlantUseCard>> = _searchUsesQuery
+        .debounce(300L)
+        .flatMapLatest { query ->
+            if (query.length >= 3) {
+                plantsRepository.searchPlantsByUse(query, allPlantsFlow)
+            } else {
+                flowOf(emptyList())
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
@@ -260,7 +280,7 @@ class DruidNetViewModel @Inject constructor(
 
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
-
+/*
     fun searchUses(searchQuery: String) : Flow<List<PlantUseCard>> {
         return if (searchQuery.isNotEmpty()) plantsRepository.searchPlantsByUse(
             searchText = searchQuery,
@@ -269,7 +289,7 @@ class DruidNetViewModel @Inject constructor(
             flowOf(emptyList())
         }
     }
-
+*/
     /*
     fun onSearchQueryChanged(query: String) {
         _searchText.value = query

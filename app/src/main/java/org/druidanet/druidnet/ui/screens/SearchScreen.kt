@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -25,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,9 +47,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +93,7 @@ fun SearchScreen(
             )
         }
 
-    val resultPlantList : List<PlantUseCard> by viewModel.searchUses(searchQuery).collectAsState(emptyList())
+    val resultPlantList : List<PlantUseCard> by viewModel.resultSearchUses.collectAsState(emptyList())
 
     Scaffold(
         topBar = searchTopBar,
@@ -114,14 +119,53 @@ fun SearchScreen(
                     modifier = Modifier.padding(paddingValues)
                 )
             } else {
-                NoResultsScreen(modifier = modifier.padding(paddingValues))
+                SearchStatusScreen(
+                    searchQuery = searchQuery,
+                    modifier = Modifier.padding(paddingValues)
+                )
             }
         }
     }
 
 @Composable
-private fun NoResultsScreen(modifier: Modifier) {
-    Box(modifier) {}
+private fun SearchStatusScreen(
+    searchQuery: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        val isSearchStarted =  searchQuery.isEmpty() || searchQuery.length < 3;
+        val noResults = !isSearchStarted
+        val (message, iconRes) = when {
+            isSearchStarted ->
+                stringResource(R.string.search_uses_hint_min_chars) to R.drawable.mystery_search
+            else ->
+                stringResource(R.string.search_uses_no_results) to R.drawable.confused_druidess
+        }
+
+        if (message.isNotEmpty()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(32.dp)
+            ) {
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    modifier = if (noResults) Modifier.size(256.dp) else Modifier.size(128.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.70f)
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
 }
 
 private val CLEAN_LINKS_REGEX = Regex("""\(druidnet://[^)]*\)""")

@@ -46,4 +46,6 @@
     <string name="title_screen_search">Búsqueda</string>
     <string name="search_uses_textfield">Busca por uso</string>
     <string name="attention_title">¡Atención!</string>
+    <string name="search_uses_hint_min_chars">Escribe al menos 3 caracteres para empezar a buscar.</string>
+    <string name="search_uses_no_results">No se han encontrado resultados para tu búsqueda.</string>
 </resources>
