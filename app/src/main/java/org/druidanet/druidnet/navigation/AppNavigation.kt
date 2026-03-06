@@ -34,6 +34,7 @@ import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
+import org.druidanet.druidnet.ui.screens.SearchScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
 
 @Serializable
@@ -102,7 +103,15 @@ object PlantSheetDestination : NavigationDestination() {
     override val title = R.string.title_screen_plant_sheet
     const val plantArg = "plantLatinName"
     const val sectionArg = "section"
-    val routeWithArgs = "$route/{$plantArg}?$sectionArg={$sectionArg}"
+    const val usageArg = "usageParams"
+    val routeWithArgs = "$route/{$plantArg}?$sectionArg={$sectionArg}&$usageArg={$usageArg}"
+    override val hasTopBar = false
+}
+
+@Serializable
+object SearchDestination : NavigationDestination() {
+    override val route = "search"
+    override val title = R.string.title_screen_search
     override val hasTopBar = false
 }
 
@@ -126,6 +135,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         GlossaryDestination.route to GlossaryDestination,
         IdentifyDestination.route to IdentifyDestination,
         CameraDestination.route to CameraDestination,
+        SearchDestination.route to SearchDestination,
     )
 
 // Before Implementation:
@@ -228,6 +238,10 @@ fun DruidNetNavHost(
                 navArgument(PlantSheetDestination.sectionArg) {
                     type = NavType.StringType
                     defaultValue = "DESCRIPTION"
+                },
+                navArgument(PlantSheetDestination.usageArg) {
+                    type = NavType.IntArrayType
+                    nullable = true
                 }
             ),
             deepLinks = listOf(
@@ -240,17 +254,17 @@ fun DruidNetNavHost(
             )
         ) { backStackEntry ->
             val plantLatinName: String? = backStackEntry.arguments?.getString(PlantSheetDestination.plantArg)
-            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
+//            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
+            val usageParams: IntArray? =
+                backStackEntry.arguments?.getIntArray(PlantSheetDestination.usageArg)
 
             if (plantLatinName != null) {
                 val defaultUriHandler = LocalUriHandler.current
                 CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
                     override fun openUri(uri: String) {
                         if (uri.startsWith("druidnet://")) {
-                            println("TEST for url: $uri")
                             navController.navigate(uri.toUri())
                         } else if (uri.startsWith("plant_sheet/")) {
-                            println("TEST for url: $uri")
                             navController.navigate(uri)
                         } else {
                             defaultUriHandler.openUri(uri)
@@ -259,6 +273,7 @@ fun DruidNetNavHost(
                 }) {
                     PlantSheetScreen(
                         plantLatinName = plantLatinName,
+                        usageParams = usageParams,
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
                         modifier = Modifier
@@ -268,6 +283,26 @@ fun DruidNetNavHost(
             } else {
                 Text("Error: There's no plant reference in the route")
             }
+        }
+        composable(route = SearchDestination.route) {
+            SearchScreen(
+                viewModel = viewModel,
+                navigateBack = { navController.navigateUp() },
+                onClickPlantUseCard = { plantUse ->
+                    val matchOffsets = plantUse.matchOffsets.split(" ")
+                    val offsetBytes = matchOffsets[2].toInt()
+                    val matchSizeBytes = matchOffsets[3].toInt()
+                    val usageParams = intArrayOf(plantUse.usageId, offsetBytes, matchSizeBytes)
+                    val usageQuery = usageParams.joinToString("&") { "usageParams=$it" }
+                    navController.navigate(
+                        "${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES&${usageQuery}"
+                    )
+                },
+                innerPadding = innerPadding,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            )
         }
         composable(route = AboutDestination.route) {
             AboutScreen(

@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -63,6 +66,7 @@ import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.assetsToBitmap
+import java.util.ArrayList
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -78,6 +82,7 @@ fun PlantSheetScreen(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = hiltViewModel(),
+    usageParams: IntArray?,
 ) {
     val plantSheetUiState = sheetViewModel.uiState.collectAsState().value
     val plant = remember (plantSheetUiState.plantUiState?.plantId) {
@@ -125,7 +130,8 @@ fun PlantSheetScreen(
                 currentSection,
                 onChangeSection,
                 plantImageBitmap = plantImageBitmap,
-                modifier = modifier.padding(padding)
+                usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
+                modifier = modifier.padding(padding),
             )
         }
 
@@ -212,28 +218,39 @@ fun PlantSheetBody(
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     plantImageBitmap: ImageBitmap,
+    usageParams: IntArray?,
     modifier: Modifier = Modifier
 ) {
 
     SelectionContainer {
 
         when (currentSection) {
-            PlantSheetSection.DESCRIPTION -> PlantSheetDescription(
-                plant,
-                onChangeSection(PlantSheetSection.USAGES),
-                imageBitmap = plantImageBitmap,
-                modifier.verticalScroll(rememberScrollState())
-            )
+            PlantSheetSection.DESCRIPTION ->
+                PlantSheetDescription(
+                    plant,
+                    onChangeSection(PlantSheetSection.USAGES),
+                    imageBitmap = plantImageBitmap,
+                    modifier.verticalScroll(rememberScrollState())
+                )
 
-            PlantSheetSection.USAGES -> PlantSheetUsages(
-                plant,
-                modifier.verticalScroll(rememberScrollState())
-            )
+            PlantSheetSection.USAGES ->
+                if (usageParams == null)
+                        PlantSheetUsages(
+                            plant,
+                            modifier.verticalScroll(rememberScrollState())
+                        )
+                else
+                        PlantSheetUsages(
+                            plant,
+                            usageParams,
+                            modifier.verticalScroll(rememberScrollState())
+                        )
 
-            PlantSheetSection.CONFUSIONS -> PlantSheetConfusions(
-                plant = plant,
-                modifier = modifier.verticalScroll(rememberScrollState())
-            )
+            PlantSheetSection.CONFUSIONS ->
+                PlantSheetConfusions(
+                    plant = plant,
+                    modifier = modifier.verticalScroll(rememberScrollState())
+                )
         }
     }
 }
@@ -274,11 +291,13 @@ fun PlantSheetDescription(plant: Plant,
 
         ) {
 
-            Text(plant.displayName,
+            Text(
+                plant.displayName,
                 style = MaterialTheme.typography.headlineLarge,
             )
 
-            Text("(${plant.latinName})",
+            Text(
+                "(${plant.latinName})",
                 fontStyle = Italic,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -314,10 +333,12 @@ fun PlantSheetDescription(plant: Plant,
             Column {
                 Text("Distribución y Habitat:",
                     style = MaterialTheme.typography.titleMedium)
-                Markdown(plant.habitat,
+                Markdown(
+                    plant.habitat,
                     typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
                 )
-                Markdown(plant.distribution,
+                Markdown(
+                    plant.distribution,
                     typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
                 )
             }
@@ -445,6 +466,7 @@ fun ConfusionTextBox(confusion: Confusion) {
 
 }
 
+// PlantSheetUsages without usage selected / text to highlight
 @Composable
 fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
     val usagesTypes = plant.usages.keys
@@ -500,6 +522,107 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
     }
 }
 
+
+fun highlightText(
+    text: String,
+    offsetBytes: Int,
+    matchSize: Int
+): String {
+    // 1. Convert string to UTF-8 bytes to match SQLite FTS5 byte offsets
+    val fullBytes = text.toByteArray(Charsets.UTF_8)
+
+    // Safety check to avoid crashes if offsets are wrong
+    if (offsetBytes < 0 || offsetBytes >= fullBytes.size) {
+        return text
+    }
+
+    // Extract part to be highlighted / shaded
+    // Use the String(bytes, offset, length, charset) constructor
+    val prefixText = String(fullBytes, 0, offsetBytes, Charsets.UTF_8)
+    val matchText = String(fullBytes, offsetBytes, matchSize, Charsets.UTF_8)
+    val suffixText = String(fullBytes,offsetBytes+matchSize, fullBytes.size-offsetBytes-matchSize, Charsets.UTF_8)
+
+    // 4. Build highlighted text with inline code (``) for the matching text query
+    val highlighted = "$prefixText`$matchText`$suffixText"
+    return highlighted
+}
+
+
+// PlantSheetUsages with a usage selected / usage text to highlight
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PlantSheetUsages(plant: Plant, usageParams: IntArray, modifier: Modifier) {
+    val usagesTypes = plant.usages.keys
+
+    val selectedUsage = usageParams[0]
+    val offsetBytes = usageParams[1]
+    val matchSize = usageParams[2]
+
+    Column( modifier =
+        modifier.padding(
+            top = 20.dp,
+            start = 10.dp,
+            end = 10.dp,
+            bottom = 0.dp)
+    ) {
+
+        if (plant.toxic && plant.toxic_text != null) {
+            ToxicTextBox(plant.toxic_text)
+        }
+
+        for (type in usagesTypes) {
+            val typeUsages = plant.usages[type] ?: emptyList()
+            val isUsageTypeFocused = typeUsages.any { it.usageId == selectedUsage }
+            
+            CollapsableSection(stringResource(type.displayText), initiallyExpanded = isUsageTypeFocused) {
+
+                typeUsages.forEach { usage: Usage ->
+                    Text(
+                        "~ " + usage.subType + " ~",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+
+                    val isUsageFocused = selectedUsage == usage.usageId
+
+                    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+                    if (isUsageFocused) {
+                        LaunchedEffect(usageParams) {
+                            bringIntoViewRequester.bringIntoView()
+//                            kotlinx.coroutines.delay(4000) // Wait 4 seconds
+//                            showHighlight = false
+                        }
+                    }
+
+                    Markdown(
+                        if (isUsageFocused) highlightText(usage.text, offsetBytes, matchSize) else usage.text,
+                        typography = markdownTypography(
+                            paragraph = MaterialTheme.typography.bodyMedium,
+                            inlineCode = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                background = MaterialTheme.colorScheme.outlineVariant,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        ),
+                        modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)
+                    )
+                    Spacer(
+                        modifier = Modifier.padding(
+                            dimensionResource(id = R.dimen.space_between_sections)
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.padding(
+                dimensionResource(id = R.dimen.space_between_sections)
+            ))
+        }
+        Spacer(modifier = Modifier.padding(
+            dimensionResource(id = R.dimen.space_between_sections)
+        ))
+    }
+}
+
 @Composable
 fun ToxicTextBox(toxicText: String) {
     Surface(
@@ -521,7 +644,8 @@ fun ToxicTextBox(toxicText: String) {
                         .align(Alignment.CenterVertically)
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("¡Atención!",
+                Text(
+                    stringResource(R.string.attention_title),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.align(Alignment.CenterVertically)
@@ -607,19 +731,20 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
 //    PlantSheetConfusions(plant = plant, modifier = Modifier.fillMaxSize())
 //}
 //
-//@Preview
+//@Preview(showBackground = true)
 //@Composable
 //fun PlantSheetUsagesPreview() {
-//    val plant = Plant(
-//        plantId = 1,
-//        displayName = "Rose",
-//        latinName = "Rosa L.",
-//        imagePath = "images/rosa_l.webp",
-//        commonNames = emptyArray(),
-//        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
-//        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
-//        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
-//    PlantSheetUsages(plant = plant, modifier = Modifier.fillMaxSize())
+//    val plant = PlantsDataSource.loadPlants()[0]
+////    val plant = Plant(
+////        plantId = 1,
+////        displayName = "Rose",
+////        latinName = "Rosa L.",
+////        imagePath = "images/rosa_l.webp",
+////        commonNames = emptyArray(),
+////        description = "", habitat = "", distribution = "", phenology = "", family = "", confusions = emptyArray(),
+////        usages = mapOf(org.druidanet.druidnet.model.UsageType.ORNAMENTAL to listOf(Usage(1,org.druidanet.druidnet.model.UsageType.ORNAMENTAL, "Gardening", "Used in gardens for its beauty."))),
+////        toxic = true, toxic_text = "Some parts can be mildly toxic if ingested."    )
+//    PlantSheetUsages(plant = plant, 1, modifier = Modifier.fillMaxSize())
 //}
 
 /**

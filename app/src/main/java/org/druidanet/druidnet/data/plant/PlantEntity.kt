@@ -5,6 +5,7 @@ import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Fts4
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -185,4 +186,16 @@ data class PlantData(
 
 )
 
-
+@Entity(tableName = "PlantUseFTS")
+@Fts4(contentEntity = UsageEntity::class)
+data class PlantUseFtsEntity(
+    @PrimaryKey @ColumnInfo(name = "rowid") val id: Int,
+    @ColumnInfo(name = "usageId") val usageId: Int,
+    @ColumnInfo(name = "plantId") val plantId: Int,
+    @ColumnInfo(name = "text") val text: String,
+    /*
+      It would be convenient to have an unformatted and no accents version of the "text" field,
+      in order to do the searches against it. Something like:
+      @ColumnInfo(name = "plain_text") val plainSearchableText: String,
+    */
+)

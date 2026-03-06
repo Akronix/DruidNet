@@ -6,15 +6,22 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.druidanet.druidnet.data.AppDatabase
@@ -32,6 +39,7 @@ import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Name
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
+import org.druidanet.druidnet.model.PlantUseCard
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import org.druidanet.druidnet.workers.KEY_GLOSSARY_UPDATED
@@ -42,6 +50,7 @@ import java.text.Collator
 import java.util.Locale
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class DruidNetViewModel @Inject constructor(
     private val plantDao: PlantDAO,
@@ -57,6 +66,39 @@ class DruidNetViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
+
+
+    private val _searchUsesQuery = MutableStateFlow("")
+    val searchUsesQuery: StateFlow<String> = _searchUsesQuery.asStateFlow()
+
+    private val _isSearchingUses = MutableStateFlow(false)
+    val isSearchingUses: StateFlow<Boolean> = _isSearchingUses.asStateFlow()
+
+    fun updateSearchUsesQuery(newQuery: String) {
+        if (_searchUsesQuery.value == newQuery)
+            return
+        else{
+            _searchUsesQuery.value = newQuery
+            _isSearchingUses.value = newQuery.length >= 3
+        }
+    }
+
+    val resultSearchUses: Flow<List<PlantUseCard>> = _searchUsesQuery
+        .debounce(300L)
+        .flatMapLatest { query ->
+            if (query.length >= 3) {
+                plantsRepository.searchPlantsByUse(query, allPlantsFlow)
+                    .onEach { _isSearchingUses.value = false }
+            } else {
+                _isSearchingUses.value = false
+                flowOf(emptyList())
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
@@ -249,7 +291,16 @@ class DruidNetViewModel @Inject constructor(
 
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
-
+/*
+    fun searchUses(searchQuery: String) : Flow<List<PlantUseCard>> {
+        return if (searchQuery.isNotEmpty()) plantsRepository.searchPlantsByUse(
+            searchText = searchQuery,
+            originalListPlants = allPlantsFlow
+        ) else {
+            flowOf(emptyList())
+        }
+    }
+*/
     /*
     fun onSearchQueryChanged(query: String) {
         _searchText.value = query
@@ -280,7 +331,7 @@ class DruidNetViewModel @Inject constructor(
             commonNames = names.map { Name(it.commonName, it.language) }.toTypedArray(),
             displayName = displayName,
             usages = usages
-                .map { Usage(it.type, it.subType, it.text) }
+                .map { Usage(it.usageId,it.type, it.subType, it.text) }
                 .groupBy { it.type },
             family = p.family,
             toxic = p.toxic,
