@@ -25,7 +25,6 @@ import org.druidanet.druidnet.data.plant.PlantUseFtsEntity
               AutoMigration (from = 2, to = 3),
               AutoMigration (from = 3, to = 4),
               AutoMigration (from = 5, to = 6),
-              AutoMigration (from = 6, to = 7)
           ]
         )
 abstract class AppDatabase: RoomDatabase() {
@@ -61,7 +60,7 @@ abstract class AppDatabase: RoomDatabase() {
 //                            }
 //                        }
 //                    })
-                    .addMigrations(MIGRATION_4_5)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_6_7)
                     .build()
                     .also {
                         INSTANCE = it
