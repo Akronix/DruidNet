@@ -60,6 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.DraggableScrollbar
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberDraggableScroller
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
+import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
@@ -272,7 +273,7 @@ private fun ResultPlantCard(
     val offsetBytes = matchOffsets[2].toInt()
     val matchSize = matchOffsets[3].toInt()
 
-    println(matchOffsets)
+//    println(matchOffsets)
 
     Card(
         colors = CardDefaults.cardColors(
@@ -312,7 +313,7 @@ private fun ResultPlantCard(
                     fontWeight = FontWeight.Bold,
                     fontStyle = if (plantUseCard.plant.isLatinName) FontStyle.Italic else FontStyle.Normal
                 )
-                com.mikepenz.markdown.m3.Markdown(
+                Markdown(
                     formatSearchPreview(plantUseCard.text, offsetBytes, matchSize),
                     typography = markdownTypography(
                         paragraph = MaterialTheme.typography.bodyMedium,
