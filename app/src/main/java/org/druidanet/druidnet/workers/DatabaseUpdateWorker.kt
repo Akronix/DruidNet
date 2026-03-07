@@ -3,6 +3,7 @@ package org.druidanet.druidnet.workers
 import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorker
+import androidx.room.RoomRawQuery
 import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -85,6 +86,8 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                     plantDao.populateNames(plantData.names)
                     plantDao.populateUsages(plantData.usages)
                     biblioDao.populateData(biblioData)
+                    // Rebuild FTS index for PlantUseFTS
+                    plantDao.executeRawQuery(RoomRawQuery("""INSERT INTO PlantUseFTS(PlantUseFTS) VALUES('rebuild');""".trimIndent()))
                     Log.i("DruidNetWorker", "Populated database with new data.")
                 }
                 userPreferencesRepository.updateDatabaseVersion(res.versionDB)

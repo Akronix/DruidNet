@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import org.druidanet.druidnet.model.LanguageEnum
@@ -79,5 +81,9 @@ interface PlantDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun populateUsages(names: List<UsageEntity>)
+
+    /*** EXECUTE RAW QUERIES for aux functions like updating indexes ***/
+    @RawQuery
+    fun executeRawQuery(query: RoomRawQuery): Int
 
 }
