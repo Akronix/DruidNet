@@ -91,7 +91,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 )
                 Spacer(modifier = Modifier.height(48.dp))
 
-                // --- MODIFICATION START ---
+                /* Button with 'BETA' Ribbon
             Box(
                 contentAlignment = Alignment.TopEnd, // Align ribbon to the top end
                 modifier = Modifier.fillMaxWidth()
@@ -137,9 +137,10 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                     )
                 }
-            }
 
-                /* Button without 'BETA' Ribbon
+            }*/
+
+                 // Button without 'BETA' Ribbon
                 Button(
                     onClick = {onNavigationButtonClick(CameraDestination)},
 //                    onClick = {onNavigationButtonClick(IdentifyDestination)},
@@ -159,7 +160,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
-                 */
+
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { onNavigationButtonClick(CatalogDestination) },
