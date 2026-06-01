@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -22,11 +23,14 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -34,10 +38,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -50,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -63,10 +70,16 @@ import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.CollapsableSection
 import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Confusion
+import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.utils.assetsToBitmap
-import java.util.ArrayList
+import androidx.compose.ui.res.imageResource
+import org.druidanet.druidnet.ui.components.PlantImageCarousel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -262,6 +275,8 @@ fun PlantSheetDescription(plant: Plant,
                           modifier: Modifier) {
 //    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
 
+    var showImageCarousel by rememberSaveable { mutableStateOf(false) };
+
     Column (
         modifier = modifier
             .padding(0.dp)
@@ -272,14 +287,60 @@ fun PlantSheetDescription(plant: Plant,
                 .padding(0.dp)
                 .zoomable(rememberZoomableState())
         ){
-            Image(
-                contentScale = ContentScale.FillWidth,
-                bitmap = imageBitmap,
-                contentDescription = stringResource(R.string.datasheet_image_cdescp),
-                modifier = Modifier
-                    .fillMaxWidth()
-
-            )
+            if (!showImageCarousel) {
+                Image(
+                    contentScale = ContentScale.FillWidth,
+                    bitmap = imageBitmap,
+                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+            ) } else {
+                PlantImageCarousel(
+                    listOf(
+                        "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
+                    ),
+                    onExit = { showImageCarousel = false }
+                )
+            }
+            if (!showImageCarousel) {
+                IconButton(
+                    onClick = { showImageCarousel = true },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.4f),
+                        contentColor = Color.White
+                    ),
+                    shape = AbsoluteCutCornerShape(20),
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_right),
+                        contentDescription = "Mostrar imágenes de internet",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            } else {
+                IconButton(
+                    onClick = { showImageCarousel = false },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.4f),
+                        contentColor = Color.White
+                    ),
+                    shape = AbsoluteCutCornerShape(20),
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_left),
+                        contentDescription = "Mostrar imágenes de internet",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
         }
         Column (
             modifier = Modifier.padding(
@@ -687,27 +748,33 @@ fun FullScreenImage(imageBitmap : ImageBitmap) {
     }
 }
 
-//@Preview
-//@Composable
-//fun PlantSheetDescriptionPreview() {
-//    val plant = Plant(
-//        plantId = 1,
-//        displayName = "Rose",
-//        latinName = "Rosa L.",
-//        imagePath = "images/rosa_l.webp", // Replace with a valid image path in your assets
-//        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
-//        description = "A beautiful flowering plant.",
-//        habitat = "Gardens and wild areas.",
-//        distribution = "Worldwide.",
-//        phenology = "Blooms in summer.",
-//        observations = "Known for its thorns.",
-//        curiosities = "Symbol of love.",
-//        usages = emptyMap(),
-//        family = "Rosaceae",
-//        confusions = emptyArray()
-//    )
-//    PlantSheetDescription(plant = plant, onClickShowUsages = {}, modifier = Modifier.fillMaxSize())
-//}
+@Preview(showBackground = true)
+@Composable
+fun PlantSheetDescriptionPreview() {
+    val plant = Plant(
+        plantId = 1,
+        displayName = "Rose",
+        latinName = "Rosa L.",
+        imagePath = "arbutus_unedo.webp",
+        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
+        description = "A beautiful flowering plant.",
+        habitat = "Gardens and wild areas.",
+        distribution = "Worldwide.",
+        phenology = "Blooms in summer.",
+        observations = "Known for its thorns.",
+        curiosities = "Symbol of love.",
+        usages = emptyMap(),
+        family = "Rosaceae",
+        confusions = emptyArray()
+    )
+
+    PlantSheetDescription(
+        plant = plant,
+        onClickShowUsages = {},
+        imageBitmap = ImageBitmap.imageResource(id = R.drawable.confused_druidess), // Using an existing drawable for preview
+        modifier = Modifier.fillMaxSize()
+    )
+}
 //
 //@Preview
 //@Composable
