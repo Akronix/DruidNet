@@ -82,6 +82,7 @@ import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantResult
+import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
@@ -243,6 +244,7 @@ fun SuccessScreen(
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
     similarPlants: List<PlantResult>,
     goToSimilarPlant: (String, Double) -> Unit,
+    plantNetImagesList: List<String>,
     modifier: Modifier = Modifier,
     imageBitMap: ImageBitmap? = null,
     plantNetImageURL: String? = null
@@ -254,19 +256,22 @@ fun SuccessScreen(
         Box(
             modifier = Modifier.weight(2f)
         ) {
-            if (mostLikelyPlant != null)
+            if (mostLikelyPlant != null) {
                 PlantInDruidNet(
                     plant = mostLikelyPlant,
                     score = mostLikelyScore,
                     goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) },
                     imageBitmapExt = imageBitMap
                 )
-            else if (latinName.isNotEmpty())
+                PlantImageCarousel(plantNetImagesList, plantName = "")
+            }
+            else if (latinName.isNotEmpty()) {
                 NotInDatabaseScreen(
-                    name = latinName,
+                    plantName = latinName,
                     score = mostLikelyScore,
-                    plantNetImageURL = plantNetImageURL
+                    plantNetImagesList = plantNetImagesList
                 )
+            }
         }
 
         HorizontalDivider(
@@ -529,7 +534,8 @@ fun IdentifyScreen(
                         goToSimilarPlant = { name: String, s: Double ->
                             identifyViewModel.updatePlantNetResult(name, s)
                         },
-                        plantNetImageURL = plantResultUIState.currentPlantResult?.images?.first()?.url?.o,
+                        plantNetImageURL = plantResultUIState.currentPlantResult?.images?.firstOrNull()?.url?.o,
+                        plantNetImagesList = plantResultUIState.currentPlantResult?.images?. mapNotNull { it.url?.o } ?: emptyList(),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(padding) ,
@@ -563,7 +569,11 @@ fun IdentifyScreen(
 }
 
 @Composable
-fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) {
+fun NotInDatabaseScreen(
+    plantName: String,
+    score: Double,
+    plantNetImagesList: List<String>
+) {
             Column(
                 modifier = Modifier
                     .padding(0.dp)
@@ -603,20 +613,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         )
                     }
 
-                    AsyncImage(
-                        model = plantNetImageURL,
-                        contentDescription = "PlantNet image for $name",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .zoomable(rememberZoomableState()),
-                        contentScale = ContentScale.FillWidth,
-                        fallback = painterResource(R.drawable.grass),
-                        placeholder = forwardingPainter(
-                            painter = painterResource(R.drawable.eco),
-                            colorFilter = ColorFilter.tint(Color.Gray),
-                            alpha = 0.5f,
-                        )
-                    )
+                    PlantImageCarousel(plantNetImagesList, plantName)
                 }
 
                 /* Scientific name + Message not in db */
@@ -632,7 +629,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                 ) {
                     SelectionContainer {
                         Text(
-                            text = name,
+                            text = plantName,
                             style = MaterialTheme.typography.headlineLarge,
                             fontStyle = Italic,
                         )
@@ -657,7 +654,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         )
                         {
                             Markdown(
-                                "¿Te gustaría contribuir a que _${name}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${name}) 🦉",
+                                "¿Te gustaría contribuir a que _${plantName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${plantName}) 🦉",
                                 modifier = Modifier,
                                 typography = markdownTypography(
                                     paragraph =

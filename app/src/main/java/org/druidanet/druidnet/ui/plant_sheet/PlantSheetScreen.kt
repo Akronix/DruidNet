@@ -299,7 +299,8 @@ fun PlantSheetDescription(plant: Plant,
                     listOf(
                         "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
                     ),
-                    onExit = { showImageCarousel = false }
+                    plantName = ""
+//                    onExit = { showImageCarousel = false }
                 )
             }
             if (!showImageCarousel) {
