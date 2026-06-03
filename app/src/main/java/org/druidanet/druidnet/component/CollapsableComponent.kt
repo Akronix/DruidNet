@@ -53,7 +53,7 @@ fun CollapsableSection(
                 .padding(3.dp)
         ) {
             Icon(
-                painterResource(R.drawable.edible),
+                painterResource(R.drawable.social),
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.section_buttom_img))
                 ,
