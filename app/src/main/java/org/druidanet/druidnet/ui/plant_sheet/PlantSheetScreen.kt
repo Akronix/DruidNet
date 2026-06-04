@@ -1,5 +1,7 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -79,6 +81,7 @@ import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.asAndroidBitmap
 
 
 enum class PlantSheetSection {
@@ -273,9 +276,8 @@ fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
                           imageBitmap: ImageBitmap,
                           modifier: Modifier) {
-//    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
 
-    var showImageCarousel by rememberSaveable { mutableStateOf(false) };
+    var offline by rememberSaveable { mutableStateOf(false) };
 
     Column (
         modifier = modifier
@@ -286,61 +288,24 @@ fun PlantSheetDescription(plant: Plant,
                 .height(250.dp)
                 .padding(0.dp)
                 .zoomable(rememberZoomableState())
-        ){
-            if (!showImageCarousel) {
+        ) {
+            if (offline) {
                 Image(
                     contentScale = ContentScale.FillWidth,
                     bitmap = imageBitmap,
                     contentDescription = stringResource(R.string.datasheet_image_cdescp),
                     modifier = Modifier
                         .fillMaxWidth()
-            ) } else {
+                )
+            } else {
                 PlantImageCarousel(
                     listOf(
+                        imageBitmap.asAndroidBitmap(),
                         "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
+                        "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
                     ),
-                    plantName = ""
-//                    onExit = { showImageCarousel = false }
+                    plantName = plant.displayName,
                 )
-            }
-            if (!showImageCarousel) {
-                IconButton(
-                    onClick = { showImageCarousel = true },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.Black.copy(alpha = 0.4f),
-                        contentColor = Color.White
-                    ),
-                    shape = AbsoluteCutCornerShape(20),
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                        .size(40.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_right),
-                        contentDescription = "Mostrar imágenes de internet",
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = { showImageCarousel = false },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.Black.copy(alpha = 0.4f),
-                        contentColor = Color.White
-                    ),
-                    shape = AbsoluteCutCornerShape(20),
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 8.dp)
-                        .size(40.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_left),
-                        contentDescription = "Mostrar imágenes de internet",
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
             }
         }
         Column (
@@ -720,31 +685,6 @@ fun ToxicTextBox(toxicText: String) {
                         .copy(textAlign = TextAlign.Center)
                 )
             )
-        }
-    }
-}
-
-/* For expanding the image of the plant to full screen */
-@Composable
-fun FullScreenImage(imageBitmap : ImageBitmap) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .padding(0.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(250.dp)
-                    .padding(0.dp)
-            ) {
-                Image(
-                    contentScale = ContentScale.None,
-                    bitmap = imageBitmap,
-                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-                )
-            }
         }
     }
 }

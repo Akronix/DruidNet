@@ -96,7 +96,6 @@ fun bitmapToFile(bitmap: Bitmap, fileName: String, context: Context): File? {
     }
 }
 
-// TODO: Remove and replace by something better (painter to pass to images or Coil)
 fun Context.assetsToBitmap(filename:String): ImageBitmap {
     val assetManager = this.assets
     val imgFn = "$filename.webp"
@@ -108,7 +107,7 @@ fun Context.assetsToBitmap(filename:String): ImageBitmap {
         if (File("$localStorageDir/$imgFn").exists())
             File("$localStorageDir/$imgFn").inputStream()
         else
-            assetManager.open("images/broken_image.jpg")
+            assetManager.open("drawable/broken_image.jpg")
 
     val bitmap = BitmapFactory.decodeStream(inputStream)
     inputStream.close()

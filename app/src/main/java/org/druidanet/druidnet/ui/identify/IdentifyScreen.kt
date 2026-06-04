@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -257,13 +258,13 @@ fun SuccessScreen(
             modifier = Modifier.weight(2f)
         ) {
             if (mostLikelyPlant != null) {
-                PlantInDruidNet(
+                PlantInDruidNetScreen(
                     plant = mostLikelyPlant,
                     score = mostLikelyScore,
                     goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) },
-                    imageBitmapExt = imageBitMap
+                    imageBitmapExt = imageBitMap,
+                    plantNetImagesList = plantNetImagesList
                 )
-                PlantImageCarousel(plantNetImagesList, plantName = "")
             }
             else if (latinName.isNotEmpty()) {
                 NotInDatabaseScreen(
@@ -301,11 +302,15 @@ fun SuccessScreen(
 }
 
 @Composable
-fun PlantInDruidNet(plant: Plant,
+fun PlantInDruidNetScreen(plant: Plant,
                       score: Double,
                       imageBitmapExt: ImageBitmap?,
+                      plantNetImagesList: List<String>,
                      goToPlantSheetSection: (PlantSheetSection) -> Unit) {
+
     val imageBitmap = imageBitmapExt ?: LocalContext.current.assetsToBitmap(plant.imagePath)
+
+    val images: List<Any> = listOf(imageBitmap.asAndroidBitmap()) + plantNetImagesList
 
     Column(
         modifier = Modifier
@@ -343,15 +348,7 @@ fun PlantInDruidNet(plant: Plant,
                 )
             }
 
-
-            Image(
-                contentScale = ContentScale.FillWidth,
-                bitmap = imageBitmap,
-                contentDescription = stringResource(R.string.datasheet_image_cdescp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .zoomable(rememberZoomableState()),
-            )
+           PlantImageCarousel(images, plant.displayName)
 
         }
 
@@ -431,10 +428,10 @@ fun PlantInDruidNet(plant: Plant,
 /*
 @Preview(showBackground = true)
 @Composable
-fun PlantInDruidNetPreview() {
+fun PlantInDruidNetScreenPreview() {
     val plant = PlantsDataSource.loadPlants()[0]
     DruidNetTheme {
-        PlantInDruidNet(
+        PlantInDruidNetScreen(
             plant = plant,
             score = 0.92,
             imageBitmapExt = ImageBitmap(1024, 768),
