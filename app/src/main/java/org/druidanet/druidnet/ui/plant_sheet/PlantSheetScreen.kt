@@ -1,6 +1,8 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -82,6 +84,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asAndroidBitmap
+import org.druidanet.druidnet.utils.isConnected
 
 
 enum class PlantSheetSection {
@@ -277,7 +280,11 @@ fun PlantSheetDescription(plant: Plant,
                           imageBitmap: ImageBitmap,
                           modifier: Modifier) {
 
-    var offline by rememberSaveable { mutableStateOf(false) };
+    val networkMonitor = LocalContext
+        .current
+        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    var online by rememberSaveable { mutableStateOf(networkMonitor.isConnected()) };
 
     Column (
         modifier = modifier
@@ -289,7 +296,7 @@ fun PlantSheetDescription(plant: Plant,
                 .padding(0.dp)
                 .zoomable(rememberZoomableState())
         ) {
-            if (offline) {
+            if (!online) {
                 Image(
                     contentScale = ContentScale.FillWidth,
                     bitmap = imageBitmap,
