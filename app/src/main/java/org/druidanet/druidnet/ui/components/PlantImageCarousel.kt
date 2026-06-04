@@ -57,8 +57,9 @@ fun PlantImageCarousel(
                 .height(300.dp),
 
             // Optional padding to show a preview of the next/previous image
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            pageSpacing = 8.dp
+//            contentPadding = PaddingValues(horizontal = 8.dp),
+//            pageSpacing = 0.dp,
+//            beyondViewportPageCount = 1,
         ) { page ->
             val url = imageUrls[page]
 
