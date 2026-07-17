@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,15 +31,13 @@ import org.druidanet.druidnet.R
 @Composable
 fun CollapsableSection(
     title: String,
+    iconPainter: Painter,
+    iconSelectedPainter: Painter,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
     content: @Composable () -> Unit
 ) {
     var expanded by remember { mutableStateOf(initiallyExpanded) }
-
-//    val iconCategoryRes = "edible";
-    val iconCategoryRes = "usage_category_$title";
-
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -53,7 +52,7 @@ fun CollapsableSection(
                 .padding(3.dp)
         ) {
             Icon(
-                painterResource(R.drawable.social),
+                if (!expanded) iconPainter else iconSelectedPainter,
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.section_buttom_img))
                 ,
@@ -88,7 +87,9 @@ fun CollapsableSection(
 @Composable
 fun CollapsableSectionPreview() {
     CollapsableSection(
-        title = "Preview Title"
+        title = "Preview Title",
+        painterResource(R.drawable.edible_unfill),
+        painterResource(R.drawable.edible_filled),
     ) {
         Text(text = "This is the content of the collapsable section.")
     }
