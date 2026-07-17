@@ -323,15 +323,19 @@ fun PlantSheetDescription(plant: Plant,
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
-            Markdown(
-                plant.description,
-                typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
-            )
+            Column {
+                Text("¿Cómo reconocerla?",
+                    style = MaterialTheme.typography.titleMedium)
+                Markdown(
+                    plant.description,
+                    typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
+                )
+            }
             Spacer(modifier = Modifier.padding(
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
             Column {
-                Text("Distribución y Habitat:",
+                Text("¿Dónde encontrarla?",
                     style = MaterialTheme.typography.titleMedium)
                 Markdown(
                     plant.habitat,
@@ -346,7 +350,7 @@ fun PlantSheetDescription(plant: Plant,
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
             Column {
-                Text("Fenología:",
+                Text("¿Cuándo florece o fructifica?",
                     style = MaterialTheme.typography.titleMedium)
                 Markdown(plant.phenology,
                     typography = markdownTypography(text = MaterialTheme.typography.bodyMedium))
