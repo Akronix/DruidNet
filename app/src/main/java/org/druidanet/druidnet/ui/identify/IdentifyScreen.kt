@@ -241,6 +241,7 @@ fun LoadingScreenPreview() {
 fun SuccessScreen(
     mostLikelyPlant: Plant?,
     latinName: String,
+    plantNetCommonName: String,
     mostLikelyScore: Double,
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
     similarPlants: List<PlantResult>,
@@ -268,7 +269,8 @@ fun SuccessScreen(
             }
             else if (latinName.isNotEmpty()) {
                 NotInDatabaseScreen(
-                    plantName = latinName,
+                    plantName = plantNetCommonName,
+                    latinName = latinName,
                     score = mostLikelyScore,
                     plantNetImagesList = plantNetImagesList
                 )
@@ -525,6 +527,7 @@ fun IdentifyScreen(
                     SuccessScreen(
                         mostLikelyPlant = plantResultUIState.plant,
                         latinName = plantResultUIState.latinName,
+                        plantNetCommonName = plantResultUIState.commonNames?.firstOrNull() ?: plantResultUIState.latinName,
                         mostLikelyScore = plantResultUIState.score,
                         goToPlantSheet = goToPlantSheet,
                         similarPlants = plantResultUIState.similarPlants,
@@ -568,6 +571,7 @@ fun IdentifyScreen(
 @Composable
 fun NotInDatabaseScreen(
     plantName: String,
+    latinName: String,
     score: Double,
     plantNetImagesList: List<String>
 ) {
@@ -613,7 +617,7 @@ fun NotInDatabaseScreen(
                     PlantImageCarousel(plantNetImagesList, plantName)
                 }
 
-                /* Scientific name + Message not in db */
+                /* Plant name + Message not in db */
                 Column(
                     modifier = Modifier
                         .padding(
@@ -622,13 +626,18 @@ fun NotInDatabaseScreen(
                             end = 10.dp,
                             bottom = 0.dp,
                         )
-
                 ) {
                     SelectionContainer {
                         Text(
                             text = plantName,
                             style = MaterialTheme.typography.headlineLarge,
+                        )
+                    }
+                    SelectionContainer {
+                        Text(
+                            "(${latinName})",
                             fontStyle = Italic,
+                            style = MaterialTheme.typography.titleLarge,
                         )
                     }
 

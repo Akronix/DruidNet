@@ -14,6 +14,8 @@ data class PlantNetResultUIState (
 
     val latinName: String = "",
 
+    val commonNames: List<String>? = null,
+
     val score: Double = 0.0,
 
     val similarPlants: List<PlantResult> = emptyList<PlantResult>(),

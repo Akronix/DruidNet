@@ -141,21 +141,26 @@ class IdentifyViewModel @Inject constructor(
 
                     val response = identifyService.plantIdentify(
                         images = imagePart,
+                        lang = language.i18n,
                         organs = organRequestBody
                     )
 
-                    val bestMatchName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
+                    val bestMatchLatinName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
+                    val bestMatchCommonNames = response.results?.firstOrNull()?.species?.commonNames
                     val bestScore = response.results?.firstOrNull()?.score ?: 0.0
+
+                    Log.d("DRUIDNET-PLANTNET", bestMatchCommonNames.toString())
 
                     _uiState.value = uiState.value.copy(
                         score = bestScore,
-                        latinName = bestMatchName,
+                        commonNames = bestMatchCommonNames,
+                        latinName = bestMatchLatinName,
                         similarPlants = response.results?.drop(1) ?: emptyList(),
                         currentPlantResult = response.results?.first()
                     )
 
                     if (response.results != null) {
-                        val plant: Plant? = plantsRepository.searchPlant(bestMatchName, language)
+                        val plant: Plant? = plantsRepository.searchPlant(bestMatchLatinName, language)
                         if (plant != null) {
 //                            Log.i(TAG, "Plant found in database!")
                             _uiState.value = uiState.value.copy(plant = plant, isInDatabase = true)
@@ -164,7 +169,7 @@ class IdentifyViewModel @Inject constructor(
 
                     }
 
-                    val successMsg = "Success: Best match - $bestMatchName."
+                    val successMsg = "Success: Best match - $bestMatchLatinName."
                     _identificationStatus.value = successMsg
 //                    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
 //                    Log.i(TAG, "$successMsg Full response: \n${json.encodeToString(response)}")
