@@ -116,10 +116,24 @@ fun PlantSheetScreen(
 
     val context = LocalContext.current
 
+    val networkMonitor =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    var online by rememberSaveable { mutableStateOf(networkMonitor.isConnected()) };
+    val onlineImages = remember (plantSheetUiState.onlineImages) {
+        plantSheetUiState.onlineImages
+    }
+
+    Log.i("PlantSheetScreen", "onlineImages: $onlineImages")
+
     if (isPlantInDatabase && plant != null) {
 
         val plantImageBitmap = remember(plant.plantId, context) {
             plant.let { context.assetsToBitmap(it.imagePath) }
+        }
+
+        LaunchedEffect(online) {
+            sheetViewModel.getOnlineImages(plant.latinName)
         }
 
         Scaffold(
@@ -149,6 +163,7 @@ fun PlantSheetScreen(
                 currentSection,
                 onChangeSection,
                 plantImageBitmap = plantImageBitmap,
+                onlineImages = onlineImages,
                 usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
                 modifier = modifier.padding(padding),
             )
@@ -237,6 +252,7 @@ fun PlantSheetBody(
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     plantImageBitmap: ImageBitmap,
+    onlineImages: List<String>,
     usageParams: IntArray?,
     modifier: Modifier = Modifier
 ) {
@@ -249,6 +265,7 @@ fun PlantSheetBody(
                     plant,
                     onChangeSection(PlantSheetSection.USAGES),
                     imageBitmap = plantImageBitmap,
+                    onlineImages = onlineImages,
                     modifier.verticalScroll(rememberScrollState())
                 )
 
@@ -278,13 +295,8 @@ fun PlantSheetBody(
 fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
                           imageBitmap: ImageBitmap,
+                          onlineImages: List<String>,
                           modifier: Modifier) {
-
-    val networkMonitor = LocalContext
-        .current
-        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-    var online by rememberSaveable { mutableStateOf(networkMonitor.isConnected()) };
 
     Column (
         modifier = modifier
@@ -296,7 +308,8 @@ fun PlantSheetDescription(plant: Plant,
                 .padding(0.dp)
                 .zoomable(rememberZoomableState())
         ) {
-            if (!online) {
+            // TODO: llamar a PlantImageCarousel aquí
+            if (onlineImages.isEmpty()) {
                 Image(
                     contentScale = ContentScale.FillWidth,
                     bitmap = imageBitmap,
@@ -306,12 +319,8 @@ fun PlantSheetDescription(plant: Plant,
                 )
             } else {
                 PlantImageCarousel(
-                    listOf(
-                        imageBitmap.asAndroidBitmap(),
-                        "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
-                        "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
-                    ),
-                    plantName = plant.displayName,
+                    listOf(imageBitmap.asAndroidBitmap()) +
+                            onlineImages
                 )
             }
         }
@@ -720,6 +729,10 @@ fun PlantSheetDescriptionPreview() {
         plant = plant,
         onClickShowUsages = {},
         imageBitmap = ImageBitmap.imageResource(id = R.drawable.confused_druidess), // Using an existing drawable for preview
+        onlineImages = listOf(
+            "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
+            "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
+        ),
         modifier = Modifier.fillMaxSize()
     )
 }

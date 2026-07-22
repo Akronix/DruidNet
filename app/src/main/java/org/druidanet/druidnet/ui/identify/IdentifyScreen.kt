@@ -350,7 +350,7 @@ fun PlantInDruidNetScreen(plant: Plant,
                 )
             }
 
-           PlantImageCarousel(images, plant.displayName)
+           PlantImageCarousel(images)
 
         }
 
@@ -614,7 +614,7 @@ fun NotInDatabaseScreen(
                         )
                     }
 
-                    PlantImageCarousel(plantNetImagesList, plantName)
+                    PlantImageCarousel(plantNetImagesList)
                 }
 
                 /* Plant name + Message not in db */

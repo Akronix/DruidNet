@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,11 +13,17 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.navigation.PlantSheetDestination
+import org.druidanet.druidnet.network.iNaturalistApiService
 import javax.inject.Inject
 
 private const val TIMEOUT_MILLIS = 5_000L
@@ -26,6 +33,7 @@ class PlantSheetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Hilt provides this
     plantsRepository: PlantsRepository, // Hilt provides this
     userPreferencesRepository: UserPreferencesRepository, // Hilt provides this
+    private val iNaturalistService: iNaturalistApiService, // Hilt provides this
 ) : ViewModel() {
 
     /***** Local vars *****/
@@ -72,6 +80,8 @@ class PlantSheetViewModel @Inject constructor(
        To do that transition, follow this example: https://github.com/android/compose-samples/blob/73b3a51e06a6520efb5b4931e71b771d257bf1dd/JetNews/app/src/main/java/com/example/jetnews/ui/home/HomeViewModel.kt#L150
      */
 
+    private val _onlineImages = MutableStateFlow<List<String>>(emptyList())
+
     private val initialSection = try {
         sectionArg?.let { PlantSheetSection.valueOf(it.uppercase()) } ?: DEFAULT_SECTION
     } catch (e: IllegalArgumentException) {
@@ -96,9 +106,12 @@ class PlantSheetViewModel @Inject constructor(
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
-    ) { plantSheetData, currentSection ->
+        _onlineImages // The flow for the iNaturalist online images
+    ) { plantSheetData, currentSection, onlineImages ->
         // When either flow emits a new value, this lambda is re-executed
-        plantSheetData.copy(currentSection = currentSection) // Update the section in the combined state
+        plantSheetData.copy(
+            currentSection = currentSection, // Update the section in the combined state
+            onlineImages = onlineImages) // Map onlineImages to the UI state
     }.
     stateIn(
         scope = viewModelScope,
@@ -111,5 +124,42 @@ class PlantSheetViewModel @Inject constructor(
             _currentSection.value = newSection // Update the _currentSection MutableStateFlow directly
         // This will trigger the combine to re-emit
     }
+
+    /** NETWORK FUNCTIONS **/
+
+    fun getOnlineImages(latinName: String) {
+
+        viewModelScope.launch {
+
+            try {
+                var resp = iNaturalistService.retrieveTaxaRecord(latinName)
+                var results = resp.body()?.get("results")?.jsonArray
+                val taxonId = results?.firstOrNull()?.jsonObject?.get("id")?.jsonPrimitive?.intOrNull
+                Log.i("DRUIDNET-INAT", resp.toString())
+                Log.i("DRUIDNET-INAT", results.toString())
+                Log.i("DRUIDNET-INAT", taxonId.toString())
+
+                if (taxonId != null) {
+                    resp = iNaturalistService.retrieveImages(taxonId)
+                    results = resp.body()?.get("results")?.jsonArray
+                    // TODO: Extract photos from json array into a List<String> of URLs for pics
+                    val photoURLSquare = results?.firstOrNull()?.jsonObject?.get("photos")?.jsonArray?.firstOrNull()?.jsonObject?.get("url").toString()
+                    val photoURL = photoURLSquare.replace("square", "large").replace("\"", "")
+                    val photos = listOf(photoURL)
+                    Log.i("DRUIDNET-INAT", resp.toString())
+                    Log.i("DRUIDNET-INAT", results.toString())
+                    Log.i("DRUIDNET-INAT", photoURL)
+                    _onlineImages.value = photos
+                }
+
+            } catch (e: Exception) {
+                Log.e("DRUIDNET-ERROR", "Failed to fetch images", e)
+            }
+
+
+        }
+
+    }
+
 
 }

@@ -60,8 +60,7 @@ class DruidNetViewModel @Inject constructor(
     private val plantsRepository: PlantsRepository,
     private val documentsRepository: DocumentsRepository,
     private val appDatabase: AppDatabase,
-    private val workManagerRepository: WorkManagerRepository,
-    private val iNaturalistService: iNaturalistApiService,
+    private val workManagerRepository: WorkManagerRepository
 ) : ViewModel() {
 
     /****** STATE VARIABLES *****/

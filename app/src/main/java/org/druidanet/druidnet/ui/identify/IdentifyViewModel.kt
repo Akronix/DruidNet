@@ -26,6 +26,7 @@ import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantNetApiService
 import org.druidanet.druidnet.network.PlantNetResponse
+import org.druidanet.druidnet.network.iNaturalistApiService
 import org.druidanet.druidnet.utils.compressImage
 import org.druidanet.druidnet.utils.getFileFromUri
 import retrofit2.HttpException

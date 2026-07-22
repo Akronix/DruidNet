@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -51,11 +52,12 @@ import kotlin.math.absoluteValue
 @Composable
 fun PlantImageCarousel(
     imageURIsOrBitMap: List<Any>,
-    plantName: String = "",
     modifier: Modifier = Modifier
 ) {
     // 1. Initialize the state with the number of pages
     val pagerState = rememberPagerState(pageCount = { imageURIsOrBitMap.size })
+
+    Log.i("PlantImageCarousel", "imageURIsOrBitMap: $imageURIsOrBitMap")
 
     Box(
         modifier = modifier
@@ -100,7 +102,7 @@ fun PlantImageCarousel(
 //            ) {
                 AsyncImage(
                     model = coilModel,
-                    contentDescription = "PlantNet image for $plantName",
+                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .zoomable(rememberZoomableState())
@@ -146,6 +148,7 @@ fun PlantImageCarousel(
                     Box(
                         modifier = Modifier
                             .size(if (isSelected) 10.dp else 8.dp)
+                            .padding(bottom = if (isSelected) 2.dp else 0.dp)
                             .background(
                                 color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
                                 shape = CircleShape
