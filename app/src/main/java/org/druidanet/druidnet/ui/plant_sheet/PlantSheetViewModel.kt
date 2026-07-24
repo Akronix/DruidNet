@@ -15,10 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.*
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
@@ -134,21 +131,29 @@ class PlantSheetViewModel @Inject constructor(
             try {
                 var resp = iNaturalistService.retrieveTaxaRecord(latinName)
                 var results = resp.body()?.get("results")?.jsonArray
-                val taxonId = results?.firstOrNull()?.jsonObject?.get("id")?.jsonPrimitive?.intOrNull
+                val taxonId = results?.get(0)?.jsonObject?.get("id")?.jsonPrimitive?.int
                 Log.i("DRUIDNET-INAT", resp.toString())
                 Log.i("DRUIDNET-INAT", results.toString())
                 Log.i("DRUIDNET-INAT", taxonId.toString())
 
                 if (taxonId != null) {
                     resp = iNaturalistService.retrieveImages(taxonId)
-                    results = resp.body()?.get("results")?.jsonArray
-                    // TODO: Extract photos from json array into a List<String> of URLs for pics
-                    val photoURLSquare = results?.firstOrNull()?.jsonObject?.get("photos")?.jsonArray?.firstOrNull()?.jsonObject?.get("url").toString()
-                    val photoURL = photoURLSquare.replace("square", "large").replace("\"", "")
-                    val photos = listOf(photoURL)
-                    Log.i("DRUIDNET-INAT", resp.toString())
-                    Log.i("DRUIDNET-INAT", results.toString())
-                    Log.i("DRUIDNET-INAT", photoURL)
+                    val resultsPhotos = resp.body()?.get("results")?.jsonArray
+                        ?.mapNotNull{ resultObj ->
+                            resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("url")?.jsonPrimitive?.content
+                        }
+
+//                    val photosURLsSquare = results?.get(0)?.jsonObject?.get("photos")?.jsonArray
+//                        ?.mapNotNull { photoObj ->
+//                            photoObj.jsonObject["url"]?.jsonPrimitive?.content
+//                        }
+
+                    val photos = resultsPhotos
+                        ?.map { it.replace("square", "large") }
+                        ?: emptyList()
+
+                    Log.i("DRUIDNET-INAT", resultsPhotos.toString())
+                    Log.i("DRUIDNET-INAT", photos.toString())
                     _onlineImages.value = photos
                 }
 
