@@ -132,6 +132,8 @@ fun PlantSheetScreen(
             plant.let { context.assetsToBitmap(it.imagePath) }
         }
 
+        val plantImages = if (onlineImages.isEmpty()) listOf(plantImageBitmap.asAndroidBitmap()) else listOf(plantImageBitmap.asAndroidBitmap()) + onlineImages
+
         LaunchedEffect(online) {
             sheetViewModel.getOnlineImages(plant.latinName)
         }
@@ -162,8 +164,7 @@ fun PlantSheetScreen(
                 plant = plant,
                 currentSection,
                 onChangeSection,
-                plantImageBitmap = plantImageBitmap,
-                onlineImages = onlineImages,
+                plantImages,
                 usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
                 modifier = modifier.padding(padding),
             )
@@ -251,8 +252,7 @@ fun PlantSheetBody(
     plant: Plant,
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
-    plantImageBitmap: ImageBitmap,
-    onlineImages: List<String>,
+    plantImages: List<Any>,
     usageParams: IntArray?,
     modifier: Modifier = Modifier
 ) {
@@ -264,8 +264,7 @@ fun PlantSheetBody(
                 PlantSheetDescription(
                     plant,
                     onChangeSection(PlantSheetSection.USAGES),
-                    imageBitmap = plantImageBitmap,
-                    onlineImages = onlineImages,
+                    plantImages,
                     modifier.verticalScroll(rememberScrollState())
                 )
 
@@ -294,8 +293,7 @@ fun PlantSheetBody(
 @Composable
 fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
-                          imageBitmap: ImageBitmap,
-                          onlineImages: List<String>,
+                          plantImages: List<Any>,
                           modifier: Modifier) {
 
     Column (
@@ -308,21 +306,7 @@ fun PlantSheetDescription(plant: Plant,
                 .padding(0.dp)
                 .zoomable(rememberZoomableState())
         ) {
-            // TODO: llamar a PlantImageCarousel aquí
-            if (onlineImages.isEmpty()) {
-                Image(
-                    contentScale = ContentScale.FillWidth,
-                    bitmap = imageBitmap,
-                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            } else {
-                PlantImageCarousel(
-                    listOf(imageBitmap.asAndroidBitmap()) +
-                            onlineImages
-                )
-            }
+            PlantImageCarousel(plantImages)
         }
         Column (
             modifier = Modifier.padding(
@@ -728,11 +712,10 @@ fun PlantSheetDescriptionPreview() {
     PlantSheetDescription(
         plant = plant,
         onClickShowUsages = {},
-        imageBitmap = ImageBitmap.imageResource(id = R.drawable.confused_druidess), // Using an existing drawable for preview
-        onlineImages = listOf(
+        plantImages = listOf(ImageBitmap.imageResource(id = R.drawable.confused_druidess),
             "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
             "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
-        ),
+            ),
         modifier = Modifier.fillMaxSize()
     )
 }
