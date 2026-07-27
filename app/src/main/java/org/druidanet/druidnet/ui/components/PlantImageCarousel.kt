@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,8 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
+import coil3.imageLoader
+import coil3.request.ImageRequest
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
@@ -56,6 +60,25 @@ fun PlantImageCarousel(
     val pagerState = rememberPagerState(pageCount = { imageURIsOrBitMap.size })
 
     Log.i("PlantImageCarousel", "imageURIsOrBitMap: $imageURIsOrBitMap")
+
+    // Code if we wanted to preload all images
+    /*
+    // Preload all online images:
+            val context = LocalContext.current
+            val imageLoader = context.imageLoader
+            LaunchedEffect(imageURIsOrBitMap ) {
+
+                for (image in ImageURIsOrBitMap) {
+                    if (image is String) {
+                        val nextRequest = ImageRequest.Builder(context)
+                            .data(image)
+                            .build()
+                        imageLoader.enqueue(nextRequest)
+                    }
+                }
+
+            }
+     */
 
     Box(
         modifier = modifier
@@ -75,6 +98,36 @@ fun PlantImageCarousel(
 //            beyondViewportPageCount = 1,
         ) { page ->
             val coilModel = imageURIsOrBitMap[page]
+
+            // Preload online images:
+            val context = LocalContext.current
+            val imageLoader = context.imageLoader
+            LaunchedEffect(page, imageURIsOrBitMap ) {
+
+                // Preload next two images:
+                if (page + 1 < imageURIsOrBitMap.size) {
+                    val image = imageURIsOrBitMap [page + 1]
+                    if (image is String) {
+                        val nextRequest = ImageRequest.Builder(context)
+                            .data(image)
+                            .build()
+                        imageLoader.enqueue(nextRequest)
+                    }
+
+                }
+
+                if (page + 2 < imageURIsOrBitMap.size) {
+                    val image = imageURIsOrBitMap [page + 2]
+                    if (image is String) {
+                        val nextRequest = ImageRequest.Builder(context)
+                            .data(image)
+                            .build()
+                        imageLoader.enqueue(nextRequest)
+                    }
+
+                }
+            }
+
 
             // Swap thumbnail for large size if pulling from iNaturalist
 //            val highResUrl = url.replace("square.jpg", "large.jpg")
