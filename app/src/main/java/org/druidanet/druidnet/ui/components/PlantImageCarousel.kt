@@ -1,6 +1,8 @@
 package org.druidanet.druidnet.ui.components
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,9 +18,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -30,7 +29,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +40,6 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
-import coil3.compose.SubcomposeAsyncImage
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.druidanet.druidnet.R
@@ -134,13 +132,18 @@ fun PlantImageCarousel(
         }
 
         // 3. Carousel Indicators (The dots at the bottom)
-        if (imageURIsOrBitMap.size > 1) {
+        AnimatedVisibility(
+            visible = imageURIsOrBitMap.size > 1,
+            enter = fadeIn(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+        ) {
             LazyRow(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .padding(bottom = 16.dp)
                     .wrapContentHeight(),
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 items(imageURIsOrBitMap.size) { index ->
                     // Change color dynamically depending on if this dot is the active page
@@ -148,7 +151,6 @@ fun PlantImageCarousel(
                     Box(
                         modifier = Modifier
                             .size(if (isSelected) 10.dp else 8.dp)
-                            .padding(bottom = if (isSelected) 2.dp else 0.dp)
                             .background(
                                 color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
                                 shape = CircleShape
@@ -197,7 +199,7 @@ fun PlantImageCarouselPreview() {
     CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
 
         val sampleImages = listOf(
-            "file:///android_asset/images/plants/achillea_millefolium.webp",
+            ImageBitmap.imageResource(id = R.drawable.confused_druidess),
             "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg",
         )
         DruidNetTheme(darkTheme = false) {
