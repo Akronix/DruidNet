@@ -126,42 +126,68 @@ class PlantSheetViewModel @Inject constructor(
 
     fun getOnlineImages(latinName: String) {
 
+        var queryName : String
+        var rank : String
+        if (latinName.contains("spp.")) {
+            queryName = latinName.substringBefore(" spp.")
+            rank = "genus"
+        } else {
+            queryName = latinName
+            rank = "species"
+        }
+
         viewModelScope.launch {
 
             try {
-                var resp = iNaturalistService.retrieveTaxaRecord(latinName)
-                var results = resp.body()?.get("results")?.jsonArray
-                val taxonId = results?.get(0)?.jsonObject?.get("id")?.jsonPrimitive?.int
+                var resp = iNaturalistService.retrieveTaxaRecord(queryName, rank)
+                val results = resp.body()?.get("results")?.jsonArray
+
                 Log.i("DRUIDNET-INAT", resp.toString())
                 Log.i("DRUIDNET-INAT", results.toString())
-                Log.i("DRUIDNET-INAT", taxonId.toString())
 
-                if (taxonId != null) {
-                    resp = iNaturalistService.retrieveImages(taxonId)
-                    val resultsPhotos = resp.body()?.get("results")?.jsonArray
-                        ?.mapNotNull{ resultObj ->
-                            resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("url")?.jsonPrimitive?.content
-                        }
+                var foundTaxa = false;
+                var taxonId: Int = 0
+                var i = 0;
+                if (results != null) {
+                    while (!foundTaxa && i < results.size) {
+                        foundTaxa = results[i].jsonObject["name"]?.jsonPrimitive?.content == queryName
+                        if (!foundTaxa)
+                            i++;
+                        else
+                            taxonId = results[i].jsonObject["id"]?.jsonPrimitive?.int!!
+                    }
+                    if (foundTaxa && taxonId != 0) {
 
-//                    val photosURLsSquare = results?.get(0)?.jsonObject?.get("photos")?.jsonArray
-//                        ?.mapNotNull { photoObj ->
-//                            photoObj.jsonObject["url"]?.jsonPrimitive?.content
-//                        }
+                        Log.i("DRUIDNET-INAT", taxonId.toString())
 
-                    val photos = resultsPhotos
-                        ?.map { it.replace("square", "large") }
-                        ?: emptyList()
+                        resp = iNaturalistService.retrieveImages(taxonId)
+                        val resultsPhotos = resp.body()?.get("results")?.jsonArray
+                            ?.mapNotNull { resultObj ->
+                                resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("url")?.jsonPrimitive?.content
+                            }
 
-                    Log.i("DRUIDNET-INAT", resultsPhotos.toString())
-                    Log.i("DRUIDNET-INAT", photos.toString())
-                    _onlineImages.value = photos
+                        //                    val photosURLsSquare = results?.get(0)?.jsonObject?.get("photos")?.jsonArray
+                        //                        ?.mapNotNull { photoObj ->
+                        //                            photoObj.jsonObject["url"]?.jsonPrimitive?.content
+                        //                        }
+
+                        val photos = resultsPhotos
+                            ?.map { it.replace("square", "large") }
+                            ?: emptyList()
+
+                        Log.i("DRUIDNET-INAT", resultsPhotos.toString())
+                        Log.i("DRUIDNET-INAT", photos.toString())
+                        _onlineImages.value = photos
+                    }
+                }
+
+                if (!foundTaxa) {
+                    Log.i("DRUIDNET-INAT", "No found taxon in iNaturalist")
                 }
 
             } catch (e: Exception) {
                 Log.e("DRUIDNET-ERROR", "Failed to fetch images", e)
             }
-
-
         }
 
     }
