@@ -205,7 +205,7 @@ fun PlantImageCarousel(
         ) {
             LazyRow(
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 25.dp)
                     .wrapContentHeight(),
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
