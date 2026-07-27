@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -42,6 +44,7 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
+import coil3.compose.SubcomposeAsyncImage
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -151,7 +154,7 @@ fun PlantImageCarousel(
 //                    )
 //                }
 //            ) {
-                AsyncImage(
+            SubcomposeAsyncImage(
                     model = coilModel,
                     contentDescription = stringResource(R.string.datasheet_image_cdescp),
                     modifier = Modifier
@@ -173,13 +176,22 @@ fun PlantImageCarousel(
                             )
                         },
                     contentScale = ContentScale.FillWidth,
-                    fallback = painterResource(R.drawable.grass),
-                    error = painterResource(R.drawable.broken_image),
-                    placeholder = forwardingPainter(
-                        painter = painterResource(R.drawable.eco),
-                        colorFilter = ColorFilter.tint(Color.Gray),
-                        alpha = 0.5f,
-                    )
+                    loading = {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(48.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    error = { Image(painterResource(R.drawable.broken_image), "Error loading image") }
+//                    fallback = { Image(painterResource(R.drawable.grass), "") },
+//                placeholder = forwardingPainter(
+//                    painter = painterResource(R.drawable.eco),
+//                    colorFilter = ColorFilter.tint(Color.Gray),
+//                    alpha = 0.5f,
+//                )
+
                 )
 //            }
         }
