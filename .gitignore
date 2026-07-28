@@ -1,6 +1,9 @@
 TODO.md
 .kotlin/
 
+# AI
+.artifacts/
+
 # Gradle files
 .gradle/
 build/
