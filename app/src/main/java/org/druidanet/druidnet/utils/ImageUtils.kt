@@ -96,6 +96,20 @@ fun bitmapToFile(bitmap: Bitmap, fileName: String, context: Context): File? {
     }
 }
 
+fun findImageLocalPath(filename: String, context: Context) : String {
+    val assetManager = context.assets
+    val imgFn = "$filename.webp"
+    val localStorageDir = context.getDir("images", Context.MODE_PRIVATE).absolutePath
+
+    if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
+        return "file:///android_asset/images/plants/$imgFn"
+    else
+        if (File("$localStorageDir/$imgFn").exists())
+        return "file://$localStorageDir/$imgFn"
+    else
+        return "file:///android_asset/images/broken_image.jpg"
+}
+
 fun Context.assetsToBitmap(filename:String): ImageBitmap {
     val assetManager = this.assets
     val imgFn = "$filename.webp"

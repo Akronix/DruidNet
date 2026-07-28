@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.components
 
+import androidx.compose.foundation.clickable
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -57,7 +58,8 @@ import kotlin.math.absoluteValue
 @Composable
 fun PlantImageCarousel(
     imageURIsOrBitMap: List<Any>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onImageClick: (Any) -> Unit = {}
 ) {
     // 1. Initialize the state with the number of pages
     val pagerState = rememberPagerState(pageCount = { imageURIsOrBitMap.size })
@@ -154,12 +156,12 @@ fun PlantImageCarousel(
 //                    )
 //                }
 //            ) {
-            SubcomposeAsyncImage(
+                SubcomposeAsyncImage(
                     model = coilModel,
                     contentDescription = stringResource(R.string.datasheet_image_cdescp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .zoomable(rememberZoomableState())
+                        .clickable { onImageClick(coilModel) }
                         .graphicsLayer {
                             // Calculate the absolute offset for the current page from the
                             // scroll position. We use the absolute value which allows us to mirror
@@ -222,31 +224,6 @@ fun PlantImageCarousel(
                             )
                     )
                 }
-            }
-        }
-    }
-}
-
-/* For expanding the image of the plant to full screen */
-@Composable
-fun FullScreenImage(imageBitmap : ImageBitmap) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .padding(0.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(250.dp)
-                    .padding(0.dp)
-            ) {
-                Image(
-                    contentScale = ContentScale.None,
-                    bitmap = imageBitmap,
-                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-                )
             }
         }
     }

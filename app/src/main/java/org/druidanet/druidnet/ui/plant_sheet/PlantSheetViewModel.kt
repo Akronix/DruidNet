@@ -78,6 +78,7 @@ class PlantSheetViewModel @Inject constructor(
      */
 
     private val _onlineImages = MutableStateFlow<List<String>>(emptyList())
+    private val _onlineImagesCopyRight = MutableStateFlow<List<String>?>(emptyList())
 
     private val initialSection = try {
         sectionArg?.let { PlantSheetSection.valueOf(it.uppercase()) } ?: DEFAULT_SECTION
@@ -166,6 +167,11 @@ class PlantSheetViewModel @Inject constructor(
                                 resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("url")?.jsonPrimitive?.content
                             }
 
+                        val resultsCopyRight = resp.body()?.get("results")?.jsonArray
+                            ?.mapNotNull { resultObj ->
+                                resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("attribution")?.jsonPrimitive?.content
+                            }
+
                         //                    val photosURLsSquare = results?.get(0)?.jsonObject?.get("photos")?.jsonArray
                         //                        ?.mapNotNull { photoObj ->
                         //                            photoObj.jsonObject["url"]?.jsonPrimitive?.content
@@ -178,6 +184,7 @@ class PlantSheetViewModel @Inject constructor(
                         Log.i("DRUIDNET-INAT", resultsPhotos.toString())
                         Log.i("DRUIDNET-INAT", photos.toString())
                         _onlineImages.value = photos
+                        _onlineImagesCopyRight.value = resultsCopyRight
                     }
                 }
 

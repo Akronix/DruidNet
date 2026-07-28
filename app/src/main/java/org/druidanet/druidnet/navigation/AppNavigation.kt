@@ -33,6 +33,7 @@ import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.GlossaryScreen
+import org.druidanet.druidnet.ui.screens.ImageFullScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 import org.druidanet.druidnet.ui.screens.SearchScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
@@ -111,8 +112,18 @@ object PlantSheetDestination : NavigationDestination() {
 @Serializable
 object SearchDestination : NavigationDestination() {
     override val route = "search"
-    override val title = R.string.title_screen_search
+    override val title = R.string.title_full_screen_image
     override val hasTopBar = false
+}
+
+@Serializable
+object FullScreenDestination : NavigationDestination() {
+    override val route = "fullscreen"
+    override val title = R.string.title_full_screen_image
+    const val imageUrlArg = "imageUrl"
+    const val attributionArg = "attribution"
+    val routeWithArgs = "$route/{$imageUrlArg}?$attributionArg={$attributionArg}"
+
 }
 
 // We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
@@ -136,6 +147,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         IdentifyDestination.route to IdentifyDestination,
         CameraDestination.route to CameraDestination,
         SearchDestination.route to SearchDestination,
+        FullScreenDestination.routeWithArgs to FullScreenDestination,
     )
 
 // Before Implementation:
@@ -274,6 +286,9 @@ fun DruidNetNavHost(
                     PlantSheetScreen(
                         plantLatinName = plantLatinName,
                         usageParams = usageParams,
+                        onNavigateToFullScreen = { imageUrl, attribution ->
+                            navController.navigate("${FullScreenDestination.route}/$imageUrl?$attribution")
+                        },
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
                         modifier = Modifier
@@ -347,6 +362,34 @@ fun DruidNetNavHost(
                     .padding(innerPadding)
                     .fillMaxSize()
             )
+        }
+        composable(
+            route = FullScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(FullScreenDestination.imageUrlArg) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val imageUrl = backStackEntry.arguments?.getString(FullScreenDestination.imageUrlArg)
+            val attribution = backStackEntry.arguments?.getString(FullScreenDestination.attributionArg)
+            if (imageUrl != null) {
+                if (attribution == null)
+                    ImageFullScreen(
+                        imageUrl = android.net.Uri.decode(imageUrl),
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                    )
+                else
+                    ImageFullScreen(
+                        imageUrl = android.net.Uri.decode(imageUrl),
+                        attribution = attribution,
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                    )
+            }
         }
     }
 }

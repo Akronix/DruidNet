@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.net.Uri
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
@@ -76,6 +77,7 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
 import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.utils.assetsToBitmap
+import org.druidanet.druidnet.utils.findImageLocalPath
 import org.druidanet.druidnet.utils.isConnected
 
 
@@ -90,6 +92,7 @@ val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 fun PlantSheetScreen(
     plantLatinName: String,
     navigateBack: () -> Unit,
+    onNavigateToFullScreen: (String, String?) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = hiltViewModel(),
@@ -124,7 +127,8 @@ fun PlantSheetScreen(
             plant.let { context.assetsToBitmap(it.imagePath) }
         }
 
-        val plantImages = if (onlineImages.isEmpty()) listOf(plantImageBitmap.asAndroidBitmap()) else listOf(plantImageBitmap.asAndroidBitmap()) + onlineImages
+        val offlineImageUrl = findImageLocalPath(plant.imagePath, context)
+        val plantImages = if (onlineImages.isEmpty()) listOf(offlineImageUrl) else listOf(offlineImageUrl) + onlineImages
 
         LaunchedEffect(online) {
             sheetViewModel.getOnlineImages(plant.latinName)
@@ -158,6 +162,13 @@ fun PlantSheetScreen(
                 onChangeSection,
                 plantImages,
                 usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
+                onImageClick = { imageUrl ->
+                    if (imageUrl is String) {
+                        val encodedUrl = Uri.encode(imageUrl)
+                        val attribution = null
+                        onNavigateToFullScreen(encodedUrl, attribution)
+                    }
+                },
                 modifier = modifier.padding(padding),
             )
         }
@@ -246,6 +257,7 @@ fun PlantSheetBody(
     onChangeSection: (PlantSheetSection) -> () -> Unit,
     plantImages: List<Any>,
     usageParams: IntArray?,
+    onImageClick: (Any) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -257,6 +269,7 @@ fun PlantSheetBody(
                     plant,
                     onChangeSection(PlantSheetSection.USAGES),
                     plantImages,
+                    onImageClick = onImageClick,
                     modifier.verticalScroll(rememberScrollState())
                 )
 
@@ -286,6 +299,7 @@ fun PlantSheetBody(
 fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
                           plantImages: List<Any>,
+                          onImageClick: (Any) -> Unit,
                           modifier: Modifier) {
 
     Column (
@@ -296,9 +310,9 @@ fun PlantSheetDescription(plant: Plant,
             modifier = Modifier
                 .height(250.dp)
                 .padding(0.dp)
-                .zoomable(rememberZoomableState())
+//                .zoomable(rememberZoomableState())
         ) {
-            PlantImageCarousel(plantImages)
+            PlantImageCarousel(plantImages, onImageClick = onImageClick)
         }
         Column (
             modifier = Modifier.padding(
@@ -704,10 +718,11 @@ fun PlantSheetDescriptionPreview() {
     PlantSheetDescription(
         plant = plant,
         onClickShowUsages = {},
-        plantImages = listOf(ImageBitmap.imageResource(id = R.drawable.confused_druidess),
+        plantImages = listOf("file:///android_asset/arbutus_unedo.webp",
             "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
             "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
             ),
+        onImageClick = {},
         modifier = Modifier.fillMaxSize()
     )
 }
