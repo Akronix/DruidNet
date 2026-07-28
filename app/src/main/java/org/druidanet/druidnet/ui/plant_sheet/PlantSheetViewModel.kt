@@ -78,7 +78,7 @@ class PlantSheetViewModel @Inject constructor(
      */
 
     private val _onlineImages = MutableStateFlow<List<String>>(emptyList())
-    private val _onlineImagesCopyRight = MutableStateFlow<List<String>?>(emptyList())
+    private val _onlineImagesAttributions = MutableStateFlow<List<String>>(emptyList())
 
     private val initialSection = try {
         sectionArg?.let { PlantSheetSection.valueOf(it.uppercase()) } ?: DEFAULT_SECTION
@@ -104,12 +104,15 @@ class PlantSheetViewModel @Inject constructor(
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
-        _onlineImages // The flow for the iNaturalist online images
-    ) { plantSheetData, currentSection, onlineImages ->
+        _onlineImages, // The flow for the iNaturalist online images
+        _onlineImagesAttributions
+    ) { plantSheetData, currentSection, onlineImages, onlineImagesAttributions ->
         // When either flow emits a new value, this lambda is re-executed
         plantSheetData.copy(
             currentSection = currentSection, // Update the section in the combined state
-            onlineImages = onlineImages) // Map onlineImages to the UI state
+            onlineImages = onlineImages, // Map onlineImages to the UI state
+            onlineImagesAttributions = onlineImagesAttributions
+        )
     }.
     stateIn(
         scope = viewModelScope,
@@ -184,7 +187,7 @@ class PlantSheetViewModel @Inject constructor(
                         Log.i("DRUIDNET-INAT", resultsPhotos.toString())
                         Log.i("DRUIDNET-INAT", photos.toString())
                         _onlineImages.value = photos
-                        _onlineImagesCopyRight.value = resultsCopyRight
+                        _onlineImagesAttributions.value = resultsCopyRight ?: emptyList()
                     }
                 }
 

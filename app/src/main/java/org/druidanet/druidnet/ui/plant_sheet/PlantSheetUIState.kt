@@ -23,5 +23,6 @@ data class PlantSheetUIState(
     val currentSection: PlantSheetSection = DEFAULT_SECTION,
 
     val onlineImages: List<String> = emptyList(),
+    val onlineImagesAttributions: List<String> = emptyList(),
 
     )

@@ -165,7 +165,14 @@ fun PlantSheetScreen(
                 onImageClick = { imageUrl ->
                     if (imageUrl is String) {
                         val encodedUrl = Uri.encode(imageUrl)
-                        val attribution = null
+                        val index = plantImages.indexOf(imageUrl)
+                        val attribution = if (index == 0) {
+                            "(c) DruidNet CC BY-NC-SA 4.0"
+                        } else if (index > 0 && index - 1 < plantSheetUiState.onlineImagesAttributions.size) {
+                            plantSheetUiState.onlineImagesAttributions[index - 1]
+                        } else {
+                            null
+                        }
                         onNavigateToFullScreen(encodedUrl, attribution)
                     }
                 },

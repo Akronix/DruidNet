@@ -287,7 +287,7 @@ fun DruidNetNavHost(
                         plantLatinName = plantLatinName,
                         usageParams = usageParams,
                         onNavigateToFullScreen = { imageUrl, attribution ->
-                            navController.navigate("${FullScreenDestination.route}/$imageUrl?$attribution")
+                            navController.navigate("${FullScreenDestination.route}/$imageUrl?attribution=$attribution")
                         },
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
@@ -368,6 +368,10 @@ fun DruidNetNavHost(
             arguments = listOf(
                 navArgument(FullScreenDestination.imageUrlArg) {
                     type = NavType.StringType
+                },
+                navArgument(FullScreenDestination.attributionArg) {
+                    type = NavType.StringType
+                    nullable = true
                 }
             )
         ) { backStackEntry ->
