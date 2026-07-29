@@ -65,9 +65,9 @@ fun PlantImageCarousel(
         .height(300.dp),
     onImageClick: (Any) -> Unit = {}
 ) {
-    Log.i("PlantImageCarousel", "imageURIsOrBitMap: $imageURIsOrBitMap")
+//    Log.i("PlantImageCarousel", "imageURIsOrBitMap: $imageURIsOrBitMap")
 
-    // Code if we wanted to preload all images
+    // Code if we wanted to preload all images (currently we preload only next 2 images)
     /*
     // Preload all online images:
             val context = LocalContext.current

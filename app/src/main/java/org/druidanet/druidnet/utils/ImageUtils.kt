@@ -36,8 +36,8 @@ fun compressImage(uri: Uri, context: Context): File {
     val compressHeight = bitmap.height / COMPRESS_FACTOR
     val compressWidth = bitmap.width / COMPRESS_FACTOR
 
-    Log.i("dimensions", "Height is " + compressHeight.toString())
-    Log.i("dimensions", "Width downto " + compressWidth.toString())
+//    Log.i("dimensions", "Height is " + compressHeight.toString())
+//    Log.i("dimensions", "Width downto " + compressWidth.toString())
 
     // 3. ScaleDown and compress the Bitmap into the file
     bitmap = bitmap.scale( compressWidth, compressHeight, filter = true )

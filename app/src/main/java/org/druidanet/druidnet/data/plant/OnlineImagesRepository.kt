@@ -44,8 +44,8 @@ class OnlineImagesRepository @Inject constructor(
             var resp = iNaturalistService.retrieveTaxaRecord(queryName, rank)
             val results = resp.body()?.get("results")?.jsonArray
 
-            Log.i("OnlineImagesRepository", "retrieveTaxaRecord resp: $resp")
-            Log.i("OnlineImagesRepository", "results: $results")
+//            Log.i("OnlineImagesRepository", "retrieveTaxaRecord resp: $resp")
+//            Log.i("OnlineImagesRepository", "results: $results")
 
             var foundTaxa = false
             var taxonId = 0
@@ -59,7 +59,7 @@ class OnlineImagesRepository @Inject constructor(
                         taxonId = results[i].jsonObject["id"]?.jsonPrimitive?.int ?: 0
                 }
                 if (foundTaxa && taxonId != 0) {
-                    Log.i("OnlineImagesRepository", "taxonId: $taxonId")
+//                    Log.i("OnlineImagesRepository", "taxonId: $taxonId")
 
                     resp = iNaturalistService.retrieveImages(taxonId)
                     val resultsPhotos = resp.body()?.get("results")?.jsonArray
@@ -76,8 +76,8 @@ class OnlineImagesRepository @Inject constructor(
                         ?.map { it.replace("square", "large") }
                         ?: emptyList()
 
-                    Log.i("OnlineImagesRepository", "resultsPhotos: $resultsPhotos")
-                    Log.i("OnlineImagesRepository", "photos: $photos")
+//                    Log.i("OnlineImagesRepository", "resultsPhotos: $resultsPhotos")
+//                    Log.i("OnlineImagesRepository", "photos: $photos")
 
                     val imageData = OnlineImageData(photos, resultsCopyRight ?: emptyList())
                     _onlineImageDataCache.value += (latinName to imageData)
@@ -85,7 +85,7 @@ class OnlineImagesRepository @Inject constructor(
             }
 
             if (!foundTaxa) {
-                Log.i("OnlineImagesRepository", "No found taxon in iNaturalist")
+                Log.d("OnlineImagesRepository", "No found taxon in iNaturalist")
             }
 
         } catch (e: Exception) {

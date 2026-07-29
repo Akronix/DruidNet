@@ -110,7 +110,7 @@ class IdentifyViewModel @Inject constructor(
             if (originalImageFile != null) {
                 _loading.value = true // Set loading true at the start
                 _identificationStatus.value = "Comprimiendo..."
-                Log.i(TAG, "Compressing...")
+//                Log.i(TAG, "Compressing...")
                 // Compress the image before uploading
                 //                    val imageSizeBc = originalImageFile.length() / 1024 // In KBYTES
                 //                    Log.d("image_before_compress", imageSizeBc.toString())
@@ -130,7 +130,7 @@ class IdentifyViewModel @Inject constructor(
             // Second, we start the identifying API request
             val identifyingMsg = "Identificando..."
             _identificationStatus.value = identifyingMsg
-            Log.i(TAG, "Identifying...")
+//            Log.i(TAG, "Identifying...")
 
             try {
                     // add image to the request
@@ -150,7 +150,7 @@ class IdentifyViewModel @Inject constructor(
                     val bestMatchCommonNames = response.results?.firstOrNull()?.species?.commonNames
                     val bestScore = response.results?.firstOrNull()?.score ?: 0.0
 
-                    Log.d("DRUIDNET-PLANTNET", bestMatchCommonNames.toString())
+//                    Log.d("DRUIDNET-PLANTNET", bestMatchCommonNames.toString())
 
                     _uiState.value = uiState.value.copy(
                         score = bestScore,

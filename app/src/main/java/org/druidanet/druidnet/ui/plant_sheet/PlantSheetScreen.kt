@@ -118,7 +118,7 @@ fun PlantSheetScreen(
         plantSheetUiState.onlineImages
     }
 
-    Log.i("PlantSheetScreen", "onlineImages: $onlineImages")
+//    Log.i("PlantSheetScreen", "onlineImages: $onlineImages")
 
     if (isPlantInDatabase && plant != null) {
 
