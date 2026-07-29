@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
-import android.net.Uri
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
@@ -92,7 +91,7 @@ val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 fun PlantSheetScreen(
     plantLatinName: String,
     navigateBack: () -> Unit,
-    onNavigateToFullScreen: (String, String?) -> Unit,
+    onNavigateToFullScreen: (String, Int) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = hiltViewModel(),
@@ -164,16 +163,8 @@ fun PlantSheetScreen(
                 usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
                 onImageClick = { imageUrl ->
                     if (imageUrl is String) {
-                        val encodedUrl = Uri.encode(imageUrl)
                         val index = plantImages.indexOf(imageUrl)
-                        val attribution = if (index == 0) {
-                            "(c) DruidNet CC BY-NC-SA 4.0"
-                        } else if (index > 0 && index - 1 < plantSheetUiState.onlineImagesAttributions.size) {
-                            plantSheetUiState.onlineImagesAttributions[index - 1]
-                        } else {
-                            null
-                        }
-                        onNavigateToFullScreen(encodedUrl, attribution)
+                        onNavigateToFullScreen(plant.latinName, if (index >= 0) index else 0)
                     }
                 },
                 modifier = modifier.padding(padding),

@@ -18,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
+import org.druidanet.druidnet.data.plant.OnlineImagesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.navigation.PlantSheetDestination
 import org.druidanet.druidnet.network.iNaturalistApiService
@@ -30,7 +31,7 @@ class PlantSheetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Hilt provides this
     plantsRepository: PlantsRepository, // Hilt provides this
     userPreferencesRepository: UserPreferencesRepository, // Hilt provides this
-    private val iNaturalistService: iNaturalistApiService, // Hilt provides this
+    private val onlineImagesRepository: OnlineImagesRepository,
 ) : ViewModel() {
 
     /***** Local vars *****/
@@ -77,9 +78,6 @@ class PlantSheetViewModel @Inject constructor(
        To do that transition, follow this example: https://github.com/android/compose-samples/blob/73b3a51e06a6520efb5b4931e71b771d257bf1dd/JetNews/app/src/main/java/com/example/jetnews/ui/home/HomeViewModel.kt#L150
      */
 
-    private val _onlineImages = MutableStateFlow<List<String>>(emptyList())
-    private val _onlineImagesAttributions = MutableStateFlow<List<String>>(emptyList())
-
     private val initialSection = try {
         sectionArg?.let { PlantSheetSection.valueOf(it.uppercase()) } ?: DEFAULT_SECTION
     } catch (e: IllegalArgumentException) {
@@ -104,14 +102,13 @@ class PlantSheetViewModel @Inject constructor(
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
-        _onlineImages, // The flow for the iNaturalist online images
-        _onlineImagesAttributions
-    ) { plantSheetData, currentSection, onlineImages, onlineImagesAttributions ->
+        onlineImagesRepository.getOnlineImages(plantLatinName)
+    ) { plantSheetData, currentSection, onlineImageData ->
         // When either flow emits a new value, this lambda is re-executed
         plantSheetData.copy(
             currentSection = currentSection, // Update the section in the combined state
-            onlineImages = onlineImages, // Map onlineImages to the UI state
-            onlineImagesAttributions = onlineImagesAttributions
+            onlineImages = onlineImageData.urls,
+            onlineImagesAttributions = onlineImageData.attributions
         )
     }.
     stateIn(
@@ -129,78 +126,8 @@ class PlantSheetViewModel @Inject constructor(
     /** NETWORK FUNCTIONS **/
 
     fun getOnlineImages(latinName: String) {
-
-        var queryName : String
-        var rank : String
-        if (latinName.contains("spp.")) {
-            queryName = latinName.substringBefore(" spp.")
-            rank = "genus"
-        } else {
-            queryName = latinName
-            rank = "species"
-        }
-
         viewModelScope.launch {
-
-            try {
-                var resp = iNaturalistService.retrieveTaxaRecord(queryName, rank)
-                val results = resp.body()?.get("results")?.jsonArray
-
-                Log.i("DRUIDNET-INAT", resp.toString())
-                Log.i("DRUIDNET-INAT", results.toString())
-
-                var foundTaxa = false;
-                var taxonId: Int = 0
-                var i = 0;
-                if (results != null) {
-                    while (!foundTaxa && i < results.size) {
-                        foundTaxa = results[i].jsonObject["name"]?.jsonPrimitive?.content == queryName
-                        if (!foundTaxa)
-                            i++;
-                        else
-                            taxonId = results[i].jsonObject["id"]?.jsonPrimitive?.int!!
-                    }
-                    if (foundTaxa && taxonId != 0) {
-
-                        Log.i("DRUIDNET-INAT", taxonId.toString())
-
-                        resp = iNaturalistService.retrieveImages(taxonId)
-                        val resultsPhotos = resp.body()?.get("results")?.jsonArray
-                            ?.mapNotNull { resultObj ->
-                                resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("url")?.jsonPrimitive?.content
-                            }
-
-                        val resultsCopyRight = resp.body()?.get("results")?.jsonArray
-                            ?.mapNotNull { resultObj ->
-                                resultObj.jsonObject["photos"]?.jsonArray?.get(0)?.jsonObject?.get("attribution")?.jsonPrimitive?.content
-                            }
-
-                        //                    val photosURLsSquare = results?.get(0)?.jsonObject?.get("photos")?.jsonArray
-                        //                        ?.mapNotNull { photoObj ->
-                        //                            photoObj.jsonObject["url"]?.jsonPrimitive?.content
-                        //                        }
-
-                        val photos = resultsPhotos
-                            ?.map { it.replace("square", "large") }
-                            ?: emptyList()
-
-                        Log.i("DRUIDNET-INAT", resultsPhotos.toString())
-                        Log.i("DRUIDNET-INAT", photos.toString())
-                        _onlineImages.value = photos
-                        _onlineImagesAttributions.value = resultsCopyRight ?: emptyList()
-                    }
-                }
-
-                if (!foundTaxa) {
-                    Log.i("DRUIDNET-INAT", "No found taxon in iNaturalist")
-                }
-
-            } catch (e: Exception) {
-                Log.e("DRUIDNET-ERROR", "Failed to fetch images", e)
-            }
+            onlineImagesRepository.fetchOnlineImages(latinName)
         }
-
     }
-
-
 }

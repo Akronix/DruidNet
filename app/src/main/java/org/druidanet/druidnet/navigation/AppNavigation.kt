@@ -120,9 +120,9 @@ object SearchDestination : NavigationDestination() {
 object FullScreenDestination : NavigationDestination() {
     override val route = "fullscreen"
     override val title = R.string.title_full_screen_image
-    const val imageUrlArg = "imageUrl"
-    const val attributionArg = "attribution"
-    val routeWithArgs = "$route/{$imageUrlArg}?$attributionArg={$attributionArg}"
+    const val plantArg = "plantLatinName"
+    const val indexArg = "initialIndex"
+    val routeWithArgs = "$route/{$plantArg}?$indexArg={$indexArg}"
 
 }
 
@@ -286,8 +286,8 @@ fun DruidNetNavHost(
                     PlantSheetScreen(
                         plantLatinName = plantLatinName,
                         usageParams = usageParams,
-                        onNavigateToFullScreen = { imageUrl, attribution ->
-                            navController.navigate("${FullScreenDestination.route}/$imageUrl?attribution=$attribution")
+                        onNavigateToFullScreen = { plantLatinName, index ->
+                            navController.navigate("${FullScreenDestination.route}/$plantLatinName?${FullScreenDestination.indexArg}=$index")
                         },
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
@@ -366,34 +366,22 @@ fun DruidNetNavHost(
         composable(
             route = FullScreenDestination.routeWithArgs,
             arguments = listOf(
-                navArgument(FullScreenDestination.imageUrlArg) {
+                navArgument(FullScreenDestination.plantArg) {
                     type = NavType.StringType
                 },
-                navArgument(FullScreenDestination.attributionArg) {
+                navArgument(FullScreenDestination.indexArg) {
                     type = NavType.StringType
-                    nullable = true
+                    defaultValue = "0"
                 }
             )
         ) { backStackEntry ->
-            val imageUrl = backStackEntry.arguments?.getString(FullScreenDestination.imageUrlArg)
-            val attribution = backStackEntry.arguments?.getString(FullScreenDestination.attributionArg)
-            if (imageUrl != null) {
-                if (attribution == null)
-                    ImageFullScreen(
-                        imageUrl = android.net.Uri.decode(imageUrl),
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                    )
-                else
-                    ImageFullScreen(
-                        imageUrl = android.net.Uri.decode(imageUrl),
-                        attribution = attribution,
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                    )
-            }
+            val viewModel: org.druidanet.druidnet.ui.screens.ImageFullScreenViewModel = hiltViewModel(backStackEntry)
+            ImageFullScreen(
+                viewModel = viewModel,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            )
         }
     }
 }

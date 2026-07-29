@@ -16,11 +16,13 @@ import org.druidanet.druidnet.data.bibliography.BibliographyRepository
 import org.druidanet.druidnet.data.images.ImagesLocalDataSource
 import org.druidanet.druidnet.data.images.ImagesRemoteDataSource
 import org.druidanet.druidnet.data.images.ImagesRepository
+import org.druidanet.druidnet.data.plant.OnlineImagesRepository
 import org.druidanet.druidnet.data.plant.PlantDAO
 import org.druidanet.druidnet.data.plant.PlantsRemoteDataSource
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.network.BackendApiService
 import org.druidanet.druidnet.network.BackendScalarApiService
+import org.druidanet.druidnet.network.iNaturalistApiService
 import org.druidanet.druidnet.workmanager.WorkManagerRepository
 import javax.inject.Singleton
 
@@ -72,6 +74,14 @@ object RepositoryModule {
     ): PlantsRepository {
         // Assuming ImagesRepository constructor takes Context, BackendScalarApiService, and PlantDAO
         return PlantsRepository(PlantsRemoteDataSource(backendApiService), plantDao = plantDAO)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOnlineImagesRepository(
+        iNaturalistService: iNaturalistApiService
+    ): OnlineImagesRepository {
+        return OnlineImagesRepository(iNaturalistService)
     }
 
     @Provides

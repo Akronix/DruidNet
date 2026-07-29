@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -59,11 +59,12 @@ import kotlin.math.absoluteValue
 fun PlantImageCarousel(
     imageURIsOrBitMap: List<Any>,
     modifier: Modifier = Modifier,
+    pagerState: PagerState = rememberPagerState { imageURIsOrBitMap.size },
+    pagerModifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp),
     onImageClick: (Any) -> Unit = {}
 ) {
-    // 1. Initialize the state with the number of pages
-    val pagerState = rememberPagerState(pageCount = { imageURIsOrBitMap.size })
-
     Log.i("PlantImageCarousel", "imageURIsOrBitMap: $imageURIsOrBitMap")
 
     // Code if we wanted to preload all images
@@ -93,9 +94,7 @@ fun PlantImageCarousel(
         // 2. The Swipeable Pager
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
+            modifier = pagerModifier,
 
             // Optional padding to show a preview of the next/previous image
 //            contentPadding = PaddingValues(horizontal = 8.dp),
@@ -161,6 +160,7 @@ fun PlantImageCarousel(
                     contentDescription = stringResource(R.string.datasheet_image_cdescp),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .zoomable(rememberZoomableState())
                         .clickable { onImageClick(coilModel) }
                         .graphicsLayer {
                             // Calculate the absolute offset for the current page from the
@@ -178,6 +178,7 @@ fun PlantImageCarousel(
                             )
                         },
                     contentScale = ContentScale.FillWidth,
+//                    contentScale = ContentScale.Inside, // option to show all images at the same size
                     loading = {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(
