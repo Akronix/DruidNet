@@ -62,7 +62,7 @@ fun ImageFullScreen(
             modifier = modifier
         ) {
             PlantImageCarousel(
-                imageURIsOrBitMap = uiState.images,
+                imageURIs = uiState.images,
                 pagerState = pagerState,
                 pagerModifier = Modifier
                     .fillMaxWidth()
@@ -101,7 +101,7 @@ fun ImageFullScreenPreview() {
             // For now, let's just use the carousel directly for the preview to see it.
             Column(modifier = Modifier.fillMaxSize()) {
                 PlantImageCarousel(
-                    imageURIsOrBitMap = listOf("file:///android_asset/images/plants/satureja.webp"),
+                    imageURIs = listOf("file:///android_asset/images/plants/satureja.webp"),
                     modifier = Modifier.weight(1f),
                     pagerModifier = Modifier.fillMaxSize(),
                 )

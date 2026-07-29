@@ -253,7 +253,7 @@ fun PlantSheetBody(
     plant: Plant,
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
-    plantImages: List<Any>,
+    plantImages: List<String>,
     usageParams: IntArray?,
     onImageClick: (Any) -> Unit,
     modifier: Modifier = Modifier
@@ -296,7 +296,7 @@ fun PlantSheetBody(
 @Composable
 fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
-                          plantImages: List<Any>,
+                          plantImages: List<String>,
                           onImageClick: (Any) -> Unit,
                           modifier: Modifier) {
 

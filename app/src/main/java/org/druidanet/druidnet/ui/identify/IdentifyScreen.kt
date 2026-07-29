@@ -88,6 +88,7 @@ import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.fileToImageBitmap
+import org.druidanet.druidnet.utils.findImageLocalPath
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
 import java.io.File
@@ -248,8 +249,6 @@ fun SuccessScreen(
     goToSimilarPlant: (String, Double) -> Unit,
     plantNetImagesList: List<String>,
     modifier: Modifier = Modifier,
-    imageBitMap: ImageBitmap? = null,
-    plantNetImageURL: String? = null
 ) {
     Column(
         modifier = modifier
@@ -263,7 +262,6 @@ fun SuccessScreen(
                     plant = mostLikelyPlant,
                     score = mostLikelyScore,
                     goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) },
-                    imageBitmapExt = imageBitMap,
                     plantNetImagesList = plantNetImagesList
                 )
             }
@@ -306,13 +304,12 @@ fun SuccessScreen(
 @Composable
 fun PlantInDruidNetScreen(plant: Plant,
                       score: Double,
-                      imageBitmapExt: ImageBitmap?,
                       plantNetImagesList: List<String>,
                      goToPlantSheetSection: (PlantSheetSection) -> Unit) {
 
-    val imageBitmap = imageBitmapExt ?: LocalContext.current.assetsToBitmap(plant.imagePath)
+    val localImage = findImageLocalPath(plant.imagePath, LocalContext.current)
 
-    val images: List<Any> = listOf(imageBitmap.asAndroidBitmap()) + plantNetImagesList
+    val images: List<String> = listOf(localImage) + plantNetImagesList
 
     Column(
         modifier = Modifier
@@ -534,7 +531,6 @@ fun IdentifyScreen(
                         goToSimilarPlant = { name: String, s: Double ->
                             identifyViewModel.updatePlantNetResult(name, s)
                         },
-                        plantNetImageURL = plantResultUIState.currentPlantResult?.images?.firstOrNull()?.url?.o,
                         plantNetImagesList = plantResultUIState.currentPlantResult?.images?. mapNotNull { it.url?.o } ?: emptyList(),
                         modifier = Modifier
                             .fillMaxSize()

@@ -57,24 +57,24 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun PlantImageCarousel(
-    imageURIsOrBitMap: List<Any>,
+    imageURIs: List<String>,
     modifier: Modifier = Modifier,
-    pagerState: PagerState = rememberPagerState { imageURIsOrBitMap.size },
+    pagerState: PagerState = rememberPagerState { imageURIs.size },
     pagerModifier: Modifier = Modifier
         .fillMaxWidth()
         .height(300.dp),
     onImageClick: (Any) -> Unit = {}
 ) {
-//    Log.i("PlantImageCarousel", "imageURIsOrBitMap: $imageURIsOrBitMap")
+//    Log.i("PlantImageCarousel", "imageURIs: $imageURIs")
 
     // Code if we wanted to preload all images (currently we preload only next 2 images)
     /*
     // Preload all online images:
             val context = LocalContext.current
             val imageLoader = context.imageLoader
-            LaunchedEffect(imageURIsOrBitMap ) {
+            LaunchedEffect(imageURIs ) {
 
-                for (image in ImageURIsOrBitMap) {
+                for (image in imageURIs) {
                     if (image is String) {
                         val nextRequest = ImageRequest.Builder(context)
                             .data(image)
@@ -101,16 +101,16 @@ fun PlantImageCarousel(
 //            pageSpacing = 0.dp,
 //            beyondViewportPageCount = 1,
         ) { page ->
-            val coilModel = imageURIsOrBitMap[page]
+            val coilModel = imageURIs[page]
 
             // Preload online images:
             val context = LocalContext.current
             val imageLoader = context.imageLoader
-            LaunchedEffect(page, imageURIsOrBitMap ) {
+            LaunchedEffect(page, imageURIs ) {
 
                 // Preload next two images:
-                if (page + 1 < imageURIsOrBitMap.size) {
-                    val image = imageURIsOrBitMap [page + 1]
+                if (page + 1 < imageURIs.size) {
+                    val image = imageURIs [page + 1]
                     if (image is String) {
                         val nextRequest = ImageRequest.Builder(context)
                             .data(image)
@@ -120,8 +120,8 @@ fun PlantImageCarousel(
 
                 }
 
-                if (page + 2 < imageURIsOrBitMap.size) {
-                    val image = imageURIsOrBitMap [page + 2]
+                if (page + 2 < imageURIs.size) {
+                    val image = imageURIs [page + 2]
                     if (image is String) {
                         val nextRequest = ImageRequest.Builder(context)
                             .data(image)
@@ -201,7 +201,7 @@ fun PlantImageCarousel(
 
         // 3. Carousel Indicators (The dots at the bottom)
         AnimatedVisibility(
-            visible = imageURIsOrBitMap.size > 1,
+            visible = imageURIs.size > 1,
             enter = fadeIn(),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -213,7 +213,7 @@ fun PlantImageCarousel(
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items(imageURIsOrBitMap.size) { index ->
+                items(imageURIs.size) { index ->
                     // Change color dynamically depending on if this dot is the active page
                     val isSelected = pagerState.currentPage == index
                     Box(
