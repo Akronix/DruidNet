@@ -1,10 +1,12 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +24,7 @@ import org.druidanet.druidnet.data.plant.OnlineImagesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.navigation.PlantSheetDestination
 import org.druidanet.druidnet.network.iNaturalistApiService
+import org.druidanet.druidnet.utils.findImageLocalPath
 import javax.inject.Inject
 
 private const val TIMEOUT_MILLIS = 5_000L
@@ -32,6 +35,7 @@ class PlantSheetViewModel @Inject constructor(
     plantsRepository: PlantsRepository, // Hilt provides this
     userPreferencesRepository: UserPreferencesRepository, // Hilt provides this
     private val onlineImagesRepository: OnlineImagesRepository,
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     /***** Local vars *****/
@@ -86,6 +90,7 @@ class PlantSheetViewModel @Inject constructor(
 
     // 1. A MutableStateFlow for the UI-driven state (currentSection)
     private val _currentSection = MutableStateFlow(initialSection) // Initialize with a default
+    private val _currentImageIndex = MutableStateFlow(0)
 
     // 2. The Flow from the repository
     private val plantDataFlow: Flow<PlantSheetUIState> = plantsRepository
@@ -102,13 +107,30 @@ class PlantSheetViewModel @Inject constructor(
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
-        onlineImagesRepository.getOnlineImages(plantLatinName)
-    ) { plantSheetData, currentSection, onlineImageData ->
+        onlineImagesRepository.getOnlineImages(plantLatinName),
+        _currentImageIndex
+    ) { plantSheetData, currentSection, onlineImageData, currentImageIndex ->
         // When either flow emits a new value, this lambda is re-executed
+        val plant = plantSheetData.plantUiState
+        val fullImages = if (plant != null) {
+            val localUrl = findImageLocalPath(plant.imagePath, context)
+            listOf(localUrl) + onlineImageData.urls
+        } else {
+            onlineImageData.urls
+        }
+        val fullAttributions = if (plant != null) {
+            listOf("(c) DruidNet CC BY-NC-SA 4.0") + onlineImageData.attributions
+        } else {
+            onlineImageData.attributions
+        }
+
         plantSheetData.copy(
             currentSection = currentSection, // Update the section in the combined state
             onlineImages = onlineImageData.urls,
-            onlineImagesAttributions = onlineImageData.attributions
+            onlineImagesAttributions = onlineImageData.attributions,
+            fullImages = fullImages,
+            fullAttributions = fullAttributions,
+            currentImageIndex = currentImageIndex
         )
     }.
     stateIn(
@@ -121,6 +143,10 @@ class PlantSheetViewModel @Inject constructor(
         if (newSection != _currentSection.value) // Check against _currentSection's value
             _currentSection.value = newSection // Update the _currentSection MutableStateFlow directly
         // This will trigger the combine to re-emit
+    }
+
+    fun updateImageIndex(index: Int) {
+        _currentImageIndex.value = index
     }
 
     /** NETWORK FUNCTIONS **/

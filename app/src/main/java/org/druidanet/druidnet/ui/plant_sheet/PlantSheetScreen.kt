@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -61,6 +62,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshotFlow
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
@@ -114,20 +117,12 @@ fun PlantSheetScreen(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     var online by rememberSaveable { mutableStateOf(networkMonitor.isConnected()) };
-    val onlineImages = remember (plantSheetUiState.onlineImages) {
-        plantSheetUiState.onlineImages
-    }
-
-//    Log.i("PlantSheetScreen", "onlineImages: $onlineImages")
 
     if (isPlantInDatabase && plant != null) {
 
         val plantImageBitmap = remember(plant.plantId, context) {
             plant.let { context.assetsToBitmap(it.imagePath) }
         }
-
-        val offlineImageUrl = findImageLocalPath(plant.imagePath, context)
-        val plantImages = if (onlineImages.isEmpty()) listOf(offlineImageUrl) else listOf(offlineImageUrl) + onlineImages
 
         LaunchedEffect(online) {
             sheetViewModel.getOnlineImages(plant.latinName)
@@ -159,14 +154,15 @@ fun PlantSheetScreen(
                 plant = plant,
                 currentSection,
                 onChangeSection,
-                plantImages,
+                plantSheetUiState.fullImages,
                 usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
                 onImageClick = { imageUrl ->
                     if (imageUrl is String) {
-                        val index = plantImages.indexOf(imageUrl)
+                        val index = plantSheetUiState.fullImages.indexOf(imageUrl)
                         onNavigateToFullScreen(plant.latinName, if (index >= 0) index else 0)
                     }
                 },
+                sheetViewModel = sheetViewModel,
                 modifier = modifier.padding(padding),
             )
         }
@@ -256,6 +252,7 @@ fun PlantSheetBody(
     plantImages: List<String>,
     usageParams: IntArray?,
     onImageClick: (Any) -> Unit,
+    sheetViewModel: PlantSheetViewModel,
     modifier: Modifier = Modifier
 ) {
 
@@ -268,6 +265,7 @@ fun PlantSheetBody(
                     onChangeSection(PlantSheetSection.USAGES),
                     plantImages,
                     onImageClick = onImageClick,
+                    sheetViewModel = sheetViewModel,
                     modifier.verticalScroll(rememberScrollState())
                 )
 
@@ -298,7 +296,29 @@ fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
                           plantImages: List<String>,
                           onImageClick: (Any) -> Unit,
+                          sheetViewModel: PlantSheetViewModel,
                           modifier: Modifier) {
+
+    val uiState by sheetViewModel.uiState.collectAsState()
+    val pagerState = rememberPagerState(
+        initialPage = uiState.currentImageIndex
+    ) { plantImages.size }
+
+    // Sync from Pager -> ViewModel only when user interaction settled
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { settledPage ->
+            if (settledPage != uiState.currentImageIndex) {
+                sheetViewModel.updateImageIndex(settledPage)
+            }
+        }
+    }
+
+    // Sync from ViewModel -> Pager only if different and not currently scrolling
+    LaunchedEffect(uiState.currentImageIndex) {
+        if (pagerState.currentPage != uiState.currentImageIndex && !pagerState.isScrollInProgress) {
+            pagerState.scrollToPage(uiState.currentImageIndex)
+        }
+    }
 
     Column (
         modifier = modifier
@@ -310,7 +330,11 @@ fun PlantSheetDescription(plant: Plant,
                 .padding(0.dp)
 //                .zoomable(rememberZoomableState())
         ) {
-            PlantImageCarousel(plantImages, onImageClick = onImageClick)
+            PlantImageCarousel(
+                imageURIs = plantImages,
+                pagerState = pagerState,
+                onImageClick = onImageClick
+            )
         }
         Column (
             modifier = Modifier.padding(
@@ -721,6 +745,7 @@ fun PlantSheetDescriptionPreview() {
             "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
             ),
         onImageClick = {},
+        sheetViewModel = hiltViewModel(),
         modifier = Modifier.fillMaxSize()
     )
 }

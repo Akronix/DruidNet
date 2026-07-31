@@ -35,54 +35,59 @@ import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.SubcomposeAsyncImage
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshotFlow
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.components.PlantImageCarousel
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 /* For expanding the image of the plant to full screen */
 @Composable
 fun ImageFullScreen(
-    viewModel: ImageFullScreenViewModel,
+    viewModel: PlantSheetViewModel,
     modifier: Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.isLoading) {
-        Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-    } else {
-        val pagerState = rememberPagerState(
-            initialPage = uiState.initialIndex
-        ) { uiState.images.size }
+    val pagerState = rememberPagerState(
+        initialPage = uiState.currentImageIndex
+    ) { uiState.fullImages.size }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = modifier
-        ) {
-            PlantImageCarousel(
-                imageURIs = uiState.images,
-                pagerState = pagerState,
-                pagerModifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
-            Spacer(modifier = Modifier.padding(12.dp))
-            val currentAttribution = if (pagerState.currentPage < uiState.attributions.size) {
-                uiState.attributions[pagerState.currentPage]
-            } else {
-                ""
+    androidx.compose.runtime.LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { settledPage ->
+            if (settledPage != uiState.currentImageIndex) {
+                viewModel.updateImageIndex(settledPage)
             }
-            Text(
-                currentAttribution,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-            )
         }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        PlantImageCarousel(
+            imageURIs = uiState.fullImages,
+            pagerState = pagerState,
+            pagerModifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        )
+        Spacer(modifier = Modifier.padding(12.dp))
+        val currentAttribution = if (pagerState.currentPage < uiState.fullAttributions.size) {
+            uiState.fullAttributions[pagerState.currentPage]
+        } else {
+            ""
+        }
+        Text(
+            currentAttribution,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+        )
     }
 }
 

@@ -25,4 +25,7 @@ data class PlantSheetUIState(
     val onlineImages: List<String> = emptyList(),
     val onlineImagesAttributions: List<String> = emptyList(),
 
-    )
+    val fullImages: List<String> = emptyList(),
+    val fullAttributions: List<String> = emptyList(),
+    val currentImageIndex: Int = 0,
+)

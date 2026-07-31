@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -19,6 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
@@ -28,6 +30,7 @@ import org.druidanet.druidnet.ui.identify.CameraXScreen
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
 import org.druidanet.druidnet.ui.identify.IdentifyViewModel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetScreen
+import org.druidanet.druidnet.ui.plant_sheet.PlantSheetViewModel
 import org.druidanet.druidnet.ui.screens.AboutScreen
 import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
@@ -120,10 +123,6 @@ object SearchDestination : NavigationDestination() {
 object FullScreenDestination : NavigationDestination() {
     override val route = "fullscreen"
     override val title = R.string.title_full_screen_image
-    const val plantArg = "plantLatinName"
-    const val indexArg = "initialIndex"
-    val routeWithArgs = "$route/{$plantArg}?$indexArg={$indexArg}"
-
 }
 
 // We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
@@ -147,7 +146,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         IdentifyDestination.route to IdentifyDestination,
         CameraDestination.route to CameraDestination,
         SearchDestination.route to SearchDestination,
-        FullScreenDestination.routeWithArgs to FullScreenDestination,
+        FullScreenDestination.route to FullScreenDestination,
     )
 
 // Before Implementation:
@@ -209,7 +208,7 @@ fun DruidNetNavHost(
             IdentifyScreen(
                 identifyViewModel = identifyViewModel,
                 goToPlantSheet = { plant, section ->
-                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=$section")
+                    navController.navigate("plant_flow/${plant.latinName}?section=$section")
                 },
                 onPressBackButton = {
                     navController.popBackStack(WelcomeDestination.route, false)
@@ -227,10 +226,10 @@ fun DruidNetNavHost(
         composable(route = CatalogDestination.route) {
             CatalogScreen(
                 onClickPlantCard = { plant ->
-                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}")
+                    navController.navigate("plant_flow/${plant.latinName}")
                 },
                 onClickShowUsages = { plant ->
-                    navController.navigate("${PlantSheetDestination.route}/${plant.latinName}?section=USAGES")
+                    navController.navigate("plant_flow/${plant.latinName}?section=USAGES")
                 },
                 listState = scrollStateCatalog,
                 viewModel = viewModel,
@@ -241,62 +240,81 @@ fun DruidNetNavHost(
                     .wrapContentSize(Alignment.Center)
             )
         }
-        composable(
-            route = PlantSheetDestination.routeWithArgs,
+        navigation(
+            route = "plant_flow/{plantLatinName}",
+            startDestination = PlantSheetDestination.routeWithArgs,
             arguments = listOf(
-                navArgument(PlantSheetDestination.plantArg) {
-                    type = NavType.StringType
-                },
-                navArgument(PlantSheetDestination.sectionArg) {
-                    type = NavType.StringType
-                    defaultValue = "DESCRIPTION"
-                },
-                navArgument(PlantSheetDestination.usageArg) {
-                    type = NavType.IntArrayType
-                    nullable = true
-                }
-            ),
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}?section={section}"
-                },
-                navDeepLink {
-                    uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}"
-                }
+                navArgument("plantLatinName") { type = NavType.StringType }
             )
-        ) { backStackEntry ->
-            val plantLatinName: String? = backStackEntry.arguments?.getString(PlantSheetDestination.plantArg)
-//            val section: String? = backStackEntry.arguments?.getString(PlantSheetDestination.sectionArg)
-            val usageParams: IntArray? =
-                backStackEntry.arguments?.getIntArray(PlantSheetDestination.usageArg)
-
-            if (plantLatinName != null) {
-                val defaultUriHandler = LocalUriHandler.current
-                CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
-                    override fun openUri(uri: String) {
-                        if (uri.startsWith("druidnet://")) {
-                            navController.navigate(uri.toUri())
-                        } else if (uri.startsWith("plant_sheet/")) {
-                            navController.navigate(uri)
-                        } else {
-                            defaultUriHandler.openUri(uri)
-                        }
+        ) {
+            composable(
+                route = PlantSheetDestination.routeWithArgs,
+                arguments = listOf(
+                    navArgument("section") {
+                        type = NavType.StringType
+                        defaultValue = "DESCRIPTION"
+                    },
+                    navArgument("usageParams") {
+                        type = NavType.IntArrayType
+                        nullable = true
                     }
-                }) {
-                    PlantSheetScreen(
-                        plantLatinName = plantLatinName,
-                        usageParams = usageParams,
-                        onNavigateToFullScreen = { plantLatinName, index ->
-                            navController.navigate("${FullScreenDestination.route}/$plantLatinName?${FullScreenDestination.indexArg}=$index")
-                        },
-                        navigateBack = { navController.navigateUp() },
-                        innerPadding = innerPadding,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
+                ),
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}?section={section}"
+                    },
+                    navDeepLink {
+                        uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}"
+                    }
+                )
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("plant_flow/{plantLatinName}")
                 }
-            } else {
-                Text("Error: There's no plant reference in the route")
+                val sharedViewModel: PlantSheetViewModel = hiltViewModel(parentEntry)
+                val plantLatinName = backStackEntry.arguments?.getString("plantLatinName")
+                val usageParams = backStackEntry.arguments?.getIntArray("usageParams")
+
+                if (plantLatinName != null) {
+                    val defaultUriHandler = LocalUriHandler.current
+                    CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
+                        override fun openUri(uri: String) {
+                            if (uri.startsWith("druidnet://")) {
+                                navController.navigate(uri.toUri())
+                            } else if (uri.startsWith("plant_sheet/")) {
+                                navController.navigate(uri)
+                            } else {
+                                defaultUriHandler.openUri(uri)
+                            }
+                        }
+                    }) {
+                        PlantSheetScreen(
+                            plantLatinName = plantLatinName,
+                            usageParams = usageParams,
+                            onNavigateToFullScreen = { _, _ ->
+                                navController.navigate(FullScreenDestination.route)
+                            },
+                            navigateBack = { navController.navigateUp() },
+                            innerPadding = innerPadding,
+                            sheetViewModel = sharedViewModel,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                } else {
+                    Text("Error: There's no plant reference in the route")
+                }
+            }
+            composable(route = FullScreenDestination.route) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("plant_flow/{plantLatinName}")
+                }
+                val sharedViewModel: PlantSheetViewModel = hiltViewModel(parentEntry)
+                ImageFullScreen(
+                    viewModel = sharedViewModel,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                )
             }
         }
         composable(route = SearchDestination.route) {
@@ -310,7 +328,7 @@ fun DruidNetNavHost(
                     val usageParams = intArrayOf(plantUse.usageId, offsetBytes, matchSizeBytes)
                     val usageQuery = usageParams.joinToString("&") { "usageParams=$it" }
                     navController.navigate(
-                        "${PlantSheetDestination.route}/${plantUse.plant.latinName}?section=USAGES&${usageQuery}"
+                        "plant_flow/${plantUse.plant.latinName}?section=USAGES&${usageQuery}"
                     )
                 },
                 innerPadding = innerPadding,
@@ -358,26 +376,6 @@ fun DruidNetNavHost(
             GlossaryScreen(
                 glossaryTxt = viewModel.getGlossaryText(),
                 scrollState = scrollStateGlossary,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            )
-        }
-        composable(
-            route = FullScreenDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(FullScreenDestination.plantArg) {
-                    type = NavType.StringType
-                },
-                navArgument(FullScreenDestination.indexArg) {
-                    type = NavType.StringType
-                    defaultValue = "0"
-                }
-            )
-        ) { backStackEntry ->
-            val viewModel: org.druidanet.druidnet.ui.screens.ImageFullScreenViewModel = hiltViewModel(backStackEntry)
-            ImageFullScreen(
-                viewModel = viewModel,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
