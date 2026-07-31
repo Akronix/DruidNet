@@ -36,8 +36,8 @@ fun compressImage(uri: Uri, context: Context): File {
     val compressHeight = bitmap.height / COMPRESS_FACTOR
     val compressWidth = bitmap.width / COMPRESS_FACTOR
 
-    Log.i("dimensions", "Height is " + compressHeight.toString())
-    Log.i("dimensions", "Width downto " + compressWidth.toString())
+//    Log.i("dimensions", "Height is " + compressHeight.toString())
+//    Log.i("dimensions", "Width downto " + compressWidth.toString())
 
     // 3. ScaleDown and compress the Bitmap into the file
     bitmap = bitmap.scale( compressWidth, compressHeight, filter = true )
@@ -96,7 +96,20 @@ fun bitmapToFile(bitmap: Bitmap, fileName: String, context: Context): File? {
     }
 }
 
-// TODO: Remove and replace by something better (painter to pass to images or Coil)
+fun findImageLocalPath(filename: String, context: Context) : String {
+    val assetManager = context.assets
+    val imgFn = "$filename.webp"
+    val localStorageDir = context.getDir("images", Context.MODE_PRIVATE).absolutePath
+
+    if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
+        return "file:///android_asset/images/plants/$imgFn"
+    else
+        if (File("$localStorageDir/$imgFn").exists())
+        return "file://$localStorageDir/$imgFn"
+    else
+        return "file:///android_asset/images/broken_image.jpg"
+}
+
 fun Context.assetsToBitmap(filename:String): ImageBitmap {
     val assetManager = this.assets
     val imgFn = "$filename.webp"
@@ -108,7 +121,7 @@ fun Context.assetsToBitmap(filename:String): ImageBitmap {
         if (File("$localStorageDir/$imgFn").exists())
             File("$localStorageDir/$imgFn").inputStream()
         else
-            assetManager.open("images/broken_image.jpg")
+            assetManager.open("drawable/broken_image.jpg")
 
     val bitmap = BitmapFactory.decodeStream(inputStream)
     inputStream.close()

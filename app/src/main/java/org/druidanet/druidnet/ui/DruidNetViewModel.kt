@@ -41,6 +41,7 @@ import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.PlantCard
 import org.druidanet.druidnet.model.PlantUseCard
 import org.druidanet.druidnet.model.Usage
+import org.druidanet.druidnet.network.iNaturalistApiService
 import org.druidanet.druidnet.utils.mergeOrderedLists
 import org.druidanet.druidnet.workers.KEY_GLOSSARY_UPDATED
 import org.druidanet.druidnet.workers.KEY_PLANTS_DB_UPDATED

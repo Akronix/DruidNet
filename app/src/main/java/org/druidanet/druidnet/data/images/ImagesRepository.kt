@@ -9,14 +9,14 @@ class ImagesRepository(
 ) {
     suspend fun fetchImages(imageList : List<String>) {
         val localImages : List<String> = localDataSource.listLocalImages()
-        Log.i("ImagesRepository", "Local images: $localImages")
+//        Log.i("ImagesRepository", "Local images: $localImages")
         val newImages : List<String> = imageList.filter { !localImages.contains(it) }
-        Log.i("ImagesRepository", "new images: $newImages")
+//        Log.i("ImagesRepository", "new images: $newImages")
         for (imgSrc in newImages) {
             val resImg = remoteDataSource.downloadImage(imgSrc)
             if (resImg != null) {
                 val result = localDataSource.saveImage(resImg, imgSrc)
-                Log.i("ImagesRepository", "Image $result saved successfully")
+//                Log.i("ImagesRepository", "Image $result saved successfully")
             }
             else
                 throw IOException("Failed to download: $imgSrc")

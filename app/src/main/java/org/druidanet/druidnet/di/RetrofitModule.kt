@@ -15,6 +15,7 @@ import org.druidanet.druidnet.BuildConfig
 import org.druidanet.druidnet.network.BackendApiService
 import org.druidanet.druidnet.network.BackendScalarApiService
 import org.druidanet.druidnet.network.PlantNetApiService
+import org.druidanet.druidnet.network.iNaturalistApiService
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Named
@@ -26,6 +27,7 @@ object RetrofitModule {
 
     private const val BASE_URL = "https://backend.druidnet.es/"
     private const val PLANTNET_ENDPOINT = "https://my-api.plantnet.org/v2/"
+    private const val INATURALIST_ENDPOINT = "https://api.inaturalist.org/v1/"
 
     @Provides
     @Singleton
@@ -126,6 +128,25 @@ object RetrofitModule {
     @Singleton
     fun providePlantNetApiService(@Named("RETROFIT_PLANTNET") retrofit: Retrofit): PlantNetApiService {
         return retrofit.create(PlantNetApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("RETROFIT_INATURALIST")
+    fun provideiNaturalistRetrofit(@Named("GENERIC_OKHTTP") okHttpClient: OkHttpClient): Retrofit {
+        val contentType = "application/json".toMediaType()
+        val json = Json { ignoreUnknownKeys = true }
+        return Retrofit.Builder()
+            .baseUrl(INATURALIST_ENDPOINT)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideiNaturalistApiService(@Named("RETROFIT_INATURALIST") retrofit: Retrofit): iNaturalistApiService {
+        return retrofit.create(iNaturalistApiService::class.java)
     }
 
 }

@@ -33,6 +33,7 @@ import org.druidanet.druidnet.ui.screens.BibliographyScreen
 import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.GlossaryScreen
+import org.druidanet.druidnet.ui.screens.ImageFullScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 import org.druidanet.druidnet.ui.screens.SearchScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
@@ -111,8 +112,18 @@ object PlantSheetDestination : NavigationDestination() {
 @Serializable
 object SearchDestination : NavigationDestination() {
     override val route = "search"
-    override val title = R.string.title_screen_search
+    override val title = R.string.title_full_screen_image
     override val hasTopBar = false
+}
+
+@Serializable
+object FullScreenDestination : NavigationDestination() {
+    override val route = "fullscreen"
+    override val title = R.string.title_full_screen_image
+    const val plantArg = "plantLatinName"
+    const val indexArg = "initialIndex"
+    val routeWithArgs = "$route/{$plantArg}?$indexArg={$indexArg}"
+
 }
 
 // We should upgrade to type-safe navigation: https://developer.android.com/guide/navigation/design/type-safety
@@ -136,6 +147,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         IdentifyDestination.route to IdentifyDestination,
         CameraDestination.route to CameraDestination,
         SearchDestination.route to SearchDestination,
+        FullScreenDestination.routeWithArgs to FullScreenDestination,
     )
 
 // Before Implementation:
@@ -274,6 +286,9 @@ fun DruidNetNavHost(
                     PlantSheetScreen(
                         plantLatinName = plantLatinName,
                         usageParams = usageParams,
+                        onNavigateToFullScreen = { plantLatinName, index ->
+                            navController.navigate("${FullScreenDestination.route}/$plantLatinName?${FullScreenDestination.indexArg}=$index")
+                        },
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
                         modifier = Modifier
@@ -343,6 +358,26 @@ fun DruidNetNavHost(
             GlossaryScreen(
                 glossaryTxt = viewModel.getGlossaryText(),
                 scrollState = scrollStateGlossary,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            )
+        }
+        composable(
+            route = FullScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(FullScreenDestination.plantArg) {
+                    type = NavType.StringType
+                },
+                navArgument(FullScreenDestination.indexArg) {
+                    type = NavType.StringType
+                    defaultValue = "0"
+                }
+            )
+        ) { backStackEntry ->
+            val viewModel: org.druidanet.druidnet.ui.screens.ImageFullScreenViewModel = hiltViewModel(backStackEntry)
+            ImageFullScreen(
+                viewModel = viewModel,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()

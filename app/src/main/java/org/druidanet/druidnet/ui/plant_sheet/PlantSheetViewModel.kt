@@ -1,5 +1,6 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,11 +13,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.*
 import org.druidanet.druidnet.data.PreferencesState
 import org.druidanet.druidnet.data.UserPreferencesRepository
+import org.druidanet.druidnet.data.plant.OnlineImagesRepository
 import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.navigation.PlantSheetDestination
+import org.druidanet.druidnet.network.iNaturalistApiService
 import javax.inject.Inject
 
 private const val TIMEOUT_MILLIS = 5_000L
@@ -26,6 +31,7 @@ class PlantSheetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Hilt provides this
     plantsRepository: PlantsRepository, // Hilt provides this
     userPreferencesRepository: UserPreferencesRepository, // Hilt provides this
+    private val onlineImagesRepository: OnlineImagesRepository,
 ) : ViewModel() {
 
     /***** Local vars *****/
@@ -96,9 +102,14 @@ class PlantSheetViewModel @Inject constructor(
     val uiState: StateFlow<PlantSheetUIState> = combine(
         plantDataFlow,
         _currentSection, // The flow that controls the current section,
-    ) { plantSheetData, currentSection ->
+        onlineImagesRepository.getOnlineImages(plantLatinName)
+    ) { plantSheetData, currentSection, onlineImageData ->
         // When either flow emits a new value, this lambda is re-executed
-        plantSheetData.copy(currentSection = currentSection) // Update the section in the combined state
+        plantSheetData.copy(
+            currentSection = currentSection, // Update the section in the combined state
+            onlineImages = onlineImageData.urls,
+            onlineImagesAttributions = onlineImageData.attributions
+        )
     }.
     stateIn(
         scope = viewModelScope,
@@ -112,4 +123,11 @@ class PlantSheetViewModel @Inject constructor(
         // This will trigger the combine to re-emit
     }
 
+    /** NETWORK FUNCTIONS **/
+
+    fun getOnlineImages(latinName: String) {
+        viewModelScope.launch {
+            onlineImagesRepository.fetchOnlineImages(latinName)
+        }
+    }
 }

@@ -26,6 +26,7 @@ import org.druidanet.druidnet.data.plant.PlantsRepository
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantNetApiService
 import org.druidanet.druidnet.network.PlantNetResponse
+import org.druidanet.druidnet.network.iNaturalistApiService
 import org.druidanet.druidnet.utils.compressImage
 import org.druidanet.druidnet.utils.getFileFromUri
 import retrofit2.HttpException
@@ -109,7 +110,7 @@ class IdentifyViewModel @Inject constructor(
             if (originalImageFile != null) {
                 _loading.value = true // Set loading true at the start
                 _identificationStatus.value = "Comprimiendo..."
-                Log.i(TAG, "Compressing...")
+//                Log.i(TAG, "Compressing...")
                 // Compress the image before uploading
                 //                    val imageSizeBc = originalImageFile.length() / 1024 // In KBYTES
                 //                    Log.d("image_before_compress", imageSizeBc.toString())
@@ -129,7 +130,7 @@ class IdentifyViewModel @Inject constructor(
             // Second, we start the identifying API request
             val identifyingMsg = "Identificando..."
             _identificationStatus.value = identifyingMsg
-            Log.i(TAG, "Identifying...")
+//            Log.i(TAG, "Identifying...")
 
             try {
                     // add image to the request
@@ -141,21 +142,26 @@ class IdentifyViewModel @Inject constructor(
 
                     val response = identifyService.plantIdentify(
                         images = imagePart,
+                        lang = language.i18n,
                         organs = organRequestBody
                     )
 
-                    val bestMatchName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
+                    val bestMatchLatinName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
+                    val bestMatchCommonNames = response.results?.firstOrNull()?.species?.commonNames
                     val bestScore = response.results?.firstOrNull()?.score ?: 0.0
+
+//                    Log.d("DRUIDNET-PLANTNET", bestMatchCommonNames.toString())
 
                     _uiState.value = uiState.value.copy(
                         score = bestScore,
-                        latinName = bestMatchName,
+                        commonNames = bestMatchCommonNames,
+                        latinName = bestMatchLatinName,
                         similarPlants = response.results?.drop(1) ?: emptyList(),
                         currentPlantResult = response.results?.first()
                     )
 
                     if (response.results != null) {
-                        val plant: Plant? = plantsRepository.searchPlant(bestMatchName, language)
+                        val plant: Plant? = plantsRepository.searchPlant(bestMatchLatinName, language)
                         if (plant != null) {
 //                            Log.i(TAG, "Plant found in database!")
                             _uiState.value = uiState.value.copy(plant = plant, isInDatabase = true)
@@ -164,7 +170,7 @@ class IdentifyViewModel @Inject constructor(
 
                     }
 
-                    val successMsg = "Success: Best match - $bestMatchName."
+                    val successMsg = "Success: Best match - $bestMatchLatinName."
                     _identificationStatus.value = successMsg
 //                    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
 //                    Log.i(TAG, "$successMsg Full response: \n${json.encodeToString(response)}")

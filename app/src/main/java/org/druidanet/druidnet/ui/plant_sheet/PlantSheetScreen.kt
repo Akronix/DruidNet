@@ -1,5 +1,8 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -12,7 +15,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -34,13 +36,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -50,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -63,10 +71,14 @@ import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.CollapsableSection
 import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Confusion
+import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
+import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.utils.assetsToBitmap
-import java.util.ArrayList
+import org.druidanet.druidnet.utils.findImageLocalPath
+import org.druidanet.druidnet.utils.isConnected
+
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -79,6 +91,7 @@ val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
 fun PlantSheetScreen(
     plantLatinName: String,
     navigateBack: () -> Unit,
+    onNavigateToFullScreen: (String, Int) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = hiltViewModel(),
@@ -97,10 +110,27 @@ fun PlantSheetScreen(
 
     val context = LocalContext.current
 
+    val networkMonitor =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    var online by rememberSaveable { mutableStateOf(networkMonitor.isConnected()) };
+    val onlineImages = remember (plantSheetUiState.onlineImages) {
+        plantSheetUiState.onlineImages
+    }
+
+//    Log.i("PlantSheetScreen", "onlineImages: $onlineImages")
+
     if (isPlantInDatabase && plant != null) {
 
         val plantImageBitmap = remember(plant.plantId, context) {
             plant.let { context.assetsToBitmap(it.imagePath) }
+        }
+
+        val offlineImageUrl = findImageLocalPath(plant.imagePath, context)
+        val plantImages = if (onlineImages.isEmpty()) listOf(offlineImageUrl) else listOf(offlineImageUrl) + onlineImages
+
+        LaunchedEffect(online) {
+            sheetViewModel.getOnlineImages(plant.latinName)
         }
 
         Scaffold(
@@ -129,8 +159,14 @@ fun PlantSheetScreen(
                 plant = plant,
                 currentSection,
                 onChangeSection,
-                plantImageBitmap = plantImageBitmap,
+                plantImages,
                 usageParams = if (usageParams != null && usageParams.isNotEmpty()) usageParams else null,
+                onImageClick = { imageUrl ->
+                    if (imageUrl is String) {
+                        val index = plantImages.indexOf(imageUrl)
+                        onNavigateToFullScreen(plant.latinName, if (index >= 0) index else 0)
+                    }
+                },
                 modifier = modifier.padding(padding),
             )
         }
@@ -217,8 +253,9 @@ fun PlantSheetBody(
     plant: Plant,
     currentSection: PlantSheetSection,
     onChangeSection: (PlantSheetSection) -> () -> Unit,
-    plantImageBitmap: ImageBitmap,
+    plantImages: List<String>,
     usageParams: IntArray?,
+    onImageClick: (Any) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -229,7 +266,8 @@ fun PlantSheetBody(
                 PlantSheetDescription(
                     plant,
                     onChangeSection(PlantSheetSection.USAGES),
-                    imageBitmap = plantImageBitmap,
+                    plantImages,
+                    onImageClick = onImageClick,
                     modifier.verticalScroll(rememberScrollState())
                 )
 
@@ -258,9 +296,9 @@ fun PlantSheetBody(
 @Composable
 fun PlantSheetDescription(plant: Plant,
                           onClickShowUsages: () -> Unit,
-                          imageBitmap: ImageBitmap,
+                          plantImages: List<String>,
+                          onImageClick: (Any) -> Unit,
                           modifier: Modifier) {
-//    val imgResourceId = LocalContext.current.getResourceId(plant.imagePath)
 
     Column (
         modifier = modifier
@@ -270,16 +308,9 @@ fun PlantSheetDescription(plant: Plant,
             modifier = Modifier
                 .height(250.dp)
                 .padding(0.dp)
-                .zoomable(rememberZoomableState())
-        ){
-            Image(
-                contentScale = ContentScale.FillWidth,
-                bitmap = imageBitmap,
-                contentDescription = stringResource(R.string.datasheet_image_cdescp),
-                modifier = Modifier
-                    .fillMaxWidth()
-
-            )
+//                .zoomable(rememberZoomableState())
+        ) {
+            PlantImageCarousel(plantImages, onImageClick = onImageClick)
         }
         Column (
             modifier = Modifier.padding(
@@ -666,52 +697,37 @@ fun ToxicTextBox(toxicText: String) {
     }
 }
 
-/* For expanding the image of the plant to full screen */
+@Preview(showBackground = true)
 @Composable
-fun FullScreenImage(imageBitmap : ImageBitmap) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .padding(0.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(250.dp)
-                    .padding(0.dp)
-            ) {
-                Image(
-                    contentScale = ContentScale.None,
-                    bitmap = imageBitmap,
-                    contentDescription = stringResource(R.string.datasheet_image_cdescp),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-                )
-            }
-        }
-    }
-}
+fun PlantSheetDescriptionPreview() {
+    val plant = Plant(
+        plantId = 1,
+        displayName = "Rose",
+        latinName = "Rosa L.",
+        imagePath = "arbutus_unedo.webp",
+        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
+        description = "A beautiful flowering plant.",
+        habitat = "Gardens and wild areas.",
+        distribution = "Worldwide.",
+        phenology = "Blooms in summer.",
+        observations = "Known for its thorns.",
+        curiosities = "Symbol of love.",
+        usages = emptyMap(),
+        family = "Rosaceae",
+        confusions = emptyArray()
+    )
 
-//@Preview
-//@Composable
-//fun PlantSheetDescriptionPreview() {
-//    val plant = Plant(
-//        plantId = 1,
-//        displayName = "Rose",
-//        latinName = "Rosa L.",
-//        imagePath = "images/rosa_l.webp", // Replace with a valid image path in your assets
-//        commonNames = arrayOf(org.druidanet.druidnet.model.Name("Rosa", LanguageEnum.CASTELLANO)),
-//        description = "A beautiful flowering plant.",
-//        habitat = "Gardens and wild areas.",
-//        distribution = "Worldwide.",
-//        phenology = "Blooms in summer.",
-//        observations = "Known for its thorns.",
-//        curiosities = "Symbol of love.",
-//        usages = emptyMap(),
-//        family = "Rosaceae",
-//        confusions = emptyArray()
-//    )
-//    PlantSheetDescription(plant = plant, onClickShowUsages = {}, modifier = Modifier.fillMaxSize())
-//}
+    PlantSheetDescription(
+        plant = plant,
+        onClickShowUsages = {},
+        plantImages = listOf("file:///android_asset/arbutus_unedo.webp",
+            "https://ci3.googleusercontent.com/meips/ADKq_NaLiMbKEeknbsSGESAYTMQW-9au6jZBSOkDgK3uVjASsYzbWrlQYiKk0e1OCdIA07Gd0wMHfblpyDiJog_k5L0QgYJ7unhpsddUXXkblS0My4EHC_75lqXV_oQmk9eYqCZwzsNcRJmBpAr-uARzPp1NY9-7bOe4RLZx=s0-d-e1-ft#https://mcusercontent.com/6bb69a4a2faac4492c1903be2/images/fb034c4a-8f0e-3e24-7ef7-7c2d5c287a74.jpeg",
+            "https://inaturalist-open-data.s3.amazonaws.com/photos/672062604/square.jpg"
+            ),
+        onImageClick = {},
+        modifier = Modifier.fillMaxSize()
+    )
+}
 //
 //@Preview
 //@Composable

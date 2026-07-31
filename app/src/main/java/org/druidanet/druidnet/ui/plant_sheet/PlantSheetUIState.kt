@@ -20,5 +20,9 @@ data class PlantSheetUIState(
 
     /* ui state related to navigation / presentation */
 
-    val currentSection: PlantSheetSection = DEFAULT_SECTION
+    val currentSection: PlantSheetSection = DEFAULT_SECTION,
+
+    val onlineImages: List<String> = emptyList(),
+    val onlineImagesAttributions: List<String> = emptyList(),
+
     )

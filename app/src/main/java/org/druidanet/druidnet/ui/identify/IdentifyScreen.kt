@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -82,10 +83,12 @@ import org.druidanet.druidnet.R
 import org.druidanet.druidnet.component.ShowUsagesButton
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.network.PlantResult
+import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.ui.plant_sheet.PlantSheetSection
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.fileToImageBitmap
+import org.druidanet.druidnet.utils.findImageLocalPath
 import org.druidanet.druidnet.utils.forwardingPainter
 import org.druidanet.druidnet.utils.sendEmailAction
 import java.io.File
@@ -239,13 +242,13 @@ fun LoadingScreenPreview() {
 fun SuccessScreen(
     mostLikelyPlant: Plant?,
     latinName: String,
+    plantNetCommonName: String,
     mostLikelyScore: Double,
     goToPlantSheet: (Plant, PlantSheetSection) -> Unit,
     similarPlants: List<PlantResult>,
     goToSimilarPlant: (String, Double) -> Unit,
+    plantNetImagesList: List<String>,
     modifier: Modifier = Modifier,
-    imageBitMap: ImageBitmap? = null,
-    plantNetImageURL: String? = null
 ) {
     Column(
         modifier = modifier
@@ -254,19 +257,22 @@ fun SuccessScreen(
         Box(
             modifier = Modifier.weight(2f)
         ) {
-            if (mostLikelyPlant != null)
-                PlantInDruidNet(
+            if (mostLikelyPlant != null) {
+                PlantInDruidNetScreen(
                     plant = mostLikelyPlant,
                     score = mostLikelyScore,
                     goToPlantSheetSection = { section -> goToPlantSheet(mostLikelyPlant, section) },
-                    imageBitmapExt = imageBitMap
+                    plantNetImagesList = plantNetImagesList
                 )
-            else if (latinName.isNotEmpty())
+            }
+            else if (latinName.isNotEmpty()) {
                 NotInDatabaseScreen(
-                    name = latinName,
+                    plantName = plantNetCommonName,
+                    latinName = latinName,
                     score = mostLikelyScore,
-                    plantNetImageURL = plantNetImageURL
+                    plantNetImagesList = plantNetImagesList
                 )
+            }
         }
 
         HorizontalDivider(
@@ -296,11 +302,14 @@ fun SuccessScreen(
 }
 
 @Composable
-fun PlantInDruidNet(plant: Plant,
+fun PlantInDruidNetScreen(plant: Plant,
                       score: Double,
-                      imageBitmapExt: ImageBitmap?,
+                      plantNetImagesList: List<String>,
                      goToPlantSheetSection: (PlantSheetSection) -> Unit) {
-    val imageBitmap = imageBitmapExt ?: LocalContext.current.assetsToBitmap(plant.imagePath)
+
+    val localImage = findImageLocalPath(plant.imagePath, LocalContext.current)
+
+    val images: List<String> = listOf(localImage) + plantNetImagesList
 
     Column(
         modifier = Modifier
@@ -338,15 +347,7 @@ fun PlantInDruidNet(plant: Plant,
                 )
             }
 
-
-            Image(
-                contentScale = ContentScale.FillWidth,
-                bitmap = imageBitmap,
-                contentDescription = stringResource(R.string.datasheet_image_cdescp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .zoomable(rememberZoomableState()),
-            )
+           PlantImageCarousel(images)
 
         }
 
@@ -426,10 +427,10 @@ fun PlantInDruidNet(plant: Plant,
 /*
 @Preview(showBackground = true)
 @Composable
-fun PlantInDruidNetPreview() {
+fun PlantInDruidNetScreenPreview() {
     val plant = PlantsDataSource.loadPlants()[0]
     DruidNetTheme {
-        PlantInDruidNet(
+        PlantInDruidNetScreen(
             plant = plant,
             score = 0.92,
             imageBitmapExt = ImageBitmap(1024, 768),
@@ -523,13 +524,14 @@ fun IdentifyScreen(
                     SuccessScreen(
                         mostLikelyPlant = plantResultUIState.plant,
                         latinName = plantResultUIState.latinName,
+                        plantNetCommonName = plantResultUIState.commonNames?.firstOrNull() ?: plantResultUIState.latinName,
                         mostLikelyScore = plantResultUIState.score,
                         goToPlantSheet = goToPlantSheet,
                         similarPlants = plantResultUIState.similarPlants,
                         goToSimilarPlant = { name: String, s: Double ->
                             identifyViewModel.updatePlantNetResult(name, s)
                         },
-                        plantNetImageURL = plantResultUIState.currentPlantResult?.images?.first()?.url?.o,
+                        plantNetImagesList = plantResultUIState.currentPlantResult?.images?. mapNotNull { it.url?.o } ?: emptyList(),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(padding) ,
@@ -563,7 +565,12 @@ fun IdentifyScreen(
 }
 
 @Composable
-fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) {
+fun NotInDatabaseScreen(
+    plantName: String,
+    latinName: String,
+    score: Double,
+    plantNetImagesList: List<String>
+) {
             Column(
                 modifier = Modifier
                     .padding(0.dp)
@@ -603,23 +610,10 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         )
                     }
 
-                    AsyncImage(
-                        model = plantNetImageURL,
-                        contentDescription = "PlantNet image for $name",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .zoomable(rememberZoomableState()),
-                        contentScale = ContentScale.FillWidth,
-                        fallback = painterResource(R.drawable.grass),
-                        placeholder = forwardingPainter(
-                            painter = painterResource(R.drawable.eco),
-                            colorFilter = ColorFilter.tint(Color.Gray),
-                            alpha = 0.5f,
-                        )
-                    )
+                    PlantImageCarousel(plantNetImagesList)
                 }
 
-                /* Scientific name + Message not in db */
+                /* Plant name + Message not in db */
                 Column(
                     modifier = Modifier
                         .padding(
@@ -628,13 +622,18 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                             end = 10.dp,
                             bottom = 0.dp,
                         )
-
                 ) {
                     SelectionContainer {
                         Text(
-                            text = name,
+                            text = plantName,
                             style = MaterialTheme.typography.headlineLarge,
+                        )
+                    }
+                    SelectionContainer {
+                        Text(
+                            "(${latinName})",
                             fontStyle = Italic,
+                            style = MaterialTheme.typography.titleLarge,
                         )
                     }
 
@@ -657,7 +656,7 @@ fun NotInDatabaseScreen(name: String, score: Double, plantNetImageURL: String?) 
                         )
                         {
                             Markdown(
-                                "¿Te gustaría contribuir a que _${name}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${name}) 🦉",
+                                "¿Te gustaría contribuir a que _${plantName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${plantName}) 🦉",
                                 modifier = Modifier,
                                 typography = markdownTypography(
                                     paragraph =
