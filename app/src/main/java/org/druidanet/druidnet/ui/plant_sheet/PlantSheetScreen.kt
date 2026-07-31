@@ -520,7 +520,11 @@ fun PlantSheetUsages(plant: Plant, modifier: Modifier) {
 
         for (type in usagesTypes) {
 
-            CollapsableSection(stringResource(type.displayText)) {
+            CollapsableSection(
+                title = stringResource(type.displayText),
+                iconPainter = painterResource(type.iconRes),
+                iconSelectedPainter = painterResource(type.iconSelectedRes),
+            ) {
 
                 plant.usages[type]?.forEach { usage: Usage ->
                     Text(
@@ -609,7 +613,12 @@ fun PlantSheetUsages(plant: Plant, usageParams: IntArray, modifier: Modifier) {
             val typeUsages = plant.usages[type] ?: emptyList()
             val isUsageTypeFocused = typeUsages.any { it.usageId == selectedUsage }
             
-            CollapsableSection(stringResource(type.displayText), initiallyExpanded = isUsageTypeFocused) {
+            CollapsableSection(
+                title = stringResource(type.displayText),
+                iconPainter = painterResource(type.iconRes),
+                iconSelectedPainter = painterResource(type.iconSelectedRes),
+                initiallyExpanded = isUsageTypeFocused
+            ) {
 
                 typeUsages.forEach { usage: Usage ->
                     Text(

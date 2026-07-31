@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +31,8 @@ import org.druidanet.druidnet.R
 @Composable
 fun CollapsableSection(
     title: String,
+    iconPainter: Painter,
+    iconSelectedPainter: Painter,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
     content: @Composable () -> Unit
@@ -46,6 +51,14 @@ fun CollapsableSection(
                 .clickable { expanded = !expanded }
                 .padding(3.dp)
         ) {
+            Icon(
+                if (!expanded) iconPainter else iconSelectedPainter,
+                modifier = Modifier
+                    .size(dimensionResource(R.dimen.section_buttom_img))
+                ,
+                contentDescription = "$title Category icon",
+                tint = MaterialTheme.colorScheme.primary
+            )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -74,7 +87,9 @@ fun CollapsableSection(
 @Composable
 fun CollapsableSectionPreview() {
     CollapsableSection(
-        title = "Preview Title"
+        title = "Preview Title",
+        painterResource(R.drawable.edible_unfill),
+        painterResource(R.drawable.edible_filled),
     ) {
         Text(text = "This is the content of the collapsable section.")
     }
