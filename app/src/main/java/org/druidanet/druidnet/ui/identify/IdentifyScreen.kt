@@ -656,7 +656,7 @@ fun NotInDatabaseScreen(
                         )
                         {
                             Markdown(
-                                "¿Te gustaría contribuir a que _${plantName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${plantName}) 🦉",
+                                "¿Te gustaría contribuir a que _${latinName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com?subject=${latinName}) 🦉",
                                 modifier = Modifier,
                                 typography = markdownTypography(
                                     paragraph =
