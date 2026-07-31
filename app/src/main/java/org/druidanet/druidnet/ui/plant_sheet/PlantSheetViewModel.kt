@@ -119,7 +119,7 @@ class PlantSheetViewModel @Inject constructor(
             onlineImageData.urls
         }
         val fullAttributions = if (plant != null) {
-            listOf("(c) DruidNet CC BY-NC-SA 4.0") + onlineImageData.attributions
+            listOf("(c) DruidNet (CC BY-NC-SA 4.0)") + onlineImageData.attributions
         } else {
             onlineImageData.attributions
         }
