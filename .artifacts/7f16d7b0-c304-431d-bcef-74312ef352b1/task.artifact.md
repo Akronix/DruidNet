@@ -1,0 +1,8 @@
+- [ ] Re-apply robust sync to `PlantSheetScreen.kt`
+    - [ ] Add `snapshotFlow` import
+    - [ ] Update Pager -> ViewModel sync with `settledPage`
+    - [ ] Update ViewModel -> Pager sync with `isScrollInProgress` check
+- [ ] Re-apply robust sync to `ImageFullScreen.kt`
+    - [ ] Add `snapshotFlow` import
+    - [ ] Update Pager -> ViewModel sync with `settledPage`
+- [ ] Verify changes with `analyze_file` and `gradle_build`

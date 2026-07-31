@@ -11,11 +11,11 @@ enum class UsageType (@StringRes val displayText: Int, @DrawableRes val iconRes:
     VET(displayText = R.string.vet_usage_type, iconRes = R.drawable.vet_unfill, iconSelectedRes = R.drawable.vet_filled),
     TOXIC(displayText = R.string.toxic_usage_type, iconRes = R.drawable.toxic_unfill, iconSelectedRes = R.drawable.toxic_filled),
     COMBUSTIBLE(displayText = R.string.combustible_usage_type, iconRes = R.drawable.combustible_unfill, iconSelectedRes = R.drawable.combustible_filled),
-    CONSTRUCTION(displayText = R.string.construction_usage_type, iconRes = R.drawable.construction, iconSelectedRes = R.drawable.construction),
+    CONSTRUCTION(displayText = R.string.construction_usage_type, iconRes = R.drawable.construction_unfill, iconSelectedRes = R.drawable.construction_filled),
     INDUSTRY_CRAFT(displayText = R.string.industry_usage_type, iconRes = R.drawable.craft_unfill, iconSelectedRes = R.drawable.craft_filled),
     ENVIRONMENTAL(displayText = R.string.environmental_usage_type, iconRes = R.drawable.environmental_unfill, iconSelectedRes = R.drawable.environmental_filled),
     ORNAMENTAL(displayText = R.string.ornamental_usage_type, iconRes = R.drawable.ornamental_unfill, iconSelectedRes = R.drawable.ornamental_filled),
-    SOCIAL(displayText = R.string.social_usage_type, iconRes = R.drawable.social_filled, iconSelectedRes = R.drawable.social_filled),
+    SOCIAL(displayText = R.string.social_usage_type, iconRes = R.drawable.social_unfill, iconSelectedRes = R.drawable.social_filled),
 }
 
 data class Usage (

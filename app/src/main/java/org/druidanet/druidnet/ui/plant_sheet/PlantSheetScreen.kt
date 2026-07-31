@@ -324,7 +324,7 @@ fun PlantSheetDescription(plant: Plant,
                 dimensionResource(id = R.dimen.space_between_sections)
             ))
             Markdown(
-                plant.descri    ption,
+                plant.description,
                 typography = markdownTypography(text = MaterialTheme.typography.bodyMedium),
             )
             Spacer(modifier = Modifier.padding(
