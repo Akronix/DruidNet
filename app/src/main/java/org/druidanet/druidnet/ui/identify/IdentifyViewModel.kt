@@ -234,6 +234,7 @@ class IdentifyViewModel @Inject constructor(
 //            }
             _uiState.value = uiState.value.copy(
                 plant = newPlant,
+                commonNames = newCurrentPlantResult?.species?.commonNames,
                 score = newScore,
                 isInDatabase = newPlant != null,
                 latinName = newPlantName,
