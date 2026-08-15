@@ -6,6 +6,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
+import androidx.room.FtsOptions
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -190,7 +191,9 @@ data class PlantData(
 )
 
 @Entity(tableName = "PlantUseFTS")
-@Fts4(contentEntity = UsageEntity::class)
+@Fts4(contentEntity = UsageEntity::class,
+    tokenizer = FtsOptions.TOKENIZER_UNICODE61,
+    tokenizerArgs = ["remove_diacritics=2"])
 data class PlantUseFtsEntity(
     @PrimaryKey @ColumnInfo(name = "rowid") val id: Int,
     @ColumnInfo(name = "usageId") val usageId: Int,

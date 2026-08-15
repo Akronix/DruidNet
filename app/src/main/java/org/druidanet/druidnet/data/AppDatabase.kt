@@ -18,13 +18,15 @@ import org.druidanet.druidnet.data.plant.PlantUseFtsEntity
 
 @Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class, BibliographyEntity::class, PlantUseFtsEntity::class],
           views = [PlantView::class, NameView::class],
-          version = 7,
+          version = 8,
           exportSchema = true,
           autoMigrations = [
               AutoMigration (from = 1, to = 2),
               AutoMigration (from = 2, to = 3),
               AutoMigration (from = 3, to = 4),
               AutoMigration (from = 5, to = 6),
+              AutoMigration (from = 7, to = 8),
+
           ]
         )
 abstract class AppDatabase: RoomDatabase() {
