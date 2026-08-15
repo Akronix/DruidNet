@@ -1,6 +1,5 @@
 package org.druidanet.druidnet.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,26 +15,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.ColorImage
 import coil3.annotation.ExperimentalCoilApi
-import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
-import coil3.compose.SubcomposeAsyncImage
-import me.saket.telephoto.zoomable.rememberZoomableState
-import me.saket.telephoto.zoomable.zoomable
-import org.druidanet.druidnet.R
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
@@ -77,9 +70,18 @@ fun ImageFullScreen(
             } else {
                 ""
             }
-            Text(
+            Markdown(
                 currentAttribution,
-                textAlign = TextAlign.Center,
+                typography = markdownTypography(
+                    paragraph = MaterialTheme.typography.bodyLarge.copy(
+                        textAlign = TextAlign.Center,
+                    ),
+                    link = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        textDecoration = TextDecoration.Underline
+                    )
+                ),
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
             )
         }

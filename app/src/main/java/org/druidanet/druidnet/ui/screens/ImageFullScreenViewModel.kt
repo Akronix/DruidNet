@@ -41,7 +41,7 @@ class ImageFullScreenViewModel @Inject constructor(
     ) { plant, onlineImageData ->
         val localUrl = findImageLocalPath(plant.imagePath, context)
         val allUrls = listOf(localUrl) + onlineImageData.urls
-        val allAttributions = listOf("(c) DruidNet (CC BY-NC-SA 4.0)") + onlineImageData.attributions
+        val allAttributions = listOf(plant.imageAttribution) + onlineImageData.attributions
 
         FullScreenUIState(
             images = allUrls,

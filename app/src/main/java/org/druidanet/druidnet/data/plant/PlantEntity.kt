@@ -42,9 +42,12 @@ data class PlantEntity(
 
     @ColumnInfo(name = "image_path")
     @SerialName("image_path")
-    val imagePath: String
+    val imagePath: String,
 
-    // otherImages
+    @ColumnInfo(name = "image_attribution", defaultValue = "'(c) DruidNet (CC BY-SA 4.0)'")
+    @SerialName("image_attribution")
+    val imageAttribution: String
+
 )
 
 @Serializable

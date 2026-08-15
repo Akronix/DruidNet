@@ -53,6 +53,8 @@ data class Plant (
 
     override val imagePath: String,
 
+    val imageAttribution: String
+
     // otherImages
 ): PlantBasic(plantId, displayName, latinName, imagePath)
 

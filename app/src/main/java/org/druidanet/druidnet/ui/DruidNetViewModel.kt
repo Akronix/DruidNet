@@ -346,5 +346,6 @@ class DruidNetViewModel @Inject constructor(
             }.toTypedArray(),
             observations = p.observations,
             curiosities = p.curiosities,
-            imagePath = p.imagePath
+            imagePath = p.imagePath,
+            imageAttribution = p.imageAttribution
         )

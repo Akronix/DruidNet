@@ -104,7 +104,8 @@ object PlantsDataSource {
                     )
                 ),
 //                references = arrayOf(refInventario1),
-                imagePath = "sambucus_nigra"
+                imagePath = "sambucus_nigra",
+                imageAttribution = "(c) DruidNet (CC BY-SA 4.0)"
             )
 
 

@@ -723,7 +723,8 @@ fun PlantSheetDescriptionPreview() {
         curiosities = "Symbol of love.",
         usages = emptyMap(),
         family = "Rosaceae",
-        confusions = emptyArray()
+        confusions = emptyArray(),
+        imageAttribution = "(c) DruidNet (CC BY-SA 4.0)"
     )
 
     PlantSheetDescription(
