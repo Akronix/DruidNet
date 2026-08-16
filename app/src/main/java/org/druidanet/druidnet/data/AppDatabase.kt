@@ -50,7 +50,7 @@ abstract class AppDatabase: RoomDatabase() {
                     .fallbackToDestructiveMigration(false)
                     .fallbackToDestructiveMigrationOnDowngrade(true)
                     // prepopulate the database after onCreate was called
-                    .createFromAsset("databases/druid_database_version_7.db")
+                    .createFromAsset("databases/druid_database_version_8.db")
                     // prepopulate the database after onCreate was called
 //                    .addCallback(object : Callback() {
 //                        override fun onCreate(db: SupportSQLiteDatabase) {
