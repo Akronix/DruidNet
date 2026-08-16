@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "org.druidanet.druidnet"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 36
         versionCode = 27
         versionName = "1.8.1"
