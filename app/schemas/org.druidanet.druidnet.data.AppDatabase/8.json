@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "dcff225c84fee7a3d1f32c74e3d4d3bb",
+    "identityHash": "e2662ca7b6ce57df675c083a2d7d1d32",
     "entities": [
       {
         "tableName": "Plant",
@@ -378,7 +378,7 @@
       },
       {
         "tableName": "PlantUseFTS",
-        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`usageId` INTEGER NOT NULL, `plantId` INTEGER NOT NULL, `text` TEXT NOT NULL, tokenize=unicode61 `remove_diacritics=2`, content=`Usage`)",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`usageId` INTEGER NOT NULL, `plantId` INTEGER NOT NULL, `text` TEXT NOT NULL, tokenize=unicode61, content=`Usage`)",
         "fields": [
           {
             "fieldPath": "usageId",
@@ -408,9 +408,7 @@
         "ftsVersion": "FTS4",
         "ftsOptions": {
           "tokenizer": "unicode61",
-          "tokenizerArgs": [
-            "remove_diacritics=2"
-          ],
+          "tokenizerArgs": [],
           "contentTable": "Usage",
           "languageIdColumnName": "",
           "matchInfo": "FTS4",
@@ -438,7 +436,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dcff225c84fee7a3d1f32c74e3d4d3bb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e2662ca7b6ce57df675c083a2d7d1d32')"
     ]
   }
 }

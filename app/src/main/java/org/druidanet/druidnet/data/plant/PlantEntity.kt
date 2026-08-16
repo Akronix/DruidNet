@@ -193,7 +193,10 @@ data class PlantData(
 @Entity(tableName = "PlantUseFTS")
 @Fts4(contentEntity = UsageEntity::class,
     tokenizer = FtsOptions.TOKENIZER_UNICODE61,
-    tokenizerArgs = ["remove_diacritics=2"])
+//    tokenizerArgs = ["remove_diacritics=2"]
+    // remove_diacritics=2 only works from API VERSION 30 onwards.
+    //    See https://www.twisterrob.net/blog/2023/10/sqlite-unicode61-remove-diacritics-2.html#fn:2 for more info-
+)
 data class PlantUseFtsEntity(
     @PrimaryKey @ColumnInfo(name = "rowid") val id: Int,
     @ColumnInfo(name = "usageId") val usageId: Int,
