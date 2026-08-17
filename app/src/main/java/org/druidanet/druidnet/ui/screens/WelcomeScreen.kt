@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,20 +13,17 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -89,7 +85,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                         fontSize = 18.sp
                     )
                 )
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 /* Button with 'BETA' Ribbon
             Box(
@@ -203,7 +199,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 ) {
                     Text(
                         "\uD83E\uDDFA " + stringResource(R.string.greetings_recommendations_btn),
-                        style = MaterialTheme.typography.labelMedium.copy(
+                        style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.secondary, // Link color
                         ),
                         textDecoration = TextDecoration.Underline,
@@ -211,7 +207,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+//                Spacer(modifier = Modifier.height(6.dp))
 
                 TextButton(
                     onClick = { onNavigationButtonClick(GlossaryDestination) },
@@ -219,7 +215,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 ) {
                     Text(
                         "\uD83D\uDD24 " + stringResource(R.string.greetings_glosarry_btn),
-                        style = MaterialTheme.typography.labelMedium.copy(
+                        style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.secondary, // Link color
                         ),
                         textDecoration = TextDecoration.Underline,
@@ -227,7 +223,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+//                Spacer(modifier = Modifier.height(12.dp))
 
             }
         }
