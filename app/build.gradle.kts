@@ -128,11 +128,10 @@ android {
 dependencies {
 
     //Image manipulation
-    implementation(libs.androidx.compose.ui)
 
     // Hilt
     implementation(libs.hilt.android)
-    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.foundation.layout)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
@@ -179,7 +178,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.core.ktx)
-    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.androidx.ui.tooling)
 
     // CameraX
     implementation(libs.androidx.camera.core)
