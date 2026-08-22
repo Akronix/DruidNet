@@ -63,7 +63,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                 // 1. Download all plants and bibliography entries
                 val plantData = plantsRepository.fetchPlantData()
                 val biblioData = biblioRepository.getBiblioData()
-                Log.i("DruidNetWorker", "Downloaded ${plantData.plants.size} plants and ${biblioData.size} bibliography entries.")
+                Log.i("DruidNetWorker", "Downloaded ${plantData.plants.size} plants and ${biblioData.biblio.size} bibliography entries.")
 
                 // 2. Download images
                 val imageList = res.images
@@ -85,7 +85,8 @@ class DatabaseUpdateWorker @AssistedInject constructor(
                     plantDao.populateConfusions(plantData.confusions)
                     plantDao.populateNames(plantData.names)
                     plantDao.populateUsages(plantData.usages)
-                    biblioDao.populateData(biblioData)
+                    biblioDao.populateData(biblioData.biblio)
+                    biblioDao.populatePlantReferences(biblioData.refs)
                     // Rebuild FTS index for PlantUseFTS
                     plantDao.executeRawQuery(RoomRawQuery("""INSERT INTO PlantUseFTS(PlantUseFTS) VALUES('rebuild');""".trimIndent()))
                     Log.i("DruidNetWorker", "Populated database with new data.")

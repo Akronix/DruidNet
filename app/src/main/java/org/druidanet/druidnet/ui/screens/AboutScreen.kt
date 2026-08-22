@@ -1,7 +1,5 @@
 package org.druidanet.druidnet.ui.screens
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -37,17 +34,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import org.druidanet.druidnet.R
-import org.druidanet.druidnet.data.bibliography.BibliographyEntity
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.navigation.BibliographyDestination
 import org.druidanet.druidnet.navigation.CreditsDestination
@@ -314,69 +308,6 @@ fun CreditsScreen (
                     .padding(vertical = 10.dp, horizontal = 30.dp)
             )
         }
-}
-
-@Composable
-fun BibliographyScreen (
-    bibliographyStr: String,
-    modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .verticalScroll(state = ScrollState(0))
-    )
-    {
-
-        SelectionContainer {
-
-            Markdown(
-                bibliographyStr.trimIndent(),
-                typography = markdownTypography(
-                    text = MaterialTheme.typography.bodyMedium,
-                    link = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Normal,
-                        textDecoration = TextDecoration.Underline
-                    )
-                ),
-                modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 30.dp)
-            )
-        }
-    }
-
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun BiblioPreview() {
-    DruidNetTheme(darkTheme = false) {
-        BibliographyScreen(
-            BibliographyEntity(
-                1,
-                "incollection",
-                "INVENTARIO ESPAÑOL DE LOS CONOCIMIENTOS TRADICIONALES RELATIVOS A LA BIODIVERSIDAD",
-                "Pardo de Santayana, Manuel, Ramón Morales, Laura Aceituno, y María Molina (editores)",
-                "Ministerio de Agricultura, Alimentación y Medio Ambiente",
-                "2014",
-                "978-84-491-1401-4",
-                null,
-                "https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-espanol-de-los-conocimientos-tradicionales/inventario_esp_conocimientos_tradicionales.html",
-                "Fase 1"
-            ).toMarkdownString() +
-            BibliographyEntity(
-                2,
-                "book",
-                "Cocinar con plantas silvestres: Reconocer, recolectar, utilizar",
-                "Bernard Bertrand",
-                "La Fertilidad de la Tierra Ediciones",
-                "2015",
-                "978-84-940582-9-5",
-                "2ª ed.",
-                "",
-                null
-            ).toMarkdownString()
-        )
-    }
 }
 
 @Preview(showBackground = true)

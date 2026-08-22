@@ -18,6 +18,8 @@ import org.druidanet.druidnet.model.PlantUseResult
 @Dao
 interface PlantDAO {
 
+    /*** QUERY DATA ***/
+
     @Query("SELECT DISTINCT common_name as displayName, plantId, image_path as imagePath, latin_name as latinName " +
             "FROM PlantView " +
             "WHERE language = :language " +

@@ -3,6 +3,7 @@ package org.druidanet.druidnet.ui.plant_sheet
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -27,8 +28,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -43,11 +47,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -60,6 +61,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
@@ -74,11 +76,13 @@ import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
+import org.druidanet.druidnet.navigation.BibliographyDestination
 import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.findImageLocalPath
 import org.druidanet.druidnet.utils.isConnected
-
+import org.druidanet.druidnet.utils.sendEmailAction
+import org.druidanet.druidnet.utils.shareAction
 
 enum class PlantSheetSection {
     DESCRIPTION, USAGES, CONFUSIONS
@@ -92,6 +96,7 @@ fun PlantSheetScreen(
     plantLatinName: String,
     navigateBack: () -> Unit,
     onNavigateToFullScreen: (String, Int) -> Unit,
+    onNavigateToBibliography: (Int) -> Unit,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     sheetViewModel: PlantSheetViewModel = hiltViewModel(),
@@ -133,11 +138,70 @@ fun PlantSheetScreen(
             sheetViewModel.getOnlineImages(plant.latinName)
         }
 
+        var showMenu by remember { mutableStateOf(false) }
+
         Scaffold(
             topBar = { DruidNetAppBar(
                 navigateUp = navigateBack,
                 topBarTitle = plant.displayName,
-                thumbnail = plantImageBitmap
+                thumbnail = plantImageBitmap,
+                actions = {
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(
+                            painter = painterResource(R.drawable.more_vert),
+                            contentDescription = stringResource(R.string.more_actions)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        shape = RoundedCornerShape(16.dp),
+                        shadowElevation = 8.dp,
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                        modifier = Modifier.padding(vertical = 0.dp)
+                    ) {
+                        DropdownMenuItem(
+                            leadingIcon = {Icon(painterResource(R.drawable.share), null)},
+                            text = {
+                                Text(
+                                    stringResource(R.string.action_share),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                shareAction(context, "Mira lo que he encontrado sobre ${plant.displayName} en DruidNet: " + "https://druidnet.app/plant_sheet/${plant.latinName}?section=$currentSection".replace(" ", "%20").toUri())
+                            }
+                        )
+                        DropdownMenuItem(
+                            leadingIcon = { Icon(painterResource(R.drawable.book), null) },
+                            text = {
+                                Text(
+                                    stringResource(R.string.plant_references),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                           },
+                            onClick = {
+                                showMenu = false
+                                onNavigateToBibliography(plant.plantId)
+                            }
+                        )
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            leadingIcon = {Icon(painterResource(R.drawable.bug_report), null)},
+                            text = {
+                                Text(
+                                    stringResource(R.string.action_report_error),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                sendEmailAction(context, "He encontrado un error en la ficha de la planta ${plant.displayName}","Rellena aquí toda la información del error.")
+                            }
+                        )
+                    }
+                }
             ) },
             bottomBar = PlantSheetBottomBar(
                 onClickBottomNavItem = onChangeSection,

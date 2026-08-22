@@ -25,8 +25,12 @@ interface BackendApiService {
     @GET("dbinfo.json")
     suspend fun getLastUpdate() : DataBaseUpdateInfo
 
-    @GET("database/allbiblio")
-    suspend fun downloadBiblio() : List<BibliographyEntity>
+    // Deprecated
+//    @GET("database/allbiblio")
+//    suspend fun downloadBiblio() : List<BibliographyEntity>
+
+    @GET("database/allbiblioAndRefs")
+    suspend fun downloadBiblio() : BiblioDTO
 
     @GET("database/allplants")
     suspend fun downloadPlantData() : PlantDataDTO

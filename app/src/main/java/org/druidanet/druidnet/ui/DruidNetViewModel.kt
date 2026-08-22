@@ -257,9 +257,6 @@ class DruidNetViewModel @Inject constructor(
     fun getPlant(plantId: Int): Flow<PlantData?> =
         plantDao.getPlant(plantId)
 
-    fun getBibliography(): Flow<List<BibliographyEntity>> =
-        biblioDao.getAllBibliographyEntries()
-
     fun clearDB() =
         appDatabase.clearAllTables() // If AppDatabase doesn't have this, adjust to appDatabase.runInTransaction { plantDao.clear(); biblioDao.clear(); ... }
 

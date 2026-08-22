@@ -3,6 +3,7 @@ package org.druidanet.druidnet
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -69,11 +69,6 @@ fun DruidNetApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     // Use the screensByRoute from the navigation package
     val currentNavigationDestination : NavigationDestination = screensByRoute[backStackEntry?.destination?.route] ?: WelcomeDestination
-
-    val bibliography by viewModel.getBibliography().collectAsState(emptyList())
-    val bibliographyStr = if (bibliography.isNotEmpty())
-                bibliography.map { "* " + it.toMarkdownString() }
-                            .reduce { acc : String, ref: String -> "$acc\n$ref"} else ""
 
     val firstLaunch by viewModel.isFirstLaunch().collectAsState(false)
 
@@ -116,7 +111,6 @@ fun DruidNetApp(
             navController = navController,
             viewModel = viewModel,
             innerPadding = innerPadding,
-            bibliographyStr = bibliographyStr,
             scrollStateCatalog = scrollStateCatalog,
             scrollStateGlossary = scrollStateGlossary
         )
@@ -195,7 +189,8 @@ fun DruidNetAppBar(
     topBarColor: Color = Color.Unspecified,
     onActionClick: () -> Unit = {},
     actionIconContentDescription: String? = null,
-    actionIconRes: Int? = null
+    actionIconRes: Int? = null,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
 
             CenterAlignedTopAppBar(
@@ -251,7 +246,9 @@ fun DruidNetAppBar(
                             )
                         }
                     }
+                    actions()
                 },
                 modifier = modifier
             )
     }
+

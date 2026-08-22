@@ -1,7 +1,6 @@
 package org.druidanet.druidnet.data.bibliography
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
@@ -42,3 +41,13 @@ data class BibliographyEntity(
     }
 
 }
+
+@Entity(
+    tableName = "Plant_References",
+    primaryKeys = ["plantId", "refId"]
+)
+@Serializable
+data class PlantReferenceEntity(
+    val plantId: Int,
+    val refId: Int
+)

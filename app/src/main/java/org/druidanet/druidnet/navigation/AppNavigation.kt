@@ -77,6 +77,9 @@ object AboutDestination : NavigationDestination() {
 object BibliographyDestination : NavigationDestination() {
     override val route = "bibliography"
     override val title = R.string.title_screen_bibliography
+    override val topBarIconPath = R.drawable.book
+    const val plantIdArg = "plantId"
+    val routeWithArgs = "$route?$plantIdArg={$plantIdArg}"
 }
 
 @Serializable
@@ -140,7 +143,6 @@ val screensByRoute : Map<String, NavigationDestination> =
         CatalogDestination.route to CatalogDestination,
         PlantSheetDestination.routeWithArgs to PlantSheetDestination,
         AboutDestination.route to AboutDestination,
-        BibliographyDestination.route to BibliographyDestination,
         CreditsDestination.route to CreditsDestination,
         RecommendationsDestination.route to RecommendationsDestination,
         GlossaryDestination.route to GlossaryDestination,
@@ -148,6 +150,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         CameraDestination.route to CameraDestination,
         SearchDestination.route to SearchDestination,
         FullScreenDestination.routeWithArgs to FullScreenDestination,
+        BibliographyDestination.routeWithArgs to BibliographyDestination,
     )
 
 // Before Implementation:
@@ -166,7 +169,6 @@ fun DruidNetNavHost(
     navController: NavHostController,
     viewModel: DruidNetViewModel,
     innerPadding: PaddingValues,
-    bibliographyStr: String,
     scrollStateCatalog: LazyListState,
     scrollStateGlossary: ScrollState
 ) {
@@ -289,6 +291,9 @@ fun DruidNetNavHost(
                         onNavigateToFullScreen = { plantLatinName, index ->
                             navController.navigate("${FullScreenDestination.route}/$plantLatinName?${FullScreenDestination.indexArg}=$index")
                         },
+                        onNavigateToBibliography = { plantId ->
+                            navController.navigate("${BibliographyDestination.route}?${BibliographyDestination.plantIdArg}=$plantId")
+                        },
                         navigateBack = { navController.navigateUp() },
                         innerPadding = innerPadding,
                         modifier = Modifier
@@ -330,9 +335,16 @@ fun DruidNetNavHost(
                     .fillMaxSize()
             )
         }
-        composable(route = BibliographyDestination.route) {
+        composable(
+            route = BibliographyDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(BibliographyDestination.plantIdArg) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                }
+            )
+        ) {
             BibliographyScreen(
-                bibliographyStr = bibliographyStr,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()

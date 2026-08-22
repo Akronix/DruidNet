@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import org.druidanet.druidnet.data.bibliography.BibliographyDAO
 import org.druidanet.druidnet.data.bibliography.BibliographyEntity
+import org.druidanet.druidnet.data.bibliography.PlantReferenceEntity
 import org.druidanet.druidnet.data.plant.ConfusionEntity
 import org.druidanet.druidnet.data.plant.NameEntity
 import org.druidanet.druidnet.data.plant.NameView
@@ -16,9 +17,10 @@ import org.druidanet.druidnet.data.plant.PlantView
 import org.druidanet.druidnet.data.plant.UsageEntity
 import org.druidanet.druidnet.data.plant.PlantUseFtsEntity
 
-@Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class, BibliographyEntity::class, PlantUseFtsEntity::class],
+@Database(entities = [PlantEntity::class, UsageEntity::class, NameEntity::class, ConfusionEntity::class, PlantUseFtsEntity::class,
+    BibliographyEntity::class, PlantReferenceEntity::class],
           views = [PlantView::class, NameView::class],
-          version = 8,
+          version = 9,
           exportSchema = true,
           autoMigrations = [
               AutoMigration (from = 1, to = 2),
@@ -26,6 +28,7 @@ import org.druidanet.druidnet.data.plant.PlantUseFtsEntity
               AutoMigration (from = 3, to = 4),
               AutoMigration (from = 5, to = 6),
               AutoMigration (from = 7, to = 8),
+              AutoMigration (from = 8, to = 9),
 
           ]
         )
@@ -50,7 +53,7 @@ abstract class AppDatabase: RoomDatabase() {
                     .fallbackToDestructiveMigration(false)
                     .fallbackToDestructiveMigrationOnDowngrade(true)
                     // prepopulate the database after onCreate was called
-                    .createFromAsset("databases/druid_database_version_8.db")
+                    .createFromAsset("databases/druid_database_version_9.db")
                     // prepopulate the database after onCreate was called
 //                    .addCallback(object : Callback() {
 //                        override fun onCreate(db: SupportSQLiteDatabase) {
