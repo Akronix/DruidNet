@@ -53,4 +53,7 @@
     <string name="action_share">Compartir</string>
     <string name="action_report_error">Informar de un error</string>
     <string name="plant_references">Referencias bibliográficas</string>
+    <string name="section_confusions">confusiones</string>
+    <string name="section_description">descripción</string>
+    <string name="section_usages">usos</string>
 </resources>

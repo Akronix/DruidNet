@@ -20,11 +20,13 @@ fun sendEmailAction(context: Context, subject: String = "DruidNetApp: ", txt: St
 
 fun shareAction(context: Context, txt: String = "") {
 
-    val iconUri = "android.resource://${context.packageName}/${R.mipmap.ic_launcher}".toUri()
+//    val iconUri = "android.resource://${context.packageName}/${R.mipmap.ic_launcher}".toUri()
     val sendIntent: Intent = Intent().apply {
         action = ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, txt)
         type = "text/plain"
+//        clipData = ClipData.newRawUri("App icon", iconUri)
+//        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
     }
 
     val shareIntent = Intent.createChooser(sendIntent, null)

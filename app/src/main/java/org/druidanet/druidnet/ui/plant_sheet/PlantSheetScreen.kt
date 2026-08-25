@@ -2,7 +2,7 @@ package org.druidanet.druidnet.ui.plant_sheet
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -76,16 +77,19 @@ import org.druidanet.druidnet.model.Confusion
 import org.druidanet.druidnet.model.LanguageEnum
 import org.druidanet.druidnet.model.Plant
 import org.druidanet.druidnet.model.Usage
-import org.druidanet.druidnet.navigation.BibliographyDestination
 import org.druidanet.druidnet.ui.components.PlantImageCarousel
 import org.druidanet.druidnet.utils.assetsToBitmap
 import org.druidanet.druidnet.utils.findImageLocalPath
 import org.druidanet.druidnet.utils.isConnected
 import org.druidanet.druidnet.utils.sendEmailAction
 import org.druidanet.druidnet.utils.shareAction
+import java.util.Locale
+import java.util.Locale.getDefault
 
-enum class PlantSheetSection {
-    DESCRIPTION, USAGES, CONFUSIONS
+enum class PlantSheetSection(@StringRes val labelResId: Int) {
+    DESCRIPTION(R.string.section_description),
+    USAGES(R.string.section_usages),
+    CONFUSIONS(R.string.section_confusions)
 }
 
 val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
@@ -140,6 +144,10 @@ fun PlantSheetScreen(
 
         var showMenu by remember { mutableStateOf(false) }
 
+        val sectionName = stringResource(currentSection.labelResId).replaceFirstChar {
+            it.titlecase(getDefault())
+        }
+
         Scaffold(
             topBar = { DruidNetAppBar(
                 navigateUp = navigateBack,
@@ -170,7 +178,7 @@ fun PlantSheetScreen(
                             },
                             onClick = {
                                 showMenu = false
-                                shareAction(context, "Mira lo que he encontrado sobre ${plant.displayName} en DruidNet: " + "https://druidnet.app/plant_sheet/${plant.latinName}?section=$currentSection".replace(" ", "%20").toUri())
+                                shareAction(context, "Mira lo que dice la ficha \"$sectionName de ${plant.displayName}\" en DruidNet.es:\n" + "https://druidnet.app/plant_sheet/${plant.latinName}?section=$currentSection".replace(" ", "%20").toUri())
                             }
                         )
                         DropdownMenuItem(
