@@ -93,12 +93,14 @@ fun AboutScreen (
                     additionalText = null
                 )
 
+                /*
                 AboutItem(
                     { onNavigationButtonClick(CreditsDestination) },
                     stringResource(R.string.title_screen_credits),
                     imageResource = R.drawable.star,
                     additionalText = null
                 )
+                */
 
                 AboutItem(
                     {
