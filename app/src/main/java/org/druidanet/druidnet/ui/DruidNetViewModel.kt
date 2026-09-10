@@ -306,13 +306,6 @@ class DruidNetViewModel @Inject constructor(
     }
     */
 
-//    fun getAssetsImage(): ImageBitmap {
-//        val inputStream = assets.open("drawable/gatherer_basket.webp")
-//        val bitmap = BitmapFactory.decodeStream(inputStream)
-//        inputStream.close()
-//        return bitmap.asImageBitmap()
-//    }
-
 //    suspend fun setDisplayName(plantLatinName: String): String {
 //        displayName = plantDao.getDisplayName(plantLatinName)
 //        updateDisplayName(displayName)

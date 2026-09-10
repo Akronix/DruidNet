@@ -13,8 +13,11 @@ import androidx.core.graphics.scale
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 
 const val COMPRESS_FACTOR = 4
+const val REQ_WIDTH = 512
+const val REQ_HEIGHT = 512
 
 fun compressImage(uri: Uri, context: Context): File {
     val contentResolver = context.contentResolver
@@ -73,11 +76,39 @@ fun getFileFromUri(context: Context, uri: Uri, prefix: String, suffix: String): 
 fun fileToImageBitmap(file: File?): ImageBitmap? {
     if (file == null || !file.exists()) return null
 
-    // Decode the file into a Bitmap
-    val bitmap: Bitmap? = BitmapFactory.decodeFile(file.absolutePath)
+    // Decode the file into a Bitmap with downsampling
+    val options = BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+    BitmapFactory.decodeFile(file.absolutePath, options)
+
+    options.inSampleSize = calculateInSampleSize(options, REQ_WIDTH, REQ_HEIGHT)
+    options.inJustDecodeBounds = false
+
+    val bitmap: Bitmap? = BitmapFactory.decodeFile(file.absolutePath, options)
 
     // Convert Bitmap to ImageBitmap
     return bitmap?.asImageBitmap()
+}
+
+private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+    // Raw height and width of image
+    val (height: Int, width: Int) = options.outHeight to options.outWidth
+    var inSampleSize = 1
+
+    if (height > reqHeight || width > reqWidth) {
+
+        val halfHeight: Int = height / 2
+        val halfWidth: Int = width / 2
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+            inSampleSize *= 2
+        }
+    }
+
+    return inSampleSize
 }
 
 fun bitmapToFile(bitmap: Bitmap, fileName: String, context: Context): File? {
@@ -99,12 +130,12 @@ fun bitmapToFile(bitmap: Bitmap, fileName: String, context: Context): File? {
 fun findImageLocalPath(filename: String, context: Context) : String {
     val assetManager = context.assets
     val imgFn = "$filename.webp"
-    val localStorageDir = context.getDir("images", Context.MODE_PRIVATE).absolutePath
+    val localStorageDir = context.getDir("images", Context.MODE_PRIVATE)?.absolutePath
 
     if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
         return "file:///android_asset/images/plants/$imgFn"
     else
-        if (File("$localStorageDir/$imgFn").exists())
+        if (localStorageDir != null && File("$localStorageDir/$imgFn").exists())
         return "file://$localStorageDir/$imgFn"
     else
         return "file:///android_asset/images/broken_image.jpg"
@@ -113,17 +144,32 @@ fun findImageLocalPath(filename: String, context: Context) : String {
 fun Context.assetsToBitmap(filename:String): ImageBitmap {
     val assetManager = this.assets
     val imgFn = "$filename.webp"
-    val localStorageDir = this.getDir("images", Context.MODE_PRIVATE).absolutePath
+    val localStorageDir = this.getDir("images", Context.MODE_PRIVATE)?.absolutePath
 
-    val inputStream = if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
-        assetManager.open("images/plants/$imgFn")
-    else
-        if (File("$localStorageDir/$imgFn").exists())
+    fun openStream(): InputStream {
+        return if (assetManager.list("images/plants/")?.toSet()?.contains(imgFn) == true)
+            assetManager.open("images/plants/$imgFn")
+        else if (localStorageDir != null && File("$localStorageDir/$imgFn").exists())
             File("$localStorageDir/$imgFn").inputStream()
         else
-            assetManager.open("drawable/broken_image.jpg")
+            assetManager.open("images/broken_image.jpg")
+    }
 
-    val bitmap = BitmapFactory.decodeStream(inputStream)
-    inputStream.close()
-    return bitmap.asImageBitmap()
+    // First pass: get dimensions
+    val options = BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+    openStream().use { inputStream ->
+        BitmapFactory.decodeStream(inputStream, null, options)
+    }
+
+    // Second pass: decode with sample size
+    options.inSampleSize = calculateInSampleSize(options, REQ_WIDTH, REQ_HEIGHT)
+    options.inJustDecodeBounds = false
+
+    val bitmap = openStream().use { inputStream ->
+        BitmapFactory.decodeStream(inputStream, null, options)
+    }
+
+    return bitmap?.asImageBitmap() ?: ImageBitmap(1, 1)
 }
