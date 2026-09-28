@@ -14,7 +14,8 @@ data class PlantNetResponse(
     val bestMatch: String? = null,
     val results: List<PlantResult>? = null,
     val version: String? = null,
-    val remainingIdentificationRequests: Long? = null
+    val remainingIdentificationRequests: Long? = null,
+    val switchToProject: String? = null
 )
 
 @Serializable
@@ -37,8 +38,8 @@ data class PredictedOrgan(
 
 @Serializable
 data class PlantResult(
-    val score: Double? = null,
-    val species: SpeciesInfo? = null,
+    val score: Double,
+    val species: SpeciesInfo,
     val images: List<PlantImage>? = null, // Added this line to include images list
     val gbif: GbifInfo? = null,
     val powo: PowoInfo? = null
@@ -46,7 +47,7 @@ data class PlantResult(
 
 @Serializable
 data class SpeciesInfo(
-    val scientificNameWithoutAuthor: String? = null,
+    val scientificNameWithoutAuthor: String,
     val scientificNameAuthorship: String? = null,
     val genus: GenusFamilyInfo? = null,
     val family: GenusFamilyInfo? = null,

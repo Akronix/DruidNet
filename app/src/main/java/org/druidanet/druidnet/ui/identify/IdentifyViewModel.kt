@@ -140,15 +140,27 @@ class IdentifyViewModel @Inject constructor(
                     val organValue = "auto"
                     val organRequestBody = organValue.toRequestBody("text/plain".toMediaTypeOrNull())
 
-                    val response = identifyService.plantIdentify(
+                    var response = identifyService.plantIdentify(
                         images = imagePart,
                         lang = language.i18n,
                         organs = organRequestBody
                     )
 
-                    val bestMatchLatinName = response.results?.firstOrNull()?.species?.scientificNameWithoutAuthor ?: ""
-                    val bestMatchCommonNames = response.results?.firstOrNull()?.species?.commonNames
-                    val bestScore = response.results?.firstOrNull()?.score ?: 0.0
+                if (response.results.isNullOrEmpty() && response.switchToProject != null) {
+                    response = identifyService.plantIdentify(
+                        project = response.switchToProject,
+                        images = imagePart,
+                        lang = language.i18n,
+                        organs = organRequestBody
+                    )
+                }
+
+                if (!response.results.isNullOrEmpty()) {
+
+                    val bestMatchLatinName =
+                        response.results.first().species.scientificNameWithoutAuthor
+                    val bestMatchCommonNames = response.results.first().species.commonNames
+                    val bestScore = response.results.first().score
 
 //                    Log.d("DRUIDNET-PLANTNET", bestMatchCommonNames.toString())
 
@@ -156,19 +168,18 @@ class IdentifyViewModel @Inject constructor(
                         score = bestScore,
                         commonNames = bestMatchCommonNames,
                         latinName = bestMatchLatinName,
-                        similarPlants = response.results?.drop(1) ?: emptyList(),
-                        currentPlantResult = response.results?.first()
+                        similarPlants = response.results.drop(1),
+                        currentPlantResult = response.results.first()
                     )
 
-                    if (response.results != null) {
-                        val plant: Plant? = plantsRepository.searchPlant(bestMatchLatinName, language)
-                        if (plant != null) {
+                    val plant: Plant? =
+                        plantsRepository.searchPlant(bestMatchLatinName, language)
+                    if (plant != null) {
 //                            Log.i(TAG, "Plant found in database!")
-                            _uiState.value = uiState.value.copy(plant = plant, isInDatabase = true)
+                        _uiState.value = uiState.value.copy(plant = plant, isInDatabase = true)
 //                            Log.i(TAG, "Plant: ${uiState.value.plant}")
-                        }
-
                     }
+
 
                     val successMsg = "Success: Best match - $bestMatchLatinName."
                     _identificationStatus.value = successMsg
@@ -180,6 +191,11 @@ class IdentifyViewModel @Inject constructor(
                     originalImageFile.delete()
 
                     _successRequest.value = true
+
+                } else {
+                    _identificationStatus.value = "No se ha encontrado ninguna identificación posible para esta imagen."
+                    Log.e(TAG, "No identification available for this image.")
+                }
 
 
                 } catch (e: HttpException) {
