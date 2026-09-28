@@ -1,6 +1,6 @@
 [versions]
 # Core Build Tools & Plugins
-agp = "9.3.2"
+agp = "9.4.1"
 kotlin = "2.2.10"
 
 # AndroidX Core & Base UI
