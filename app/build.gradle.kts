@@ -12,7 +12,7 @@ plugins {
 
 android {
     namespace = "org.druidanet.druidnet"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "org.druidanet.druidnet"

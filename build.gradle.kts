@@ -2,8 +2,8 @@
 buildscript {
     extra.apply {
         set("lifecycle_version", "2.9.1")
-        set("room_version", "2.8.0")
-        set("compose_version", "1.8.2")
+        set("room_version", "2.8.5")
+        set("compose_version", "1.12.1")
     }
 }
 
@@ -11,8 +11,9 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     id("com.google.devtools.ksp") version "2.3.6" apply false
-    id("androidx.room") version "2.8.0" apply false
+    id("androidx.room") version "2.8.5" apply false
     alias(libs.plugins.compose.compiler) apply false
-    id("com.google.dagger.hilt.android") version "2.57.1" apply false
+    id("com.google.dagger.hilt.android") version "2.60.1" apply false
+
 }
-val ndkVersion by extra("28.0.12916984")
+extra["ndkVersion"] = "28.0.12916984"

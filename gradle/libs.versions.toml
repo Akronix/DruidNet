@@ -11,7 +11,7 @@ material = "1.13.0"
 activity = "1.12.2"
 
 # Jetpack Compose
-composeBom = "2026.04.01"
+composeBom = "2026.09.00"
 navigationCompose = "2.9.6"
 lifecycleRuntimeKtx = "2.9.1"
 
