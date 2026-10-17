@@ -7,9 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
@@ -22,7 +22,7 @@ class IdentifyActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val imageSrc: Uri? = if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
-            intent.getParcelableExtra(Intent.EXTRA_STREAM, )
+            intent.getParcelableExtra(Intent.EXTRA_STREAM)
         } else {
             null
         }
@@ -41,7 +41,8 @@ class IdentifyActivity : ComponentActivity() {
                 IdentifyScreen(
                     identifyViewModel = identifyViewModel,
                     goToPlantSheet = { plant, section ->
-                        val deepLinkUri = Uri.parse("druidnet://druidanet.org/plant_sheet/${plant.latinName}?section=$section")
+                        val deepLinkUri =
+                            "druidnet://plant_sheet/${plant.latinName}?section=$section".toUri()
                         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
                         startActivity(intent)
                         finish()

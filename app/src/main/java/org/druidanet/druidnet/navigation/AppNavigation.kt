@@ -266,6 +266,12 @@ fun DruidNetNavHost(
                     uriPattern = "druidnet://druidanet.org/plant_sheet/{plantLatinName}"
                 },
                 navDeepLink {
+                    uriPattern = "druidnet://plant_sheet/{plantLatinName}?section={section}"
+                },
+                navDeepLink {
+                    uriPattern = "druidnet://plant_sheet/{plantLatinName}"
+                },
+                navDeepLink {
                     uriPattern = "https://druidnet.app/plant_sheet/{plantLatinName}?section={section}"
                 },
                 navDeepLink {

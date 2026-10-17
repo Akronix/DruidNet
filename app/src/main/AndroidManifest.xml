@@ -50,7 +50,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="druidnet" android:host="druidanet.org" />
+                <data android:scheme="druidnet" />
             </intent-filter>
         </activity>
 
