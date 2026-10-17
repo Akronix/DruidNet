@@ -1,6 +1,8 @@
 package org.druidanet.druidnet.ui.plant_sheet
 
+import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -26,7 +28,10 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.contextmenu.builder.item
+import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.rememberSelectionState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -57,7 +62,6 @@ import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,8 +87,8 @@ import org.druidanet.druidnet.utils.findImageLocalPath
 import org.druidanet.druidnet.utils.isConnected
 import org.druidanet.druidnet.utils.sendEmailAction
 import org.druidanet.druidnet.utils.shareAction
-import java.util.Locale
 import java.util.Locale.getDefault
+
 
 enum class PlantSheetSection(@StringRes val labelResId: Int) {
     DESCRIPTION(R.string.section_description),
@@ -239,6 +243,7 @@ fun PlantSheetScreen(
                         onNavigateToFullScreen(plant.latinName, if (index >= 0) index else 0)
                     }
                 },
+                context = context,
                 modifier = modifier.padding(padding),
             )
         }
@@ -328,10 +333,25 @@ fun PlantSheetBody(
     plantImages: List<String>,
     usageParams: IntArray?,
     onImageClick: (Any) -> Unit,
+    context: Context,
     modifier: Modifier = Modifier
 ) {
 
-    SelectionContainer {
+    val selectionState = rememberSelectionState()
+
+    SelectionContainer(
+        state = selectionState,
+        modifier = Modifier.appendTextContextMenuComponents {
+            item(label = "Compartir", key = "share", onClick = {
+                shareAction(context, "Mira lo que pone en la ficha de ${plant.displayName} en DruidNet.es:\n" +  selectionState.selectedTexts.joinToString(separator = "[...]\n") + '\n' + "https://druidnet.app/plant_sheet/${plant.latinName}?section=$currentSection".replace(" ", "%20").toUri())
+            })
+            item(label = "Buscar en internet", key = "search", onClick = {
+                val searchIntent = Intent(Intent.ACTION_WEB_SEARCH)
+                searchIntent.putExtra(SearchManager.QUERY, selectionState.selectedTexts.joinToString(separator = "\n"))
+                context.startActivity(searchIntent)
+            })
+        }
+    ) {
 
         when (currentSection) {
             PlantSheetSection.DESCRIPTION ->
