@@ -1,9 +1,8 @@
 import java.util.Properties
 
 plugins {
-    kotlin("plugin.serialization") version "2.2.10"
+    alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
     id("androidx.room")
     alias(libs.plugins.compose.compiler)
@@ -89,9 +88,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -192,6 +188,16 @@ dependencies {
 
     // Telephoto lib
     implementation(libs.zoomable)
+
+    // Supabase & Ktor
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.postgrest)
+    implementation(libs.supabase.storage)
+    implementation(libs.supabase.auth)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.utils)
+    implementation(libs.ktor.client.okhttp)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

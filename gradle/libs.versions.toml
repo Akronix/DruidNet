@@ -1,7 +1,7 @@
 [versions]
 # Core Build Tools & Plugins
 agp = "9.4.1"
-kotlin = "2.2.10"
+kotlin = "2.4.21"
 
 # AndroidX Core & Base UI
 coreKtx = "1.16.0"
@@ -33,6 +33,8 @@ coil = "3.3.0"
 # Third-Party Libraries
 multiplatformMarkdownRenderer = "0.32.0"
 zoomable = "0.19.0"
+supabase = "3.8.0"
+ktor = "3.6.0"
 
 # Testing
 junit = "4.13.2"
@@ -94,6 +96,16 @@ multiplatform-markdown-renderer-android = { module = "com.mikepenz:multiplatform
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 zoomable = { module = "me.saket.telephoto:zoomable", version.ref = "zoomable" }
 
+# Supabase & Ktor
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
+supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-storage = { module = "io.github.jan-tennert.supabase:storage-kt" }
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
+
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -101,5 +113,5 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
