@@ -31,7 +31,11 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
         val plantNetApiKey = localProperties.getProperty("PLANTNET_API_KEY", "")
+        val supabaseUrl = localProperties.getProperty("SUPABASE_URL","")
+        val supabaseApiKey = localProperties.getProperty("SUPABASE_PUBLISHABLE_KEY", "")
         buildConfigField("String", "PLANTNET_API_KEY", "\"$plantNetApiKey\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"$supabaseApiKey\"")
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
 
     }
 
