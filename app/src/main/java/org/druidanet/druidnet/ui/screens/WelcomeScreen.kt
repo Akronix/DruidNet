@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -40,6 +41,7 @@ import org.druidanet.druidnet.navigation.GlossaryDestination
 import org.druidanet.druidnet.navigation.NavigationDestination
 import org.druidanet.druidnet.navigation.RecommendationsDestination
 import org.druidanet.druidnet.navigation.SearchDestination
+import org.druidanet.druidnet.navigation.SignInDestination
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @Composable
@@ -54,13 +56,37 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                 .fillMaxWidth()
                 .zIndex(1f)
                 .padding(top = 40.dp)
-                .offset(x = (-40).dp) // Offset from the end by a specific amount
+                .offset(x = (-20).dp) // Offset from the end by a specific amount
         ) {
-            Icon(
-                painterResource(R.drawable.settings),
-                "Abre ajustes de la aplicación",
-                modifier = Modifier.clickable { onNavigationButtonClick(AboutDestination) }
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable { onNavigationButtonClick(AboutDestination) }
+                ) {
+                    Icon(
+                        painterResource(R.drawable.settings),
+                        contentDescription = "Abre ajustes de la aplicación",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable { onNavigationButtonClick(SignInDestination) }
+                ) {
+                    Icon(
+                        painterResource(R.drawable.user_signin),
+                        contentDescription = "Inicia sesión en la aplicación",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
         }
 
         Box(modifier = modifier) {

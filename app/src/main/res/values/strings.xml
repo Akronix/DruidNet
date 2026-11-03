@@ -56,4 +56,5 @@
     <string name="section_confusions">confusiones</string>
     <string name="section_description">descripción</string>
     <string name="section_usages">usos</string>
+    <string name="title_screen_signin">Tu cuenta</string>
 </resources>

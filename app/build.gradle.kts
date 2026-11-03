@@ -195,6 +195,7 @@ dependencies {
 
     // Supabase & Ktor
     implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.core)
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.storage)
     implementation(libs.supabase.auth)

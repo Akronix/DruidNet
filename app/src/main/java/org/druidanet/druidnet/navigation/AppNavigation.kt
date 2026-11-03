@@ -24,6 +24,8 @@ import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.ui.DruidNetViewModel
+import org.druidanet.druidnet.ui.auth.AuthViewModel
+import org.druidanet.druidnet.ui.auth.SignInScreen
 import org.druidanet.druidnet.ui.identify.CameraXScreen
 import org.druidanet.druidnet.ui.identify.IdentifyScreen
 import org.druidanet.druidnet.ui.identify.IdentifyViewModel
@@ -102,6 +104,12 @@ object GlossaryDestination : NavigationDestination() {
 }
 
 @Serializable
+object SignInDestination : NavigationDestination() {
+    override val route = "signin"
+    override val title = R.string.title_screen_signin
+}
+
+@Serializable
 object PlantSheetDestination : NavigationDestination() {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
@@ -151,6 +159,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         SearchDestination.route to SearchDestination,
         FullScreenDestination.routeWithArgs to FullScreenDestination,
         BibliographyDestination.routeWithArgs to BibliographyDestination,
+        SignInDestination.route to SignInDestination,
     )
 
 // Before Implementation:
@@ -382,6 +391,16 @@ fun DruidNetNavHost(
             GlossaryScreen(
                 glossaryTxt = viewModel.getGlossaryText(),
                 scrollState = scrollStateGlossary,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            )
+        }
+        composable(route = SignInDestination.route) {
+            val authViewModel: AuthViewModel = hiltViewModel()
+            SignInScreen(
+                viewModel = authViewModel,
+                navigateBack = { navController.navigateUp() },
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
