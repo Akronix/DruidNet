@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -88,12 +90,18 @@ class AuthViewModel @Inject constructor(
                         successMessage = "¡Código de acceso enviado a $email!"
                     )
                 }
-            } catch (e: Exception) {
+            } catch (e: AuthRestException) {
+                Log.e("AuthViewModel", "Código de error: ${e.errorCode}" )
                 Log.e("AuthViewModel", "Error al enviar el código OTP: $e" )
+                val errorMessage = if (e.errorCode == AuthErrorCode.SignupDisabled) {
+                    "Sólo puedes entrar en la red de druidas con invitación";
+                } else {
+                    e.localizedMessage ?: "Error indefinido al enviar el código OTP."
+                }
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.localizedMessage ?: "Error al enviar el código OTP."
+                        errorMessage = errorMessage
                     )
                 }
             }
