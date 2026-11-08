@@ -1,5 +1,7 @@
 package org.druidanet.druidnet.ui.auth
 
+import org.druidanet.druidnet.R
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,6 +25,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,28 +45,28 @@ fun SignInScreen(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Autenticación Supabase",
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Acceso sin contraseña mediante código OTP por correo electrónico",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(32.dp))
+
+            if (!uiState.successMessage.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = uiState.successMessage!!,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             if (uiState.isLoggedIn) {
                 Text(
-                    text = "¡Sesión iniciada!",
+                    text = "¡Estás dentro!",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -87,6 +93,29 @@ fun SignInScreen(
             } else {
                 when (uiState.step) {
                     SignInStep.EMAIL_INPUT -> {
+                        Text(
+                            text = "Entra en la comunidad de los druidas",
+                            style = MaterialTheme.typography.headlineMedium,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Introduce tu correo electrónico para recibir el código de acceso",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Featured Image
+                        Image(
+                            painter = painterResource(R.drawable.druids),
+                            contentDescription = "Ilustración de un druida y una druidesa",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
                         OutlinedTextField(
                             value = uiState.email,
                             onValueChange = { viewModel.onEmailChanged(it) },
@@ -104,13 +133,21 @@ fun SignInScreen(
                             if (uiState.isLoading) {
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                             } else {
-                                Text("Enviar código OTP")
+                                Text("Solicitar código")
                             }
                         }
                     }
                     SignInStep.OTP_INPUT -> {
+                        Image(
+                            painter = painterResource(R.drawable.introduce_otp_code),
+                            contentDescription = "Ilustración de un druida escribiendo un cód´digo",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Introduce el código de 6 dígitos enviado a\n${uiState.email}",
+                            text = "Introduce el código secreto de 6 dígitos enviado a\n${uiState.email}",
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
@@ -118,7 +155,7 @@ fun SignInScreen(
                         OutlinedTextField(
                             value = uiState.otpCode,
                             onValueChange = { viewModel.onOtpChanged(it) },
-                            label = { Text("Código OTP") },
+                            label = { Text("Código numérico") },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -147,17 +184,7 @@ fun SignInScreen(
                     Text(
                         text = uiState.errorMessage!!,
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                if (!uiState.successMessage.isNullOrEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = uiState.successMessage!!,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center
                     )
                 }
