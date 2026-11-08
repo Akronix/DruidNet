@@ -57,4 +57,6 @@
     <string name="section_description">descripción</string>
     <string name="section_usages">usos</string>
     <string name="title_screen_signin">Tu cuenta</string>
+    <string name="testimonials_plantsheet_bottombar">Testimonios</string>
+    <string name="section_testimonials">Testimonios</string>
 </resources>

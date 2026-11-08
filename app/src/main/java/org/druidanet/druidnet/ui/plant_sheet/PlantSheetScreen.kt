@@ -93,7 +93,8 @@ import java.util.Locale.getDefault
 enum class PlantSheetSection(@StringRes val labelResId: Int) {
     DESCRIPTION(R.string.section_description),
     USAGES(R.string.section_usages),
-    CONFUSIONS(R.string.section_confusions)
+    CONFUSIONS(R.string.section_confusions),
+    TESTIMONIALS(R.string.section_testimonials)
 }
 
 val DEFAULT_SECTION = PlantSheetSection.DESCRIPTION
@@ -381,6 +382,9 @@ fun PlantSheetBody(
                     plant = plant,
                     modifier = modifier.verticalScroll(rememberScrollState())
                 )
+
+            PlantSheetSection.TESTIMONIALS ->
+                Box(modifier = modifier) {}
         }
     }
 }

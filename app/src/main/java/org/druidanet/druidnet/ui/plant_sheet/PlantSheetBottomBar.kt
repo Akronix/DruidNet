@@ -18,7 +18,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import org.druidanet.druidnet.R
+import org.druidanet.druidnet.ui.theme.DruidNetTheme
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -54,6 +56,14 @@ fun PlantSheetBottomBar(
                         resText = stringResource(R.string.usages_plantsheet_bottombar),
                         onClick = onClickBottomNavItem(PlantSheetSection.USAGES),
                         selected = currentSection == PlantSheetSection.USAGES
+                    )
+
+                    SectionButton(
+                        rowScope = this,
+                        resImg = R.drawable.testimonials,
+                        resText = stringResource(R.string.testimonials_plantsheet_bottombar),
+                        onClick = onClickBottomNavItem(PlantSheetSection.TESTIMONIALS),
+                        selected = currentSection == PlantSheetSection.TESTIMONIALS
                     )
                 }
             )
@@ -123,28 +133,15 @@ fun SectionBadgedButton(rowScope: RowScope,
     )
 }
 
-/**
- * Composable that displays what the UI of the app looks like in light theme in the design tab.
- */
-//@Preview(showBackground = true)
-//@Composable
-//fun PlantSheetBottomBarPreview() {
-//    val samplePlant = PlantsDataSource.loadPlants()[0]
-//
-//    DruidNetTheme {
-//        Scaffold(
-//            bottomBar = PlantSheetBottomBar(
-//                onClickBottomNavItem = { _ -> { } },
-//                currentSection = PlantSheetSection.USAGES,
-//                hasConfusions = samplePlant.confusions.isNotEmpty()
-//            ),
-//        ) {
-//            PlantSheetBody(
-//                plant = samplePlant,
-//                currentSection = PlantSheetSection.USAGES,
-//                onChangeSection = { { } },
-//                modifier = Modifier.padding(it),
-//            )
-//        }
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun PlantSheetBottomBarPreview() {
+    DruidNetTheme {
+        val bottomBarContent = PlantSheetBottomBar(
+            onClickBottomNavItem = { _ -> {} },
+            currentSection = PlantSheetSection.TESTIMONIALS,
+            hasConfusions = true
+        )
+        bottomBarContent()
+    }
+}
