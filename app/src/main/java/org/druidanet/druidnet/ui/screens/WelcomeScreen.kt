@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import org.druidanet.druidnet.R
 import org.druidanet.druidnet.navigation.AboutDestination
 import org.druidanet.druidnet.navigation.CameraDestination
@@ -43,11 +44,22 @@ import org.druidanet.druidnet.navigation.ProfileDestination
 import org.druidanet.druidnet.navigation.RecommendationsDestination
 import org.druidanet.druidnet.navigation.SearchDestination
 import org.druidanet.druidnet.navigation.SignInDestination
+import org.druidanet.druidnet.ui.DruidNetViewModel
 import org.druidanet.druidnet.ui.theme.DruidNetTheme
+import androidx.compose.runtime.collectAsState
 
 @Composable
-fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
+fun WelcomeScreen(
+    viewModel: DruidNetViewModel = hiltViewModel(),
+    onNavigationButtonClick: (NavigationDestination) -> Unit,
                    modifier: Modifier) {
+
+    val profileLink = if (viewModel.uiState.collectAsState().value.isUserLoggedIn)
+        ProfileDestination
+    else
+        SignInDestination
+
+
     Box(
         modifier = modifier
     ) {
@@ -79,7 +91,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(48.dp)
-                        .clickable { onNavigationButtonClick(ProfileDestination) }
+                        .clickable { onNavigationButtonClick(profileLink) }
                 ) {
                     Icon(
                         painterResource(R.drawable.user_signin),

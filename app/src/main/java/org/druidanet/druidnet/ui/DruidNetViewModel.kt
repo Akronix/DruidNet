@@ -6,6 +6,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -60,14 +61,14 @@ class DruidNetViewModel @Inject constructor(
     private val plantsRepository: PlantsRepository,
     private val documentsRepository: DocumentsRepository,
     private val appDatabase: AppDatabase,
-    private val workManagerRepository: WorkManagerRepository
+    private val workManagerRepository: WorkManagerRepository,
+    private val auth: Auth
 ) : ViewModel() {
 
     /****** STATE VARIABLES *****/
 
     private val _uiState = MutableStateFlow(DruidNetUiState())
     val uiState: StateFlow<DruidNetUiState> = _uiState.asStateFlow()
-
 
     private val _searchUsesQuery = MutableStateFlow("")
     val searchUsesQuery: StateFlow<String> = _searchUsesQuery.asStateFlow()
@@ -123,6 +124,14 @@ class DruidNetViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+
+            // Check if there's a logged user
+            _uiState.update {
+                it.copy(
+                    isUserLoggedIn = auth.currentSessionOrNull() != null
+                )
+            }
+
             workManagerRepository.databaseUpdateWorkInfo.asFlow().collect { workInfos ->
                 // For unique work, the list should contain one WorkInfo instance, or be empty.
                 val workInfo = workInfos.firstOrNull()
@@ -289,16 +298,16 @@ class DruidNetViewModel @Inject constructor(
 
     fun getGlossaryText(): String =
         documentsRepository.getGlossaryMd()
-/*
-    fun searchUses(searchQuery: String) : Flow<List<PlantUseCard>> {
-        return if (searchQuery.isNotEmpty()) plantsRepository.searchPlantsByUse(
-            searchText = searchQuery,
-            originalListPlants = allPlantsFlow
-        ) else {
-            flowOf(emptyList())
+    /*
+        fun searchUses(searchQuery: String) : Flow<List<PlantUseCard>> {
+            return if (searchQuery.isNotEmpty()) plantsRepository.searchPlantsByUse(
+                searchText = searchQuery,
+                originalListPlants = allPlantsFlow
+            ) else {
+                flowOf(emptyList())
+            }
         }
-    }
-*/
+    */
     /*
     fun onSearchQueryChanged(query: String) {
         _searchText.value = query

@@ -30,10 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.druidanet.druidnet.navigation.NavigationDestination
+import org.druidanet.druidnet.navigation.ProfileDestination
 
 @Composable
 fun SignInScreen(
     viewModel: AuthViewModel,
+    onNavigationButtonClick: (NavigationDestination) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -75,6 +78,13 @@ fun SignInScreen(
                     text = "Correo: ${uiState.currentUserEmail ?: uiState.email}",
                     style = MaterialTheme.typography.bodyLarge
                 )
+                Button(
+                    onClick = { onNavigationButtonClick(ProfileDestination) },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Ir a mi perfil")
+                }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { viewModel.signOut() },

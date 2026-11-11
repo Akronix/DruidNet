@@ -407,6 +407,9 @@ fun DruidNetNavHost(
         composable(route = SignInDestination.route) {
             val authViewModel: AuthViewModel = hiltViewModel()
             SignInScreen(
+                onNavigationButtonClick = { navigationDestination: NavigationDestination ->
+                    navController.navigate(navigationDestination.route)
+                },
                 viewModel = authViewModel,
                 navigateBack = { navController.navigateUp() },
                 modifier = Modifier
