@@ -32,7 +32,7 @@ fun ProfileScreen(
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         if (uiState.isLoading) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
+            CircularProgressIndicator()
         } else if (uiState.profile != null) {
             val profile: Profile = uiState.profile!!
 
