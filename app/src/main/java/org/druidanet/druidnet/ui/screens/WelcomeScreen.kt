@@ -39,6 +39,7 @@ import org.druidanet.druidnet.navigation.CameraDestination
 import org.druidanet.druidnet.navigation.CatalogDestination
 import org.druidanet.druidnet.navigation.GlossaryDestination
 import org.druidanet.druidnet.navigation.NavigationDestination
+import org.druidanet.druidnet.navigation.ProfileDestination
 import org.druidanet.druidnet.navigation.RecommendationsDestination
 import org.druidanet.druidnet.navigation.SearchDestination
 import org.druidanet.druidnet.navigation.SignInDestination
@@ -78,7 +79,7 @@ fun WelcomeScreen(onNavigationButtonClick: (NavigationDestination) -> Unit,
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(48.dp)
-                        .clickable { onNavigationButtonClick(SignInDestination) }
+                        .clickable { onNavigationButtonClick(ProfileDestination) }
                 ) {
                     Icon(
                         painterResource(R.drawable.user_signin),

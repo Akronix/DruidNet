@@ -36,6 +36,7 @@ import org.druidanet.druidnet.ui.screens.CatalogScreen
 import org.druidanet.druidnet.ui.screens.CreditsScreen
 import org.druidanet.druidnet.ui.screens.GlossaryScreen
 import org.druidanet.druidnet.ui.screens.ImageFullScreen
+import org.druidanet.druidnet.ui.screens.ProfileScreen
 import org.druidanet.druidnet.ui.screens.RecomendationsScreen
 import org.druidanet.druidnet.ui.screens.SearchScreen
 import org.druidanet.druidnet.ui.screens.WelcomeScreen
@@ -110,6 +111,12 @@ object SignInDestination : NavigationDestination() {
 }
 
 @Serializable
+object ProfileDestination : NavigationDestination() {
+    override val route = "profile"
+    override val title = R.string.title_screen_profile
+}
+
+@Serializable
 object PlantSheetDestination : NavigationDestination() {
     override val route = "plant_sheet"
     override val title = R.string.title_screen_plant_sheet
@@ -160,6 +167,7 @@ val screensByRoute : Map<String, NavigationDestination> =
         FullScreenDestination.routeWithArgs to FullScreenDestination,
         BibliographyDestination.routeWithArgs to BibliographyDestination,
         SignInDestination.route to SignInDestination,
+        ProfileDestination.route to ProfileDestination
     )
 
 // Before Implementation:
@@ -401,6 +409,19 @@ fun DruidNetNavHost(
             SignInScreen(
                 viewModel = authViewModel,
                 navigateBack = { navController.navigateUp() },
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            )
+        }
+        composable(route = ProfileDestination.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://druidnet.app/plant_sheet/{plantLatinName}"
+                }
+            )
+        ) {
+            ProfileScreen(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
