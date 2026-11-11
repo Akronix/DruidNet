@@ -45,7 +45,12 @@ class ProfileViewModel @Inject constructor(
 
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val user = supabase.auth.currentSessionOrNull()?.user ?: return@launch
+                val user = supabase.auth.currentSessionOrNull()?.user
+
+                if (user == null) {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = "No active session found") }
+                    return@launch
+                }
 
                 Log.i("ProfileViewModel", "User: $user")
 
