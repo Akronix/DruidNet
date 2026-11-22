@@ -326,7 +326,7 @@ fun CreditsPreview() {
 <br/>
  
 # Datos de plantas
-**Diversos autores**; [escribir un e-mail al equipo de DruidNet](mailto:druidnetbeta@gmail.com?subject=DruidNetApp:%20Autoría%20Plantas)
+**Diversos autores**; [escribir un e-mail al equipo de DruidNet](mailto:druidnetapp@gmail.com?subject=DruidNetApp:%20Autoría%20Plantas)
  
 <br/>
  

@@ -301,7 +301,7 @@ fun NoPlantFound(
                     modifier = Modifier
                         .padding(20.dp))
                 {
-                    Markdown("¿Te gustaría contribuir a que _${plantLatinName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetbeta@gmail.com) \uD83D\uDD4A\uFE0F",
+                    Markdown("¿Te gustaría contribuir a que _${plantLatinName}_ esté en DruidNet?\n\n\n[Envíanos una lechuza mensajera](mailto:druidnetapp@gmail.com) \uD83D\uDD4A\uFE0F",
                         modifier = Modifier,
                         typography = markdownTypography(
                             paragraph =

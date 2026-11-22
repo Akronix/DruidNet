@@ -236,7 +236,7 @@ fun NoPlantsScreen(modifier: Modifier) {
             .padding(dimensionResource(R.dimen.padding_large))) {
             Markdown(
                 "Aún no tenemos ninguna planta que coincida con tu búsqueda.\n\n" +
-                        "¿Echas algo de menos? [Envíanos un mensaje](mailto:druidnetbeta@gmail.com)"
+                        "¿Echas algo de menos? [Envíanos un mensaje](mailto:druidnetapp@gmail.com)"
             )
         }
     }
