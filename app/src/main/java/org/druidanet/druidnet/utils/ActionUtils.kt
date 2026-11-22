@@ -11,7 +11,7 @@ fun sendEmailAction(context: Context, subject: String = "DruidNetApp: ", txt: St
 
     val intent = Intent(Intent.ACTION_SENDTO).apply {
         data = "mailto:".toUri()
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetbeta@gmail.com")) // recipients
+        putExtra(Intent.EXTRA_EMAIL, arrayOf("druidnetapp@gmail.com")) // recipients
         putExtra(Intent.EXTRA_SUBJECT, subject)
         putExtra(Intent.EXTRA_TEXT, txt)
     }
